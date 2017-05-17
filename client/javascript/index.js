@@ -1,9 +1,3 @@
-
-/* ////////// TODOs /////////
- 1. Resize canvas if screen resizes.
- */ // ////// TODOs //////////
-
-
 // canvas
 const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
