@@ -1,0 +1,39 @@
+/* Specific to our game */
+
+#toasts {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+.toast {
+  background-color: #FFF;
+  padding: 5px;
+  margin: 8px;
+}
+.toast__close {
+  float: right;
+  cursor: pointer;
+  font-weight: bold;
+}
+.toast__close:hover {
+  color: red;
+}
+.toast__title {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.toast__message {
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+@keyframes toastClosing {
+    from { opacity: 100% }
+    to { opacity: 0 }
+}
+.toast.closing {
+    position: relative;
+    animation-name: toastClosing;
+    animation-duration: 2.5s;
+}

@@ -4,8 +4,15 @@
   "description": "Multiplayer game server",
   "main": "app.js",
   "scripts": {
+    "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "James Marks",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "eslint-plugin-react": "^7.0.1",
+    "express": "^4.15.2",
+    "random-token": "^0.0.8",
+    "ws": "^2.3.1"
+  }
 }
