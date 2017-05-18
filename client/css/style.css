@@ -1,7 +1,16 @@
 /* Generic Style Sheet for whole site */
 
-document, body {
-  margin: 0; padding: 0;
+html, body {
+  margin: 0; 
+  padding: 0;
   overflow: hidden;
+  height: 100%;
+  width: 100%;
   font-family: Arial, sans-serif;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
 }

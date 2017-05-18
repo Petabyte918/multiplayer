@@ -19,7 +19,7 @@ const MSG_TYPE_PORT = 'PORT';
 // Helpers & Abstractions
 const log = console.log;
 
-const authenticate = function (authString) { // TODO: add function name and explain why!
+const authenticate = function authenticate(authString) { // TODO: add function name and explain why!
   // TODO: Faking user authentication. Need the real thing.
   const [user, passHash] = authString.split(':');
 
@@ -53,7 +53,7 @@ const initiateClient = (socket) => {
   socket.send(JSON.stringify({ type: MSG_TYPE_WHO }));
 };
 
-const clientMessage = function (incoming = '{}') {
+const clientMessage = function clientMessage(incoming = '{}') {
   const message = JSON.parse(incoming);
 
   switch (message.type) {
@@ -64,7 +64,7 @@ const clientMessage = function (incoming = '{}') {
             type: MSG_TYPE_AUTHENTICATION,
             success: true,
             token: this.token,
-          }),
+          })
         );
       } else {
         this.socket.send(
@@ -72,7 +72,7 @@ const clientMessage = function (incoming = '{}') {
             type: MSG_TYPE_AUTHENTICATION,
             success: false,
             errorMessage: 'Authentication failed.',
-          }),
+          })
         );
       }
       break;
@@ -88,7 +88,7 @@ const clientMessage = function (incoming = '{}') {
           success: true,
           tileMap: level.tileMap,
           sprites: level.sprites,
-        }),
+        })
       );
       break;
     default:

@@ -1,17 +1,28 @@
-// canvas
-const canvas = document.querySelector('#canvas');
-const ctx = canvas.getContext('2d');
+// tile canvas
+const canvasTiles = document.querySelector('#tileCanvas');
+const ctxTiles = canvasTiles.getContext('2d');
+// sprite canvas
+// UI canvas / div ---- // TODO???
+// Cursor canvas
+const canvasCursor = document.querySelector('#cursorCanvas');
+const ctxCursor = canvasCursor.getContext('2d');
+
 
 // Message Types
 const MSG_TYPE_WHO = 'WHO';
 const MSG_TYPE_AUTHENTICATION = 'AUTHENTICATION';
 const MSG_TYPE_PORT = 'PORT';
 
+// Modes
+const MODE_PLAY = 'PLAY';
+const MODE_EDIT = 'EDIT';
+
 // Application globals
 const client = {
   token: undefined,
 };
 const TILE_SCALE = 32;
+const currentMode = MODE_EDIT;
 
 // Tile Types
 const TileType = {
@@ -34,8 +45,10 @@ ColorMap.set(TileType.PIT, 'black');
 ColorMap.set(TileType.BRIDGE, '#7c4b2e');
 ColorMap.set(SpriteType.CHEST, '#d8c741');
 
+const SpriteMap = new Map();
+SpriteMap.set(SpriteType.CHEST, './images/ChestClosed.png');
+
 const ImageMap = new Map();
-ImageMap.set(SpriteType.CHEST, './images/ChestClosed.png');
 
 // level map
 let levelMap = [];
@@ -53,7 +66,7 @@ function startSocketClient() {
   const sock = client.socket || new WebSocket('ws://localhost:8080/');
   client.socket = sock;
 
-  sock.onmessage = function (event) {
+  sock.onmessage = function onmessage(event) {
     const message = JSON.parse(event.data);
 
     switch (message.type) {
@@ -82,10 +95,10 @@ function startSocketClient() {
     }
   };
 
-  sock.onclose = function (something) {
+  sock.onclose = function onclose(something) {
     console.log('Something -> ', something);
   };
-  sock.onerror = function (something) {
+  sock.onerror = function onerror(something) {
     console.log('Some Error -> ', something);
   };
 }
@@ -100,9 +113,10 @@ function LoginSucceeded(token = undefined) {
 }
 
 function LoginFailed(error = 'not defined') {
-  alert('YOU FAILED!!!');
-  alert("PS. Who doesn't hate alerts?");
-  alert('Oh and the error was: ', error);
+  /* eslint-disable no-alert */
+  toast('YOU FAILED!!!');
+  toast("PS. Who doesn't hate alerts?");
+  toast('Oh and the error was: ', error);
 }
 
 function toast(title = 'Toast', message) {
@@ -119,7 +133,7 @@ function toast(title = 'Toast', message) {
 
   tTitle.textContent = title;
   tMessage.textContent = message;
-  tClose.addEventListener('click', (e) => {
+  tClose.addEventListener('click', () => {
     toastDiv.classList.add('closing');
     setTimeout(() => {
       toastDiv.parentElement.removeChild(toastDiv);
@@ -129,42 +143,45 @@ function toast(title = 'Toast', message) {
   document.querySelector('#toasts').appendChild(toastDiv);
 }
 
-
 // Set up canvas: (Note: may need to use this later to reinit when screen size changes.)
 function initCanvas() {
-  canvas.width = screen.availWidth;
-  canvas.height = screen.availHeight;
-
+  handleResize();
   if (levelMap.length > 0) drawCanvas(); // TODO: Put this in a timed loop?
+}
+
+function handleResize() {
+  canvasCursor.width = canvasTiles.width = document.body.offsetWidth;
+  canvasCursor.height = canvasTiles.height = document.body.offsetHeight;
+  drawCanvas();
 }
 
 // Draw canvas
 function drawCanvas() {
-  ctx.fillStyle = 'black';
+  ctxTiles.fillStyle = 'black';
   // clear bg
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctxTiles.fillRect(0, 0, canvasTiles.width, canvasTiles.height);
 
   // drawbackground tiles
-  for (let r = 0; r < levelMap.length; r++) {
+  for (let r = 0; r < levelMap.length; r += 1) {
     const row = levelMap[r];
-    for (let c = 0; c < row.length; c++) {
+    for (let c = 0; c < row.length; c += 1) {
       const cell = row[c];
-      ctx.fillStyle = ColorMap.get(cell);
-      ctx.fillRect(c * TILE_SCALE, r * TILE_SCALE, TILE_SCALE, TILE_SCALE);
+      ctxTiles.fillStyle = ColorMap.get(cell);
+      ctxTiles.fillRect(c * TILE_SCALE, r * TILE_SCALE, TILE_SCALE, TILE_SCALE);
     }
   }
 
   // draw sprites
-  for (const sprite of sprites) {
+  sprites.forEach((sprite) => {
     const color = sprite.color || ColorMap.get(sprite.type) || '#FFFFFF';
     /* eslint-disable no-undef */
     if (sprite instanceof PlayerCharacter) {
     /* eslint-enable no-undef */
       drawCircle(sprite.x, sprite.y, (TILE_SCALE / 2) - 2, color);
     } else {
-      drawSprite(sprite.x, sprite.y, ImageMap.get(sprite.type));
+      drawSprite(sprite.x, sprite.y, SpriteMap.get(sprite.type));
     }
-  }
+  });
 
   // TODO: draw HUD
 }
@@ -174,32 +191,34 @@ const drawCircle = function drawCircle(x, y, radius = TILE_SCALE, fill = '#FFFFF
   const centerX = (x * TILE_SCALE) + (TILE_SCALE / 2);
   const centerY = (y * TILE_SCALE) + (TILE_SCALE / 2);
 
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-  ctx.fillStyle = fill;
-  ctx.fill();
-  ctx.lineWidth = 1;
-  ctx.strokeStyle = strokeColor;
-  ctx.stroke();
+  ctxTiles.beginPath();
+  ctxTiles.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+  ctxTiles.fillStyle = fill;
+  ctxTiles.fill();
+  ctxTiles.lineWidth = 1;
+  ctxTiles.strokeStyle = strokeColor;
+  ctxTiles.stroke();
 };
 
 const drawSprite = function drawSprite(x, y, imageSource) {
-  const imgElement = document.querySelector('#image-loader');
-  if (imgElement.src !== imageSource) {
-    console.log(imgElement.src, imageSource);
+  // const imgElement = document.querySelector('#image-loader');
+
+  let imgElement = ImageMap.get(imageSource);
+
+  if (!imgElement) {
+    imgElement = new Image();
     imgElement.src = imageSource;
     const onImageLoad = () => {
-      console.log('Loaded image', imgElement instanceof HTMLImageElement);
-      ctx.drawImage(imgElement, x * TILE_SCALE, y * TILE_SCALE);
+      ctxTiles.drawImage(imgElement, x * TILE_SCALE, y * TILE_SCALE);
+      ImageMap.set(imageSource, imgElement);
       imgElement.removeEventListener('load', onImageLoad);
     };
+    // TODO: handle errors where images are not found.
     imgElement.addEventListener('load', onImageLoad);
   } else {
-    ctx.drawImage(imgElement, x * TILE_SCALE, y * TILE_SCALE);
+    ctxTiles.drawImage(imgElement, x * TILE_SCALE, y * TILE_SCALE);
   }
 };
-
-
 
 // Low Level Event Handlers
 function keyDown(e) {
@@ -234,11 +253,73 @@ function keyDown(e) {
   }
 }
 function mouseMove(e) {
+  canvasCursor.focusedTileCoords = {
+    tx: Math.floor(e.clientX / TILE_SCALE),
+    ty: Math.floor(e.clientY / TILE_SCALE)
+  };
+
+  clearCursors();
+  drawCursors();
 }
 function docClick(e) {
   console.log('clicking!!!!');
   // target
-  // const target = e.target;
+  // const target = e.target; // TODO: determine why events are not bubbling/capturing
+  // TODO: getTileAt();
+  canvasCursor.selectedTileCoords = getCanvasCoords({ x: e.clientX, y: e.clientY });
+  updateCursors();
+}
+
+function getCanvasCoords(info) {
+  return {
+    tx: Math.floor(info.x / TILE_SCALE),
+    ty: Math.floor(info.y / TILE_SCALE),
+  };
+}
+
+function clearCursors() {
+  ctxCursor.clearRect(0, 0, canvasCursor.width, canvasCursor.height);
+}
+
+function updateCursors() {
+  clearCursors();
+  drawCursors();
+}
+
+function drawCursors() {
+  const cursors = [
+    {
+      type: 'FOCUSED',
+      source: './images/SelectionCursorFocused.png',
+      tx: (canvasCursor.focusedTileCoords && canvasCursor.focusedTileCoords.tx) || null,
+      ty: (canvasCursor.focusedTileCoords && canvasCursor.focusedTileCoords.ty) || null
+    },
+    {
+      type: 'SELECTED',
+      source: './images/SelectionCursorSelected.png',
+      tx: (canvasCursor.selectedTileCoords && canvasCursor.selectedTileCoords.tx) || null,
+      ty: (canvasCursor.selectedTileCoords && canvasCursor.selectedTileCoords.ty) || null
+    },
+  ];
+  cursors.forEach((cursor) => {
+    console.log(cursor.type, cursor.tx, cursor.ty);
+    if (cursor.tx === null || cursor.ty === null) return;
+    const cursorSource = cursor.source;
+    let cursorElement = ImageMap.get(cursorSource);
+    if (!cursorElement) {
+      cursorElement = new Image();
+      cursorElement.src = cursorSource;
+      const onImageLoad = () => {
+        ctxCursor.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);
+        ImageMap.set(cursorSource, cursorElement);
+        cursorElement.removeEventListener('load', onImageLoad);
+      };
+      // TODO: handle errors where images are not found.
+      cursorElement.addEventListener('load', onImageLoad);
+    } else {
+      ctxCursor.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);
+    }
+  });
 }
 
 // Event Handler Abstractions
@@ -290,6 +371,7 @@ function initEventHandlers() {
   document.addEventListener('keydown', keyDown);
   document.addEventListener('mousemove', mouseMove);
   document.addEventListener('click', docClick); // TODO: handle different clicks for different targets.
+  window.onresize = handleResize;
 }
 
 
