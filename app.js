@@ -50,7 +50,14 @@ const initiateClient = (socket) => {
   // socket.on('close', clientClose);
   // socket.on('error', clientError);
 
-  socket.send(JSON.stringify({ type: MSG_TYPE_WHO }));
+  sendPackage(socket, MSG_TYPE_WHO);
+};
+
+const sendPackage = function sendPackage(socket, type = null, attributes = {}) {
+  if (socket === null) throw new Error('Socket must be specified.'); // TODO: instanceof what?
+  if (type === null) throw new Error('Package type must be specified.');
+
+  socket.send(JSON.stringify(Object.assign({ type }, attributes)));
 };
 
 const clientMessage = function clientMessage(incoming = '{}') {
@@ -59,36 +66,29 @@ const clientMessage = function clientMessage(incoming = '{}') {
   switch (message.type) {
     case MSG_TYPE_WHO:
       if (authenticate(message.who)) {
-        this.socket.send(
-          JSON.stringify({
-            type: MSG_TYPE_AUTHENTICATION,
-            success: true,
-            token: this.token,
-          })
+        sendPackage(
+          this.socket,
+          MSG_TYPE_AUTHENTICATION,
+          { success: true, token: this.token }
         );
       } else {
-        this.socket.send(
-          JSON.stringify({
-            type: MSG_TYPE_AUTHENTICATION,
-            success: false,
-            errorMessage: 'Authentication failed.',
-          })
+        sendPackage(
+          this.socket,
+          MSG_TYPE_AUTHENTICATION,
+          { success: false, errorMessage: 'Authentication failed.' }
         );
       }
       break;
     case MSG_TYPE_PORT: // eslint-disable-line
       console.log('PORTED');
-      // message: { levelId }
+      // incoming -> message: { levelId }
       const level = new Level(message.levelId);
       // TODO: Will need to check whether player is "allowed" to port here.
       //  For example, are they currently near a portal to this area?
-      this.socket.send(
-        JSON.stringify({
-          type: MSG_TYPE_PORT,
-          success: true,
-          tileMap: level.tileMap,
-          sprites: level.sprites,
-        })
+      sendPackage(
+        this.socket,
+        MSG_TYPE_PORT,
+        { success: true, level }
       );
       break;
     default:

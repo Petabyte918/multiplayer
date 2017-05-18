@@ -1,11 +1,13 @@
 // tile canvas
-const canvasTiles = document.querySelector('#tileCanvas');
-const ctxTiles = canvasTiles.getContext('2d');
+const tileCanvas = document.querySelector('#tileCanvas');
+const tileContext = tileCanvas.getContext('2d');
 // sprite canvas
+const spriteCanvas = document.querySelector('#spriteCanvas');
+const spriteContext = spriteCanvas.getContext('2d');
 // UI canvas / div ---- // TODO???
 // Cursor canvas
-const canvasCursor = document.querySelector('#cursorCanvas');
-const ctxCursor = canvasCursor.getContext('2d');
+const cursorCanvas = document.querySelector('#cursorCanvas');
+const cursorContext = cursorCanvas.getContext('2d');
 
 
 // Message Types
@@ -22,7 +24,7 @@ const client = {
   token: undefined,
 };
 const TILE_SCALE = 32;
-const currentMode = MODE_EDIT;
+const gameMode = MODE_PLAY;
 
 // Tile Types
 const TileType = {
@@ -35,6 +37,7 @@ const TileType = {
 };
 const SpriteType = {
   CHEST: 'Chest',
+  FIREBALL: 'Fireball'
 };
 const ColorMap = new Map();
 ColorMap.set(TileType.DIRT, '#562508');
@@ -47,6 +50,7 @@ ColorMap.set(SpriteType.CHEST, '#d8c741');
 
 const SpriteMap = new Map();
 SpriteMap.set(SpriteType.CHEST, './images/ChestClosed.png');
+SpriteMap.set(SpriteType.FIREBALL, './images/FireballStatic.png');
 
 const ImageMap = new Map();
 
@@ -54,11 +58,10 @@ const ImageMap = new Map();
 let levelMap = [];
 
 /* eslint-disable no-undef */
-const playerCharacter = new PlayerCharacter();
+let playerCharacter = null;
 /* eslint-enable no-undef */
 
 const sprites = [];
-sprites.push(playerCharacter);
 
 // Start socket
 function startSocketClient() {
@@ -71,7 +74,7 @@ function startSocketClient() {
 
     switch (message.type) {
       case MSG_TYPE_WHO:
-        sock.send(JSON.stringify({ type: MSG_TYPE_WHO, who: 'James:df8c8023ae' }));
+        sendPackage(MSG_TYPE_WHO, { who: 'James:df8c8023ae' });
         break;
       case MSG_TYPE_AUTHENTICATION:
         if (message.success === true) {
@@ -83,8 +86,20 @@ function startSocketClient() {
       case MSG_TYPE_PORT:
         console.log('PORTED');
         if (message.success === true) {
-          levelMap = message.tileMap;
-          sprites.push(...message.sprites);
+          levelMap = message.level.tileMap;
+          sprites.push(...message.level.sprites);
+          if (!playerCharacter) {
+            /* eslint-disable no-undef */
+            playerCharacter = new PlayerCharacter(
+              'James',
+              message.level.start.tx,
+              message.level.start.ty
+            );
+            /* eslint-enable no-undef */
+          } else {
+            playerCharacter.setPosition(message.level.start);
+          }
+          sprites.push(playerCharacter);
           // TODO: Can we determine if this is a first load?
           drawCanvas();
         }
@@ -133,11 +148,12 @@ function toast(title = 'Toast', message) {
 
   tTitle.textContent = title;
   tMessage.textContent = message;
-  tClose.addEventListener('click', () => {
+  tClose.addEventListener('click', (e) => {
+    // Start CSS animation. Takes 2.5 seconds.
     toastDiv.classList.add('closing');
-    setTimeout(() => {
-      toastDiv.parentElement.removeChild(toastDiv);
-    }, 2500);
+    // Remove after completely faded out. (2.5 seconds)
+    setTimeout(() => { toastDiv.parentElement.removeChild(toastDiv); }, 2500);
+    e.stopPropagation();
   });
 
   document.querySelector('#toasts').appendChild(toastDiv);
@@ -150,54 +166,71 @@ function initCanvas() {
 }
 
 function handleResize() {
-  canvasCursor.width = canvasTiles.width = document.body.offsetWidth;
-  canvasCursor.height = canvasTiles.height = document.body.offsetHeight;
+  spriteCanvas.width = cursorCanvas.width = tileCanvas.width = document.body.offsetWidth;
+  spriteCanvas.height = cursorCanvas.height = tileCanvas.height = document.body.offsetHeight;
   drawCanvas();
 }
 
 // Draw canvas
 function drawCanvas() {
-  ctxTiles.fillStyle = 'black';
+  tileContext.fillStyle = 'cyan';
   // clear bg
-  ctxTiles.fillRect(0, 0, canvasTiles.width, canvasTiles.height);
+  tileContext.fillRect(0, 0, tileCanvas.width, tileCanvas.height);
 
-  // drawbackground tiles
+  // draw background tiles
+  drawBackground();
+
+  // draw sprites
+  drawSprites();
+
+  // TODO: draw HUD
+}
+
+const drawBackground = function drawBackground() {
+  // TODO: Rewrite using array functions for looping.
   for (let r = 0; r < levelMap.length; r += 1) {
     const row = levelMap[r];
     for (let c = 0; c < row.length; c += 1) {
       const cell = row[c];
-      ctxTiles.fillStyle = ColorMap.get(cell);
-      ctxTiles.fillRect(c * TILE_SCALE, r * TILE_SCALE, TILE_SCALE, TILE_SCALE);
+      tileContext.fillStyle = ColorMap.get(cell);
+      tileContext.fillRect(c * TILE_SCALE, r * TILE_SCALE, TILE_SCALE, TILE_SCALE);
     }
   }
+};
 
-  // draw sprites
+const drawSprites = function drawSprites() {
+  // TODO: Check differences. Only erase previous sprites if they moved and redraw???
+
+  // but for now, lets just clear sprites and redraw
+  spriteContext.clearRect(0, 0, spriteCanvas.width, spriteCanvas.height);
+
   sprites.forEach((sprite) => {
     const color = sprite.color || ColorMap.get(sprite.type) || '#FFFFFF';
+
     /* eslint-disable no-undef */
-    if (sprite instanceof PlayerCharacter) {
+    if (sprite instanceof FireBall) {
+      drawSprite(sprite.x, sprite.y, SpriteMap.get(SpriteType.FIREBALL));
+    } else if (sprite instanceof PlayerCharacter) {
     /* eslint-enable no-undef */
-      drawCircle(sprite.x, sprite.y, (TILE_SCALE / 2) - 2, color);
+      drawCircle(sprite.tx, sprite.ty, (TILE_SCALE / 2) - 2, color);
     } else {
-      drawSprite(sprite.x, sprite.y, SpriteMap.get(sprite.type));
+      drawSprite(sprite.tx * TILE_SCALE, sprite.ty * TILE_SCALE, SpriteMap.get(sprite.type));
     }
   });
-
-  // TODO: draw HUD
-}
+};
 
 // Canvas helper functions
 const drawCircle = function drawCircle(x, y, radius = TILE_SCALE, fill = '#FFFFFF', strokeColor = '#000000') {
   const centerX = (x * TILE_SCALE) + (TILE_SCALE / 2);
   const centerY = (y * TILE_SCALE) + (TILE_SCALE / 2);
 
-  ctxTiles.beginPath();
-  ctxTiles.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-  ctxTiles.fillStyle = fill;
-  ctxTiles.fill();
-  ctxTiles.lineWidth = 1;
-  ctxTiles.strokeStyle = strokeColor;
-  ctxTiles.stroke();
+  tileContext.beginPath();
+  tileContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+  tileContext.fillStyle = fill;
+  tileContext.fill();
+  tileContext.lineWidth = 1;
+  tileContext.strokeStyle = strokeColor;
+  tileContext.stroke();
 };
 
 const drawSprite = function drawSprite(x, y, imageSource) {
@@ -209,14 +242,14 @@ const drawSprite = function drawSprite(x, y, imageSource) {
     imgElement = new Image();
     imgElement.src = imageSource;
     const onImageLoad = () => {
-      ctxTiles.drawImage(imgElement, x * TILE_SCALE, y * TILE_SCALE);
+      spriteContext.drawImage(imgElement, x, y);
       ImageMap.set(imageSource, imgElement);
       imgElement.removeEventListener('load', onImageLoad);
     };
     // TODO: handle errors where images are not found.
     imgElement.addEventListener('load', onImageLoad);
   } else {
-    ctxTiles.drawImage(imgElement, x * TILE_SCALE, y * TILE_SCALE);
+    spriteContext.drawImage(imgElement, x, y);
   }
 };
 
@@ -245,6 +278,9 @@ function keyDown(e) {
       // move down
       tryMovePlayer('DOWN');
       break;
+    case 16:
+      // SHIFT
+      break;
     default:
       // Just in case we want to set up other keys,
       // our console will tell us the key code we need to use.
@@ -252,8 +288,17 @@ function keyDown(e) {
       break;
   }
 }
+function keyUp(e) {
+  switch (e.keyCode) {
+    case 16:
+      // SHIFT
+      break;
+    default:
+      break;
+  }
+}
 function mouseMove(e) {
-  canvasCursor.focusedTileCoords = {
+  cursorCanvas.focusedTileCoords = {
     tx: Math.floor(e.clientX / TILE_SCALE),
     ty: Math.floor(e.clientY / TILE_SCALE)
   };
@@ -262,23 +307,25 @@ function mouseMove(e) {
   drawCursors();
 }
 function docClick(e) {
-  console.log('clicking!!!!');
   // target
   // const target = e.target; // TODO: determine why events are not bubbling/capturing
   // TODO: getTileAt();
-  canvasCursor.selectedTileCoords = getCanvasCoords({ x: e.clientX, y: e.clientY });
+  const fireball = new FireBall({ x: playerCharacter.tx * TILE_SCALE, y: playerCharacter.ty * TILE_SCALE }, { x: e.clientX, y: e.clientY }, 32 * 18);
+  sprites.push(fireball);
+  drawCanvas();
+  cursorCanvas.selectedTileCoords = getCanvasCoords({ x: e.clientX, y: e.clientY });
   updateCursors();
 }
 
 function getCanvasCoords(info) {
   return {
-    tx: Math.floor(info.x / TILE_SCALE),
-    ty: Math.floor(info.y / TILE_SCALE),
+    tx: Math.floor(info.x / TILE_SCALE) || 0,
+    ty: Math.floor(info.y / TILE_SCALE) || 0,
   };
 }
 
 function clearCursors() {
-  ctxCursor.clearRect(0, 0, canvasCursor.width, canvasCursor.height);
+  cursorContext.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
 }
 
 function updateCursors() {
@@ -289,20 +336,21 @@ function updateCursors() {
 function drawCursors() {
   const cursors = [
     {
-      type: 'FOCUSED',
-      source: './images/SelectionCursorFocused.png',
-      tx: (canvasCursor.focusedTileCoords && canvasCursor.focusedTileCoords.tx) || null,
-      ty: (canvasCursor.focusedTileCoords && canvasCursor.focusedTileCoords.ty) || null
-    },
-    {
       type: 'SELECTED',
       source: './images/SelectionCursorSelected.png',
-      tx: (canvasCursor.selectedTileCoords && canvasCursor.selectedTileCoords.tx) || null,
-      ty: (canvasCursor.selectedTileCoords && canvasCursor.selectedTileCoords.ty) || null
+      tx: (cursorCanvas.selectedTileCoords && cursorCanvas.selectedTileCoords.tx) || 0,
+      ty: (cursorCanvas.selectedTileCoords && cursorCanvas.selectedTileCoords.ty) || 0
     },
   ];
+  if (gameMode === MODE_EDIT) {
+    cursors.push({
+      type: 'FOCUSED',
+      source: './images/SelectionCursorFocused.png',
+      tx: (cursorCanvas.focusedTileCoords && cursorCanvas.focusedTileCoords.tx) || 0,
+      ty: (cursorCanvas.focusedTileCoords && cursorCanvas.focusedTileCoords.ty) || 0
+    });
+  }
   cursors.forEach((cursor) => {
-    console.log(cursor.type, cursor.tx, cursor.ty);
     if (cursor.tx === null || cursor.ty === null) return;
     const cursorSource = cursor.source;
     let cursorElement = ImageMap.get(cursorSource);
@@ -310,14 +358,14 @@ function drawCursors() {
       cursorElement = new Image();
       cursorElement.src = cursorSource;
       const onImageLoad = () => {
-        ctxCursor.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);
+        cursorContext.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);
         ImageMap.set(cursorSource, cursorElement);
         cursorElement.removeEventListener('load', onImageLoad);
       };
       // TODO: handle errors where images are not found.
       cursorElement.addEventListener('load', onImageLoad);
     } else {
-      ctxCursor.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);
+      cursorContext.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);
     }
   });
 }
@@ -326,29 +374,29 @@ function drawCursors() {
 const tryMovePlayer = function tryMovePlayer(dir) {
   // TODO: ensure we are allowed to move in the direction we want to before attempting to move.
   const newPosition = {
-    x: playerCharacter.x,
-    y: playerCharacter.y,
+    tx: playerCharacter.tx,
+    ty: playerCharacter.ty,
   };
   switch (dir) {
     case 'LEFT':
-      newPosition.x = playerCharacter.x - 1;
+      newPosition.tx = playerCharacter.tx - 1;
       break;
     case 'RIGHT':
-      newPosition.x = playerCharacter.x + 1;
+      newPosition.tx = playerCharacter.tx + 1;
       break;
     case 'UP':
-      newPosition.y = playerCharacter.y - 1;
+      newPosition.ty = playerCharacter.ty - 1;
       break;
     case 'DOWN':
-      newPosition.y = playerCharacter.y + 1;
+      newPosition.ty = playerCharacter.ty + 1;
       break;
     default:
       console.log('Invalid Direction');
       break;
   }
   if (isWalkable(newPosition)) {
-    playerCharacter.x = newPosition.x;
-    playerCharacter.y = newPosition.y;
+    playerCharacter.tx = newPosition.tx;
+    playerCharacter.ty = newPosition.ty;
   } else {
     // TODO: play "can't walk" sound.
   }
@@ -357,10 +405,12 @@ const tryMovePlayer = function tryMovePlayer(dir) {
 };
 const isWalkable = function isWalkable(tile) {
   // tile should have at minimum: { x , y }
-  if (tile.y < 0 || tile.x < 0) return false;
-  const tileTypeAtPosition = levelMap[tile.y][tile.x];
+  if (tile.ty < 0 || tile.tx < 0) return false;
+
+  const tileTypeAtPosition = levelMap[tile.ty][tile.tx];
+
   if ([TileType.DIRT, TileType.GRASS, TileType.BRIDGE].includes(tileTypeAtPosition)) {
-    if (!sprites.filter(s => s.x === tile.x && s.y === tile.y).length > 0) {
+    if (!sprites.filter(s => s.tx === tile.tx && s.ty === tile.ty).length > 0) {
       return true;
     }
   }
@@ -374,16 +424,35 @@ function initEventHandlers() {
   window.onresize = handleResize;
 }
 
+function updateSprites(delta) {
+  sprites.forEach((sprite) => {
+    if (sprite.update) {
+      sprite.update(delta);
+    }
+  });
+}
 
 // Initiate game
 function startGame() {
   initCanvas();
   initEventHandlers();
-  console.log('Sending a socket event');
-  client.socket.send(JSON.stringify({
-    type: MSG_TYPE_PORT,
-    levelId: 123,
-  }));
+  sendPackage(MSG_TYPE_PORT, { level: 123 });
+  updateLoop();
 }
+
+let loopTime = performance.now();
+function updateLoop(timestamp = performance.now()) {
+  const delta = (timestamp - loopTime) / 1000;
+  loopTime = timestamp;
+  updateSprites(delta);
+  drawCanvas();
+  window.requestAnimationFrame(updateLoop);
+}
+
+const sendPackage = function sendPackage(type = null, attributes = {}) {
+  if (type === null) throw new Error('Package type must be specified.');
+
+  client.socket.send(JSON.stringify(Object.assign({ type }, attributes)));
+};
 
 startSocketClient(); // TODO: Need to monitor and reconnect
