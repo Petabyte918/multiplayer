@@ -15,7 +15,7 @@ function Level(levelId) {
   // TODO: Read level info from level data file
   this.start = {
     tx: 3,
-    ty: 7,
+    ty: 3,
   };
   /* eslint max-len: 0 */
   this.tileMap = [

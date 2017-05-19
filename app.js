@@ -9,7 +9,11 @@ const Client = require('./classes/Client');
 const Level = require('./classes/Level');
 
 // Application Globals
-const clients = {};
+const world = {
+  levels: [],
+  clients: {}
+};
+
 
 // Constants & Enumerations
 const MSG_TYPE_WHO = 'WHO';
@@ -39,11 +43,11 @@ http.createServer(app).listen(5555, () => log('App started.'));
 const initiateClient = (socket) => {
   // Add socket to client list.
   let clientToken = randomToken(16);
-  while (clients.clientToken) {
+  while (world.clients.clientToken) {
     clientToken = randomToken(16);
   }
   const client = new Client(clientToken, socket);
-  clients[clientToken] = client;
+  world.clients[clientToken] = client;
 
   // Define socket behaviors
   socket.on('message', clientMessage.bind(client));
