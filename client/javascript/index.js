@@ -1,3 +1,6 @@
+import FireBall from '../../classes/client/FireBall';
+import PlayerCharacter from '../../classes/shared/PlayerCharacter';
+
 // tile canvas
 const tileCanvas = document.querySelector('#tileCanvas');
 const tileContext = tileCanvas.getContext('2d');
@@ -9,11 +12,9 @@ const spriteContext = spriteCanvas.getContext('2d');
 const cursorCanvas = document.querySelector('#cursorCanvas');
 const cursorContext = cursorCanvas.getContext('2d');
 
+import MessageTypes from '../../classes/MessageTypes';
+import GameSettings from '../../classes/GameSettings';
 
-// Message Types
-const MSG_TYPE_WHO = 'WHO';
-const MSG_TYPE_AUTHENTICATION = 'AUTHENTICATION';
-const MSG_TYPE_PORT = 'PORT';
 
 // Modes
 const MODE_PLAY = 'PLAY';
@@ -23,49 +24,47 @@ const MODE_EDIT = 'EDIT';
 const client = {
   token: undefined,
 };
-const TILE_SCALE = 32;
+const TILE_SCALE = GameSettings.TILE_SCALE;
 const gameMode = MODE_PLAY;
 
 // Tile Types
-const TileType = {
-  DIRT: 'Dirt',
-  GRASS: 'Grass',
-  ROCK: 'Rock',
-  WATER: 'Water',
-  PIT: 'Pit',
-  BRIDGE: 'Bridge',
+const TileTypes = {
+  DIRT: 0,
+  GRASS: 1,
+  ROCK: 2,
+  WATER: 3,
+  PIT: 4,
+  BRIDGE: 5,
 };
-const SpriteType = {
-  CHEST: 'Chest',
-  FIREBALL: 'Fireball'
+const SpriteTypes = {
+  CHEST: 0,
+  FIREBALL: 1,
+  PLAYER: 2,
 };
-const ColorMap = new Map();
-ColorMap.set(TileType.DIRT, '#562508');
-ColorMap.set(TileType.GRASS, 'green');
-ColorMap.set(TileType.ROCK, 'grey');
-ColorMap.set(TileType.WATER, 'blue');
-ColorMap.set(TileType.PIT, 'black');
-ColorMap.set(TileType.BRIDGE, '#7c4b2e');
-ColorMap.set(SpriteType.CHEST, '#d8c741');
+const TileColorMap = new Map();
+TileColorMap.set(TileTypes.DIRT, '#5b2607');
+TileColorMap.set(TileTypes.GRASS, 'green');
+TileColorMap.set(TileTypes.ROCK, 'grey');
+TileColorMap.set(TileTypes.WATER, 'blue');
+TileColorMap.set(TileTypes.PIT, 'black');
+TileColorMap.set(TileTypes.BRIDGE, '#7c4b2e');
 
-const SpriteMap = new Map();
-SpriteMap.set(SpriteType.CHEST, './images/ChestClosed.png');
-SpriteMap.set(SpriteType.FIREBALL, './images/FireballStatic.png');
+const SpriteTextureMap = new Map();
+SpriteTextureMap.set(SpriteTypes.CHEST, './images/ChestClosed.png');
+SpriteTextureMap.set(SpriteTypes.FIREBALL, './images/FireballStatic.png');
+SpriteTextureMap.set(SpriteTypes.PLAYER, './images/PlayerOverhead.png');
 
-const ImageMap = new Map();
+const ImageLoader = new Map();
 
-// level map
-let levelMap = [];
-
-/* eslint-disable no-undef */
 let playerCharacter = null;
-/* eslint-enable no-undef */
 
-const sprites = [];
+// level tiles / objects for map the player is currently on.
+let tileMap = [];
+let sprites = [];
 
 // Start socket
 function startSocketClient() {
-  // TODO: This may cause conflicts if called more than once.
+  // TODO: Does this cause conflicts if called more than once?
   const sock = client.socket || new WebSocket('ws://localhost:8080/');
   client.socket = sock;
 
@@ -73,36 +72,34 @@ function startSocketClient() {
     const message = JSON.parse(event.data);
 
     switch (message.type) {
-      case MSG_TYPE_WHO:
-        sendPackage(MSG_TYPE_WHO, { who: 'James:df8c8023ae' });
+      case MessageTypes.Who:
+        sendPackage(MessageTypes.Who, { who: 'James:df8c8023ae' });
         break;
-      case MSG_TYPE_AUTHENTICATION:
+      case MessageTypes.Authentication:
         if (message.success === true) {
-          LoginSucceeded(message.token);
+          LoginSucceeded(message);
         } else {
           LoginFailed(message.error);
         }
         break;
-      case MSG_TYPE_PORT:
+      case MessageTypes.Port:
         console.log('PORTED');
         if (message.success === true) {
-          levelMap = message.level.tileMap;
+          console.log(message.level);
+          tileMap = message.level.tileMap;
           sprites.push(...message.level.sprites);
-          if (!playerCharacter) {
-            /* eslint-disable no-undef */
-            playerCharacter = new PlayerCharacter(
-              'James',
-              message.level.start.tx,
-              message.level.start.ty
-            );
-            /* eslint-enable no-undef */
-          } else {
-            playerCharacter.setPosition(message.level.start);
-          }
+          
+          playerCharacter.setPosition(message.level.start);
+
           sprites.push(playerCharacter);
           // TODO: Can we determine if this is a first load?
           drawCanvas();
         }
+        break;
+      case MessageTypes.MoveTo:
+        console.log("Attempted to move: ", message);
+        playerCharacter.setPosition(message);
+        drawSprites();
         break;
       default:
         console.log('Message type not recognized: ', event.data);
@@ -119,10 +116,12 @@ function startSocketClient() {
 }
 
 // Pipeline message handlers
-function LoginSucceeded(token = undefined) {
-  if (!token) return;
-  client.token = token; // Save to global for later use.
+function LoginSucceeded(message = {}) {
+  if (!message.token) return;
+  client.token = message.token; // Save to global for later use.
   toast('Welcome', 'Connected to server.');
+
+  playerCharacter = Object.assign(new PlayerCharacter(), JSON.parse(message.playerCharacter));
   // TODO: Show loading message.
   startGame();
 }
@@ -162,7 +161,7 @@ function toast(title = 'Toast', message) {
 // Set up canvas: (Note: may need to use this later to reinit when screen size changes.)
 function initCanvas() {
   handleResize();
-  if (levelMap.length > 0) drawCanvas(); // TODO: Put this in a timed loop?
+  if (tileMap.length > 0) drawCanvas(); // TODO: Put this in a timed loop?
 }
 
 function handleResize() {
@@ -188,11 +187,11 @@ function drawCanvas() {
 
 const drawBackground = function drawBackground() {
   // TODO: Rewrite using array functions for looping.
-  for (let r = 0; r < levelMap.length; r += 1) {
-    const row = levelMap[r];
+  for (let r = 0; r < tileMap.length; r += 1) {
+    const row = tileMap[r];
     for (let c = 0; c < row.length; c += 1) {
       const cell = row[c];
-      tileContext.fillStyle = ColorMap.get(cell);
+      tileContext.fillStyle = TileColorMap.get(cell);
       tileContext.fillRect(c * TILE_SCALE, r * TILE_SCALE, TILE_SCALE, TILE_SCALE);
     }
   }
@@ -205,16 +204,15 @@ const drawSprites = function drawSprites() {
   spriteContext.clearRect(0, 0, spriteCanvas.width, spriteCanvas.height);
 
   sprites.forEach((sprite) => {
-    const color = sprite.color || ColorMap.get(sprite.type) || '#FFFFFF';
+    const color = sprite.color || TileColorMap.get(sprite.type) || '#FFFFFF';
 
-    /* eslint-disable no-undef */
     if (sprite instanceof FireBall) {
-      drawSprite(sprite.x, sprite.y, SpriteMap.get(SpriteType.FIREBALL));
+      drawSprite(sprite.x, sprite.y, SpriteTextureMap.get(SpriteTypes.FIREBALL), sprite.angle);
     } else if (sprite instanceof PlayerCharacter) {
-    /* eslint-enable no-undef */
-      drawCircle(sprite.tx, sprite.ty, (TILE_SCALE / 2) - 2, color);
+      drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(SpriteTypes.PLAYER), sprite.angle || 0);
+      //drawCircle(sprite.tx, sprite.ty, (TILE_SCALE / 2) - 2, color);
     } else {
-      drawSprite(sprite.tx * TILE_SCALE, sprite.ty * TILE_SCALE, SpriteMap.get(sprite.type));
+      drawSprite(sprite.tx * TILE_SCALE, sprite.ty * TILE_SCALE, SpriteTextureMap.get(sprite.type));
     }
   });
 };
@@ -233,68 +231,83 @@ const drawCircle = function drawCircle(x, y, radius = TILE_SCALE, fill = '#FFFFF
   tileContext.stroke();
 };
 
-const drawSprite = function drawSprite(x, y, imageSource) {
+const drawSprite = function drawSprite(x, y, imageSource, angle = null) {
   // const imgElement = document.querySelector('#image-loader');
 
-  let imgElement = ImageMap.get(imageSource);
-
+  let imgElement = ImageLoader.get(imageSource);
+  let rotAngle = 0;
+  if (angle) {
+    rotAngle = angle; // (angle * Math.PI) / 180;
+  }
   if (!imgElement) {
     imgElement = new Image();
     imgElement.src = imageSource;
     const onImageLoad = () => {
-      spriteContext.drawImage(imgElement, x, y);
-      ImageMap.set(imageSource, imgElement);
+      spriteContext.translate(x, y);
+      spriteContext.rotate(rotAngle);
+      spriteContext.drawImage(imgElement, 0, 0);
+      spriteContext.rotate(-rotAngle);
+      spriteContext.translate(-x, -y);
+
+      ImageLoader.set(imageSource, imgElement);
       imgElement.removeEventListener('load', onImageLoad);
     };
     // TODO: handle errors where images are not found.
     imgElement.addEventListener('load', onImageLoad);
   } else {
-    spriteContext.drawImage(imgElement, x, y);
+    spriteContext.translate(x, y);
+    spriteContext.rotate(rotAngle);
+    spriteContext.drawImage(imgElement, 0, 0);
+    spriteContext.rotate(-rotAngle);
+    spriteContext.translate(-x, -y);
   }
 };
 
+function keyPressed(keyName) {
+  if (keyName.indexOf('UNMAPPED') === 0) {
+    const code = parseInt(keyName.split(':')[1], 10);
+    console.log(`Unmapped key pressed: ${code}`);
+  } else {
+    client.socket.send(JSON.stringify({ type: MessageTypes.KeyPressed, action: keyName }));
+  }
+}
+function keyReleased(keyName) {
+  if (keyName.indexOf('UNMAPPED') === 0) {
+    const code = parseInt(keyName.split(':')[1], 10);
+    console.log(`Unmapped key released: ${code}`);
+  } else {
+    client.socket.send(JSON.stringify({ type: MessageTypes.KeyReleased, action: keyName }));
+  }
+}
+
+const keyMap = [
+  { code: 65, action: 'LEFT ' }, // a
+  { code: 65, action: 'LEFT' },
+  { code: 37, action: 'LEFT' }, // left arrow
+  { code: 87, action: 'UP' }, // w
+  { code: 38, action: 'UP' }, // up arrow
+  { code: 68, action: 'RIGHT' }, // d
+  { code: 39, action: 'RIGHT' }, // right arrow
+  { code: 83, action: 'DOWN' }, // s
+  { code: 40, action: 'DOWN' }, // down arrow
+  { code: 16, action: 'SHIFT' },
+];
+
 // Low Level Event Handlers
 function keyDown(e) {
-  // a = 65, w = 87, d = 68, s = 83
-  // left = 37, up = 38, right = 39, down = 40
-  switch (e.keyCode) {
-    case 65:
-    case 37:
-      // move left
-      tryMovePlayer('LEFT');
-      break;
-    case 87:
-    case 38:
-      // move up
-      tryMovePlayer('UP');
-      break;
-    case 68:
-    case 39:
-      // move right
-      tryMovePlayer('RIGHT');
-      break;
-    case 83:
-    case 40:
-      // move down
-      tryMovePlayer('DOWN');
-      break;
-    case 16:
-      // SHIFT
-      break;
-    default:
-      // Just in case we want to set up other keys,
-      // our console will tell us the key code we need to use.
-      console.log(e.keyCode);
-      break;
+  const keyInfo = keyMap.find(k => k.code === e.keyCode);
+  if (keyInfo) {
+    keyPressed(keyInfo.action);
+  } else {
+    keyPressed(`UNMAPPED:${e.keyCode}`);
   }
 }
 function keyUp(e) {
-  switch (e.keyCode) {
-    case 16:
-      // SHIFT
-      break;
-    default:
-      break;
+  const keyInfo = keyMap.find(k => k.code === e.keyCode);
+  if (keyInfo) {
+    keyReleased(keyInfo.action);
+  } else {
+    keyReleased(`UNMAPPED:${e.keyCode}`);
   }
 }
 function mouseMove(e) {
@@ -306,11 +319,19 @@ function mouseMove(e) {
   clearCursors();
   drawCursors();
 }
-function docClick(e) {
-  // target
-  // const target = e.target; // TODO: determine why events are not bubbling/capturing
-  // TODO: getTileAt();
-  const fireball = new FireBall({ x: playerCharacter.tx * TILE_SCALE, y: playerCharacter.ty * TILE_SCALE }, { x: e.clientX, y: e.clientY }, 32 * 18);
+function mouseClick(e) {
+  // fireball is flavor like image and particle systems
+  // fireball should inherit from projectile // projectile manages speed and angle and updates position
+  // projectile should inherit from sprite // sprite is an object with a visual representation that shows up above the tiled map
+  // sprite should inherit from gameobject // Gameobject is something that belongs to a map. It has a position, but does not necessarily have a representation.
+  const fireball = new FireBall(
+    { x: playerCharacter.tx * TILE_SCALE, y: playerCharacter.ty * TILE_SCALE }, // start
+    { x: e.clientX, y: e.clientY }, // aim at
+    32 * 18 // speed
+  );
+  fireball.delete = function deleteFireball() {
+    sprites = sprites.filter(s => s !== this);
+  };
   sprites.push(fireball);
   drawCanvas();
   cursorCanvas.selectedTileCoords = getCanvasCoords({ x: e.clientX, y: e.clientY });
@@ -353,13 +374,13 @@ function drawCursors() {
   cursors.forEach((cursor) => {
     if (cursor.tx === null || cursor.ty === null) return;
     const cursorSource = cursor.source;
-    let cursorElement = ImageMap.get(cursorSource);
+    let cursorElement = ImageLoader.get(cursorSource);
     if (!cursorElement) {
       cursorElement = new Image();
       cursorElement.src = cursorSource;
       const onImageLoad = () => {
         cursorContext.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);
-        ImageMap.set(cursorSource, cursorElement);
+        ImageLoader.set(cursorSource, cursorElement);
         cursorElement.removeEventListener('load', onImageLoad);
       };
       // TODO: handle errors where images are not found.
@@ -407,9 +428,9 @@ const isWalkable = function isWalkable(tile) {
   // tile should have at minimum: { x , y }
   if (tile.ty < 0 || tile.tx < 0) return false;
 
-  const tileTypeAtPosition = levelMap[tile.ty][tile.tx];
+  const tileTypeAtPosition = tileMap[tile.ty][tile.tx];
 
-  if ([TileType.DIRT, TileType.GRASS, TileType.BRIDGE].includes(tileTypeAtPosition)) {
+  if ([TileTypes.DIRT, TileTypes.GRASS, TileTypes.BRIDGE].includes(tileTypeAtPosition)) {
     if (!sprites.filter(s => s.tx === tile.tx && s.ty === tile.ty).length > 0) {
       return true;
     }
@@ -418,12 +439,14 @@ const isWalkable = function isWalkable(tile) {
 };
 
 function initEventHandlers() {
-  document.addEventListener('keydown', keyDown);
+  document.onkeydown = keyDown;
+  document.onkeyup = keyUp;
   document.addEventListener('mousemove', mouseMove);
-  document.addEventListener('click', docClick); // TODO: handle different clicks for different targets.
+  document.addEventListener('click', mouseClick);
   window.onresize = handleResize;
 }
 
+// server side
 function updateSprites(delta) {
   sprites.forEach((sprite) => {
     if (sprite.update) {
@@ -436,7 +459,7 @@ function updateSprites(delta) {
 function startGame() {
   initCanvas();
   initEventHandlers();
-  sendPackage(MSG_TYPE_PORT, { level: 123 });
+  sendPackage(MessageTypes.Port, { levelId: 1 });
   updateLoop();
 }
 
