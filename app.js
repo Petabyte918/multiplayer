@@ -98,7 +98,12 @@ const clientMessage = function clientMessage(incoming = '{}') {
       break;
     case MessageTypes.Port: // eslint-disable-line
       // incoming -> message: { levelId }
-      const level = new Level(message.levelId);
+      if( world.levels[message.levelId]) {
+        const level = world.levels[message.levelId];
+      } else {
+        const level = new Level(message.levelId);
+        world.levels[message.levelId] = level;
+      }
       const pc = this.playerCharacter;
       pc.tx = level.start.tx;
       pc.ty = level.start.ty;
