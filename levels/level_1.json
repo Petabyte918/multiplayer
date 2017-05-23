@@ -23,12 +23,14 @@
   },
   "sprites": [
     {
-      "type": 0,
+      "type": "SpriteTypes.CHEST",
+      "class": null,
       "tx": 10,
       "ty": 1
     },
     {
-      "type": 0,
+      "type": "SpriteTypes.CHEST",
+      "class": null,
       "tx": 1,
       "ty": 12
     }

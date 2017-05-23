@@ -5,6 +5,8 @@ import GameSettings from '../GameSettings';
 class PlayerCharacter extends Character {
   constructor(characterName = 'BoOoOoOob', startX = 1, startY = 1) {
     super();
+
+    this.id = -1;
     
     this.name = characterName;
     this.level = 1;
@@ -24,6 +26,13 @@ class PlayerCharacter extends Character {
     if(this.tx < 0) this.tx = 0;
     if(this.ty < 0) this.ty = 0;
   }
-};
+
+  update(delta) {
+    const deltaY = Math.sin(this.angle) * this.velocity * delta;
+    const deltaX = Math.cos(this.angle) * this.velocity * delta;
+    this.x += deltaX;
+    this.y += deltaY;
+  }
+}
 
 export default PlayerCharacter;

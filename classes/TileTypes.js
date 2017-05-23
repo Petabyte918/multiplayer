@@ -7,4 +7,4 @@ const TileTypes = {
   BRIDGE: 5,
 };
 
-module.exports = TileTypes;
+export default TileTypes;

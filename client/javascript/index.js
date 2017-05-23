@@ -1,5 +1,15 @@
-import FireBall from '../../classes/client/FireBall';
+// Game Objects
+import FireBall from '../../classes/shared/FireBall';
 import PlayerCharacter from '../../classes/shared/PlayerCharacter';
+
+// Constants & Enumerations
+import MessageTypes from '../../classes/MessageTypes';
+import TileTypes from '../../classes/TileTypes';
+import SpriteTypes, { SpriteClassMap } from '../../classes/SpriteTypes';
+import PlayerActions from '../../classes/PlayerActions';
+
+// Game Managers
+import GameSettings from '../../classes/GameSettings';
 
 // tile canvas
 const tileCanvas = document.querySelector('#tileCanvas');
@@ -12,10 +22,6 @@ const spriteContext = spriteCanvas.getContext('2d');
 const cursorCanvas = document.querySelector('#cursorCanvas');
 const cursorContext = cursorCanvas.getContext('2d');
 
-import MessageTypes from '../../classes/MessageTypes';
-import GameSettings from '../../classes/GameSettings';
-
-
 // Modes
 const MODE_PLAY = 'PLAY';
 const MODE_EDIT = 'EDIT';
@@ -27,20 +33,6 @@ const client = {
 const TILE_SCALE = GameSettings.TILE_SCALE;
 const gameMode = MODE_PLAY;
 
-// Tile Types
-const TileTypes = {
-  DIRT: 0,
-  GRASS: 1,
-  ROCK: 2,
-  WATER: 3,
-  PIT: 4,
-  BRIDGE: 5,
-};
-const SpriteTypes = {
-  CHEST: 0,
-  FIREBALL: 1,
-  PLAYER: 2,
-};
 const TileColorMap = new Map();
 TileColorMap.set(TileTypes.DIRT, '#5b2607');
 TileColorMap.set(TileTypes.GRASS, 'green');
@@ -60,13 +52,19 @@ let playerCharacter = null;
 
 // level tiles / objects for map the player is currently on.
 let tileMap = [];
-let sprites = [];
+let sprites = []; // SPRITE
 
 // Start socket
 function startSocketClient() {
   // TODO: Does this cause conflicts if called more than once?
-  const sock = client.socket || new WebSocket('ws://localhost:8080/');
-  client.socket = sock;
+  let sock = null;
+  try {
+    sock = client.socket || new WebSocket(`ws://${location.hostname}:8080/`);
+    client.socket = sock;
+  } catch(ex) {
+    console.log("Error: ", ex);
+    console.log("If you're testing on the server, did you remember to use localhost?")
+  }
 
   sock.onmessage = function onmessage(event) {
     const message = JSON.parse(event.data);
@@ -85,15 +83,24 @@ function startSocketClient() {
       case MessageTypes.Port:
         console.log('PORTED');
         if (message.success === true) {
-          console.log(message.level);
+          console.log(message);
           tileMap = message.level.tileMap;
-          sprites.push(...message.level.sprites);
+          sprites.push(...message.level.sprites); // SPRITE
+          message.level.sprites.forEach(s => {
+            sprites[s.instanceId] = s
+          });
           
-          playerCharacter.setPosition(message.level.start);
+          const pcIndex = sprites.findIndex(s => s.instanceId === client.instanceId); // SPRITE
+          playerCharacter = Object.assign(new PlayerCharacter(), sprites[pcIndex]); // SPRITE
+          sprites[pcIndex] = playerCharacter; // SPRITE
 
-          sprites.push(playerCharacter);
+          playerCharacter.setPosition(message.playerCharacter.position);
+
+          sprites.push(playerCharacter); // SPRITE
           // TODO: Can we determine if this is a first load?
           drawCanvas();
+        } else {
+          console.log("Message was not successful!!!!", message);
         }
         break;
       case MessageTypes.MoveTo:
@@ -101,17 +108,59 @@ function startSocketClient() {
         playerCharacter.setPosition(message);
         drawSprites();
         break;
+      case MessageTypes.Spawn:
+        console.log('Spawn info: ', message);
+        if(!message.spawnClass) {
+          console.error("No spawn class provided.");
+          return;
+        }
+        const spawnClass = SpriteClassMap.get(message.spawnClass);
+        if(message.spawn.instanceId === playerCharacter.instanceId) return;
+        const newSpawn = Object.assign(new spawnClass(), message.spawn);
+        sprites.push(newSpawn);
+        sprites[newSpawn.instanceId] = newSpawn;
+        break;
+      case MessageTypes.Despawn:
+        console.log('Despawn Message: ', message); // message.spawnId
+        sprites.splice(sprites.findIndex(s => s.instanceId === message.spawnId), 1);
+        sprites[message.spawnId] = undefined;
+        break;
+      case MessageTypes.FrameQueue:
+        // TODO: finish below
+        //    ... console.log("FrameQueue received: ", message.queue);
+        message.queue.forEach((item) => {
+          if(item.type === MessageTypes.UpdateSprite) {
+            const spriteUpdateInfo = JSON.parse(item.sprite);
+            if(spriteUpdateInfo.instanceId === playerCharacter.instanceId) return;
+            //console.log(spriteUpdateInfo.position);
+            const spriteToUpdate = sprites[spriteUpdateInfo.instanceId];
+            if(spriteToUpdate) {
+              Object.assign(spriteToUpdate, spriteUpdateInfo);
+              //console.log(spriteToUpdate);
+            } else {
+              console.log("couldn't find sprite.", spriteUpdateInfo);
+            }
+          }
+        });
+        drawSprites();
+        // TODO: Draw sprite changes all in one go - DO NOT draw them in each iteration above.
+        break;
+      case MessageTypes.DEBUG:
+        console.log('Debug package received. Message: ' + message.message);
+        break;
       default:
-        console.log('Message type not recognized: ', event.data);
+        console.log('Message type not recognized: ', message);
         break;
     }
   };
 
   sock.onclose = function onclose(something) {
-    console.log('Something -> ', something);
+    console.log('Socket Closed -> ', something);
+    // TODO: Set a timer to attempt to reconnect.
   };
   sock.onerror = function onerror(something) {
     console.log('Some Error -> ', something);
+    // TODO: Determine conditions for reconnect and then use them to create reconnect logic.
   };
 }
 
@@ -121,7 +170,9 @@ function LoginSucceeded(message = {}) {
   client.token = message.token; // Save to global for later use.
   toast('Welcome', 'Connected to server.');
 
-  playerCharacter = Object.assign(new PlayerCharacter(), JSON.parse(message.playerCharacter));
+  client.instanceId = JSON.parse(message.playerCharacter).instanceId;
+  //playerCharacter = Object.assign(new PlayerCharacter(), JSON.parse(message.playerCharacter));
+
   // TODO: Show loading message.
   startGame();
 }
@@ -203,16 +254,19 @@ const drawSprites = function drawSprites() {
   // but for now, lets just clear sprites and redraw
   spriteContext.clearRect(0, 0, spriteCanvas.width, spriteCanvas.height);
 
-  sprites.forEach((sprite) => {
+  sprites.forEach((sprite) => {  // SPRITE
+    // DEBUG: console.log("SPRITES: ", sprites);
     const color = sprite.color || TileColorMap.get(sprite.type) || '#FFFFFF';
 
     if (sprite instanceof FireBall) {
-      drawSprite(sprite.x, sprite.y, SpriteTextureMap.get(SpriteTypes.FIREBALL), sprite.angle);
+      drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(SpriteTypes.FIREBALL), sprite.angle);
     } else if (sprite instanceof PlayerCharacter) {
       drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(SpriteTypes.PLAYER), sprite.angle || 0);
       //drawCircle(sprite.tx, sprite.ty, (TILE_SCALE / 2) - 2, color);
     } else {
-      drawSprite(sprite.tx * TILE_SCALE, sprite.ty * TILE_SCALE, SpriteTextureMap.get(sprite.type));
+      // console.log("Other type of sprite: ", sprite.type, sprite.position, typeof sprite);
+
+      drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(sprite.type));
     }
   });
 };
@@ -237,15 +291,15 @@ const drawSprite = function drawSprite(x, y, imageSource, angle = null) {
   let imgElement = ImageLoader.get(imageSource);
   let rotAngle = 0;
   if (angle) {
-    rotAngle = angle; // (angle * Math.PI) / 180;
+    rotAngle = angle;
   }
   if (!imgElement) {
     imgElement = new Image();
     imgElement.src = imageSource;
     const onImageLoad = () => {
-      spriteContext.translate(x, y);
+      spriteContext.translate(x , y);
       spriteContext.rotate(rotAngle);
-      spriteContext.drawImage(imgElement, 0, 0);
+      spriteContext.drawImage(imgElement, -16, -16);
       spriteContext.rotate(-rotAngle);
       spriteContext.translate(-x, -y);
 
@@ -257,18 +311,19 @@ const drawSprite = function drawSprite(x, y, imageSource, angle = null) {
   } else {
     spriteContext.translate(x, y);
     spriteContext.rotate(rotAngle);
-    spriteContext.drawImage(imgElement, 0, 0);
+    spriteContext.drawImage(imgElement, -16, -16);
     spriteContext.rotate(-rotAngle);
     spriteContext.translate(-x, -y);
   }
 };
 
 function keyPressed(keyName) {
-  if (keyName.indexOf('UNMAPPED') === 0) {
+  // If the keyName starts with Unmapped...
+  if (keyName.toUpperCase().indexOf('UNMAPPED') === 0) {
     const code = parseInt(keyName.split(':')[1], 10);
     console.log(`Unmapped key pressed: ${code}`);
   } else {
-    client.socket.send(JSON.stringify({ type: MessageTypes.KeyPressed, action: keyName }));
+    sendPackage(MessageTypes.KeyPressed, { action: keyName });
   }
 }
 function keyReleased(keyName) {
@@ -276,21 +331,22 @@ function keyReleased(keyName) {
     const code = parseInt(keyName.split(':')[1], 10);
     console.log(`Unmapped key released: ${code}`);
   } else {
-    client.socket.send(JSON.stringify({ type: MessageTypes.KeyReleased, action: keyName }));
+    sendPackage(MessageTypes.KeyReleased, { action: keyName });
   }
 }
 
+
 const keyMap = [
-  { code: 65, action: 'LEFT ' }, // a
-  { code: 65, action: 'LEFT' },
-  { code: 37, action: 'LEFT' }, // left arrow
-  { code: 87, action: 'UP' }, // w
-  { code: 38, action: 'UP' }, // up arrow
-  { code: 68, action: 'RIGHT' }, // d
-  { code: 39, action: 'RIGHT' }, // right arrow
-  { code: 83, action: 'DOWN' }, // s
-  { code: 40, action: 'DOWN' }, // down arrow
-  { code: 16, action: 'SHIFT' },
+  { code: 65, action: PlayerActions.LEFT }, // a
+  { code: 65, action: PlayerActions.LEFT },
+  { code: 37, action: PlayerActions.LEFT }, // left arrow
+  { code: 87, action: PlayerActions.UP }, // w
+  { code: 38, action: PlayerActions.UP }, // up arrow
+  { code: 68, action: PlayerActions.RIGHT }, // d
+  { code: 39, action: PlayerActions.RIGHT }, // right arrow
+  { code: 83, action: PlayerActions.DOWN }, // s
+  { code: 40, action: PlayerActions.DOWN }, // down arrow
+  { code: 16, action: PlayerActions.SHIFT },
 ];
 
 // Low Level Event Handlers
@@ -299,7 +355,7 @@ function keyDown(e) {
   if (keyInfo) {
     keyPressed(keyInfo.action);
   } else {
-    keyPressed(`UNMAPPED:${e.keyCode}`);
+    keyPressed(`${PlayerActions.UNMAPPED}:${e.keyCode}`);
   }
 }
 function keyUp(e) {
@@ -307,7 +363,7 @@ function keyUp(e) {
   if (keyInfo) {
     keyReleased(keyInfo.action);
   } else {
-    keyReleased(`UNMAPPED:${e.keyCode}`);
+    keyReleased(`${PlayerActions.UNMAPPED}:${e.keyCode}`);
   }
 }
 function mouseMove(e) {
@@ -320,28 +376,35 @@ function mouseMove(e) {
   drawCursors();
 }
 function mouseClick(e) {
+  sendPackage(MessageTypes.KeyPressed, { 
+    action: PlayerActions.MOUSE_ACTION_1, 
+    start: playerCharacter.position, 
+    aim: { x: e.clientX, y: e.clientY }
+  });
+}
+function spawnFireball(paramsObj) {
   // fireball is flavor like image and particle systems
   // fireball should inherit from projectile // projectile manages speed and angle and updates position
   // projectile should inherit from sprite // sprite is an object with a visual representation that shows up above the tiled map
   // sprite should inherit from gameobject // Gameobject is something that belongs to a map. It has a position, but does not necessarily have a representation.
   const fireball = new FireBall(
-    { x: playerCharacter.tx * TILE_SCALE, y: playerCharacter.ty * TILE_SCALE }, // start
-    { x: e.clientX, y: e.clientY }, // aim at
-    32 * 18 // speed
+    { 
+      start: paramsObj.start, // start
+      aim: paramsObj.aim, // aim at
+      speed: paramsObj.speed // speed
+    }
   );
-  fireball.delete = function deleteFireball() {
-    sprites = sprites.filter(s => s !== this);
+  fireball.delete = () => {
+    sprites = sprites.filter(s => s !== this); // SPRITE
   };
-  sprites.push(fireball);
+  sprites.push(fireball); // SPRITE
   drawCanvas();
-  cursorCanvas.selectedTileCoords = getCanvasCoords({ x: e.clientX, y: e.clientY });
-  updateCursors();
 }
 
 function getCanvasCoords(info) {
   return {
-    tx: Math.floor(info.x / TILE_SCALE) || 0,
-    ty: Math.floor(info.y / TILE_SCALE) || 0,
+    tx: Math.floor(info.x / TILE_SCALE) || -1,
+    ty: Math.floor(info.y / TILE_SCALE) || -1,
   };
 }
 
@@ -431,7 +494,7 @@ const isWalkable = function isWalkable(tile) {
   const tileTypeAtPosition = tileMap[tile.ty][tile.tx];
 
   if ([TileTypes.DIRT, TileTypes.GRASS, TileTypes.BRIDGE].includes(tileTypeAtPosition)) {
-    if (!sprites.filter(s => s.tx === tile.tx && s.ty === tile.ty).length > 0) {
+    if (!sprites.filter(s => s.tx === tile.tx && s.ty === tile.ty).length > 0) { // SPRITE
       return true;
     }
   }
@@ -444,16 +507,34 @@ function initEventHandlers() {
   document.addEventListener('mousemove', mouseMove);
   document.addEventListener('click', mouseClick);
   window.onresize = handleResize;
+  document.ondragstart = (e) => e.preventDefault();
+  document.addEventListener('mousedown', function(e) {
+    if(e.button === 2) {
+      console.log("DOWN: " + e.button);
+      e.preventDefault();
+      return;
+    }
+  })
+  document.addEventListener('mouseup', function(e) {
+    if(e.button === 2) {
+      console.log("UP: " + e.button);
+      e.preventDefault();
+      return;
+    }
+  })
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  })
 }
 
 // server side
-function updateSprites(delta) {
-  sprites.forEach((sprite) => {
-    if (sprite.update) {
-      sprite.update(delta);
-    }
-  });
-}
+// function updateSprites(delta) {
+//   sprites.forEach((sprite) => { // SPRITE
+//     if (sprite.update) {
+//       sprite.update(delta);
+//     }
+//   });
+// }
 
 // Initiate game
 function startGame() {
@@ -465,10 +546,16 @@ function startGame() {
 
 let loopTime = performance.now();
 function updateLoop(timestamp = performance.now()) {
+  if(client.socket.readyState !== WebSocket.OPEN) {
+    toast("Websocket has closed.");
+    return;
+  }
   const delta = (timestamp - loopTime) / 1000;
   loopTime = timestamp;
-  updateSprites(delta);
+  // updateSprites(delta);
   drawCanvas();
+
+  // ensure next frame runs.
   window.requestAnimationFrame(updateLoop);
 }
 
