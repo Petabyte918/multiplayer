@@ -1,5 +1,5 @@
 
-import GameSettings from '../GameSettings';
+import { GameSettings } from '../GameSettings';
 import Sprite from './Sprite';
 
 class FireBall extends Sprite {
@@ -13,12 +13,12 @@ class FireBall extends Sprite {
 
     const life = paramObject.life || .5; // Seconds to live
 
-    console.log("Starting fireball at: ", start);
+    //console.log("Starting fireball at: ", start);
     this.setPosition(start);
     this.aim = aim;
     // https://gist.github.com/conorbuck/2606166
     this.angle = Math.atan2(aim.y - start.y, aim.x - start.x); // radians
-    console.log("Speed is: ", speed);
+    //console.log("Speed is: ", speed);
     this.speed = speed;
     
     // TODO: Don't hit this fireball's owner!!!! this.owner = owner;
@@ -32,6 +32,9 @@ class FireBall extends Sprite {
       this.delete();
       return;
     }
+
+    this.checkCollisions();
+
     if(this.aim.placeholder) return;
     // SOH, CAH, TOA
     const deltaY = Math.sin(this.angle) * this.speed * delta / 1000;

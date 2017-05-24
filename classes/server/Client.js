@@ -1,5 +1,5 @@
 
-function Client(info) {
+export default function Client(info) {
   this.socket = info.socket;
   this.token = info.token;
   this.authenticated = info.authenticated || false;
@@ -7,5 +7,3 @@ function Client(info) {
                     || this.socket.upgradeReq.connection.remoteAddress;
   this.playerCharacter = info.playerCharacter || null;
 }
-
-module.exports = Client;

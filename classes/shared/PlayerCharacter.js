@@ -1,8 +1,8 @@
 
 import Character from './Character';
-import GameSettings from '../GameSettings';
+import { GameSettings } from '../GameSettings';
 
-class PlayerCharacter extends Character {
+class PlayerCharacter extends Character { // BOOOOOOOOOOO!!!!!
   constructor(characterName = 'BoOoOoOob', startX = 1, startY = 1) {
     super();
 

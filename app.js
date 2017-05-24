@@ -10,7 +10,7 @@ import Level from './classes/server/Level';
 
 // Game Managers
 import DatabaseManager from './classes/server/DatabaseManager';
-import GameSettings from  './classes/GameSettings';
+import { GameSettings } from  './classes/GameSettings';
 
 // Game Objects
 import FireBall from './classes/shared/FireBall';
@@ -18,7 +18,7 @@ import FireBall from './classes/shared/FireBall';
 // Constants & Enumerations
 import MessageTypes from './classes/MessageTypes';
 import PlayerActions from './classes/PlayerActions';
-import SpriteTypes from './classes/SpriteTypes';
+import { SpriteTypes } from './classes/SpriteTypes';
 
 // Shared Dependencies
 
@@ -113,7 +113,7 @@ const clientMessage = function clientMessage(incoming = '{}') {
         );
       }
       break;
-    case MessageTypes.Port: // eslint-disable-line
+    case MessageTypes.Port: 
       // incoming -> message: { levelId }
       let level = null;
       if( world.levels[message.levelId]) {
@@ -139,10 +139,12 @@ const clientMessage = function clientMessage(incoming = '{}') {
         MessageTypes.Port,
         { success: true, level, playerCharacter: pc }
       );
+      console.log("sent port package");
       broadcastPackage(
         MessageTypes.Spawn,
         { spawnClass: SpriteTypes.PLAYER, spawn: pc }
       );
+      console.log("broadcast port package");
       break;
     case MessageTypes.KeyPressed:
       handleKeyPressed(this, message);

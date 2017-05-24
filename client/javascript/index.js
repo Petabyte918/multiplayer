@@ -5,11 +5,11 @@ import PlayerCharacter from '../../classes/shared/PlayerCharacter';
 // Constants & Enumerations
 import MessageTypes from '../../classes/MessageTypes';
 import TileTypes from '../../classes/TileTypes';
-import SpriteTypes, { SpriteClassMap } from '../../classes/SpriteTypes';
+import { SpriteTypes, SpriteClassMap } from '../../classes/SpriteTypes';
 import PlayerActions from '../../classes/PlayerActions';
 
 // Game Managers
-import GameSettings from '../../classes/GameSettings';
+import { GameSettings } from '../../classes/GameSettings';
 
 // tile canvas
 const tileCanvas = document.querySelector('#tileCanvas');
@@ -83,20 +83,18 @@ function startSocketClient() {
       case MessageTypes.Port:
         console.log('PORTED');
         if (message.success === true) {
-          console.log(message);
+          message.level = JSON.parse(message.level);
+          // console.log(message);
           tileMap = message.level.tileMap;
-          sprites.push(...message.level.sprites); // SPRITE
-          message.level.sprites.forEach(s => {
-            sprites[s.instanceId] = s
+          const massagedSpriteData = message.level.sprites.map(s => classifySprite(s.spawn, s.spawnClass));
+          sprites.push(...massagedSpriteData); // SPRITE
+          massagedSpriteData.forEach(s => {
+            sprites[s.instanceId] = s;
           });
           
-          const pcIndex = sprites.findIndex(s => s.instanceId === client.instanceId); // SPRITE
-          playerCharacter = Object.assign(new PlayerCharacter(), sprites[pcIndex]); // SPRITE
-          sprites[pcIndex] = playerCharacter; // SPRITE
-
+          playerCharacter = sprites.find(s => s.instanceId === client.instanceId); // SPRITE
           playerCharacter.setPosition(message.playerCharacter.position);
 
-          sprites.push(playerCharacter); // SPRITE
           // TODO: Can we determine if this is a first load?
           drawCanvas();
         } else {
@@ -104,15 +102,18 @@ function startSocketClient() {
         }
         break;
       case MessageTypes.MoveTo:
-        console.log("Attempted to move: ", message);
+        // DEBUG: console.log("Attempted to move: ", message);
         playerCharacter.setPosition(message);
         drawSprites();
         break;
       case MessageTypes.Spawn:
-        console.log('Spawn info: ', message);
+        // console.log('Spawn info: ', message);
         if(!message.spawnClass) {
           console.error("No spawn class provided.");
           return;
+        }
+        if(message.spawnClass === SpriteTypes.PLAYER) {
+          console.log("Player spawned: ", message.spawn.instanceId);
         }
         const spawnClass = SpriteClassMap.get(message.spawnClass);
         if(message.spawn.instanceId === playerCharacter.instanceId) return;
@@ -121,9 +122,10 @@ function startSocketClient() {
         sprites[newSpawn.instanceId] = newSpawn;
         break;
       case MessageTypes.Despawn:
-        console.log('Despawn Message: ', message); // message.spawnId
+        // console.log('Despawn Message: ', message); // message.spawnId
         sprites.splice(sprites.findIndex(s => s.instanceId === message.spawnId), 1);
         sprites[message.spawnId] = undefined;
+        delete sprites[message.spawnId];
         break;
       case MessageTypes.FrameQueue:
         // TODO: finish below
@@ -162,6 +164,14 @@ function startSocketClient() {
     console.log('Some Error -> ', something);
     // TODO: Determine conditions for reconnect and then use them to create reconnect logic.
   };
+}
+
+const classifySprite = function classifySprite(sprite, spriteClassTag) {
+  if(!spriteClassTag) return sprite;
+  const spriteClass = SpriteClassMap.get(spriteClassTag);
+  if(sprite instanceof spriteClass) return;
+  const classifiedSprite = Object.assign(new spriteClass(), sprite);
+  return classifiedSprite;
 }
 
 // Pipeline message handlers

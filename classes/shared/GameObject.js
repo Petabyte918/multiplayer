@@ -1,7 +1,7 @@
 import { guid } from '../Helpers.js'
 
-class GameObject {
-  constructor() {
+export default class GameObject {
+  constructor() { // (paramObject = {}) {
     this.position = {
       x: 0,
       y: 0
@@ -9,5 +9,3 @@ class GameObject {
     this.instanceId = guid();
   }
 }
-
-export default GameObject;

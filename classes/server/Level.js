@@ -1,7 +1,7 @@
-import { guid } from '../Helpers';
 import fs from 'fs';
 import Sprite from '../shared/Sprite';
-import GameSettings from '../GameSettings';
+import { GameSettings } from '../GameSettings';
+import { SpriteClassMap, GetSpriteTypeName } from '../SpriteTypes';
 
 function Level(levelId) {
 
@@ -19,6 +19,16 @@ function Level(levelId) {
   } else {
     throw new Error("Didn't provide level ID");
   }
+}
+
+Level.prototype.toJSON = function toJSON() {
+  const obj = Object.assign({}, this);
+  obj.sprites = obj.sprites.map(s => {
+    const obj = { spawnClass: GetSpriteTypeName(s), spawn: s }
+    return obj
+  });
+  console.log("Level JSONified: ", obj);
+  return JSON.stringify(obj);
 }
 
 Level.prototype.loadFromJSONFile = function loadFromJSONFile(filename) {
