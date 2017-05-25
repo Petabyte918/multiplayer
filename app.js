@@ -1,3 +1,6 @@
+
+const PORT = process.env.PORT || 5555;
+
 // External Dependencies
 import express from 'express';
 import http from 'http';
@@ -69,7 +72,7 @@ const authenticate = async function authenticate(client, authString) { // TODO: 
 // Serving front end items (web pages, client scripts, images, etc.)
 const app = express();
 app.use(express.static('client'));
-http.createServer(app).listen(5555, () => log('App started.'));
+http.createServer(app).listen(PORT, () => log('App started.'));
 
 // Socket Event Handlers
 const initiateClient = (socket) => {
@@ -306,7 +309,7 @@ const castSpell = function castSpell(client, message) {
 // Serving the game service.
 const gameServer = new WebSocket.Server({
   perMessageDeflate: false,
-  port: 8080,
+  port: PORT,
 });
 gameServer.on('connection', initiateClient);
 
