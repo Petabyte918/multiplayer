@@ -3,6 +3,11 @@ import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
 import randomToken from 'random-token';
+import mongoose from 'mongoose';
+
+// Helpers
+import { guid } from './classes/Helpers/guid';
+import { hashPassword } from './classes/Helpers/passhashing';
 
 // Internal Dependencies
 import Client from './classes/server/Client';
@@ -19,8 +24,11 @@ import FireBall from './classes/shared/FireBall';
 import MessageTypes from './classes/MessageTypes';
 import PlayerActions from './classes/PlayerActions';
 import { SpriteTypes } from './classes/SpriteTypes';
+import { CollisionStatus } from './classes/shared/Collider';
 
-// Shared Dependencies
+// Database related
+mongoose.connect(GameSettings.MONGODB_CONNECTIONSTRING);
+import User from './models/User';
 
 // Application Globals
 const world = {
@@ -31,12 +39,28 @@ const world = {
 // Helpers & Abstractions
 const log = console.log; // TODO: log things to a file for production.
 
-const authenticate = function authenticate(authString) { // TODO: add function name and explain why!
+const authenticate = async function authenticate(client, authString) { // TODO: add function name and explain why!
   // TODO: Faking user authentication. Need the real thing.
-  const [user, passHash] = authString.split(':');
+  const [username, password] = authString.split(':');
 
-  if (user && passHash && user.toLowerCase() === 'james') {
-    return true;
+  if (username && password) {
+    try {
+      const user = await User.findOne({ user: username }); // , 'user pass');
+      console.log("User: ", user);
+      const hashedPass = hashPassword(password, user.pass.salt);
+      if(hashedPass.hash === user.pass.hash) {
+        // TODO: retrieve character info???
+        client.model = user;
+        return true;
+      } else if(username.toLowerCase() === 'james') {
+        console.log("Password incorrect.");
+        await User.findOneAndUpdate({ user: username }, { $set: { pass: hashedPass }});
+        console.log("Changed password. Check DB.");
+      }
+    } catch(exception) {
+      // This is probably a promise error.
+      console.error("Exception occurred: ", exception);
+    }
   }
 
   return false;
@@ -51,24 +75,22 @@ http.createServer(app).listen(5555, () => log('App started.'));
 const initiateClient = (socket) => {
   // Add socket to client list.
   let clientToken = randomToken(16);
-  while (world.clients.clientToken) {
+  while (world.clients[clientToken]) {
     clientToken = randomToken(16);
   }
   const client = new Client({
     token: clientToken,
     socket,
-    playerCharacter: null
+    playerCharacter: null,
+    model: null,
   });
   world.clients[clientToken] = client;
 
   // Define socket behaviors
   socket.on('message', clientMessage.bind(client));
   socket.on('close', clientClose.bind(client));
-  // socket.on('error', clientError);
 
-  socket.on('keyPressed', (info) => {
-    log(info);
-  });
+  socket.on('keyPressed', (info) => { log(info); });
 
   sendPackage(socket, MessageTypes.Who);
 };
@@ -90,14 +112,14 @@ const sendPackage = function sendPackage(socket, type = null, attributes = {}) {
   socket.send(JSON.stringify(Object.assign({ type }, attributes)));
 };
 
-const clientMessage = function clientMessage(incoming = '{}') {
+const clientMessage = async function clientMessage(incoming = '{}') {
   // 'this' === the client that generated this message
-
+  // const client = this; ????
   const message = JSON.parse(incoming);
 
   switch (message.type) {
     case MessageTypes.Who:
-      if (authenticate(message.who)) {
+      if (await authenticate(this, message.who)) {
         log("Getting player.");
         this.playerCharacter = DatabaseManager.getPlayer('James');
         sendPackage(
@@ -139,7 +161,7 @@ const clientMessage = function clientMessage(incoming = '{}') {
         MessageTypes.Port,
         { success: true, level, playerCharacter: pc }
       );
-      console.log("sent port package");
+      // console.log("sent port package");
       broadcastPackage(
         MessageTypes.Spawn,
         { spawnClass: SpriteTypes.PLAYER, spawn: pc }
@@ -248,15 +270,19 @@ const handlePlayerMoveRequest = function handlePlayerMoveRequest(client, message
 
 const handlePlayerFireRequest = function handlePlayerFireRequest(client, message) {
   const pc = client.playerCharacter;
-  console.log("Firing from: ", client.playerCharacter.position);
+  //console.log("Firing from: ", client.playerCharacter.position);
   const fireball = new FireBall(
     {
       start: pc.position,
       aim: message.aim,
       speed: GameSettings.TILE_SCALE * 12, // TODO: up to 12 when things seem good.
-      owner: pc
+      // owner: pc,
+      collider: {
+        ignoresIds: [ pc.instanceId ]
+      }
     }
   );
+  pc.collider.ignoresIds.push(fireball.instanceId);
   let sprites = world.levels[pc.levelId].sprites;
   sprites.push(fireball);
   broadcastPackage(MessageTypes.Spawn, { spawnClass: SpriteTypes.FIREBALL, spawn: fireball });
@@ -312,6 +338,22 @@ setInterval(function() {
           });
         }
       }
+
+      level.sprites.forEach(function(otherSprite) {
+        if(otherSprite === sprite) return;
+        switch(sprite.checkCollision(otherSprite)) {
+          case CollisionStatus.ENTER:
+            sprite.onCollisionEnter && sprite.onCollisionEnter(otherSprite.collider);
+            break;
+          case CollisionStatus.COLLIDING:
+            sprite.onCollision && sprite.onCollision(otherSprite.collider);
+            break;
+          case CollisionStatus.EXIT:
+            sprite.onCollisionExit && sprite.onCollisionExit(otherSprite.collider);
+            break;
+        }
+      })
+
     });
   });
 

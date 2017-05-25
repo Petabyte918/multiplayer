@@ -1,4 +1,4 @@
-import { guid } from '../Helpers.js'
+import { guid } from '../Helpers/guid'
 
 export default class GameObject {
   constructor() { // (paramObject = {}) {

@@ -1,10 +1,16 @@
 
 import Character from './Character';
 import { GameSettings } from '../GameSettings';
+import ColliderTypes from '../ColliderTypes';
 
-class PlayerCharacter extends Character { // BOOOOOOOOOOO!!!!!
-  constructor(characterName = 'BoOoOoOob', startX = 1, startY = 1) {
-    super();
+class PlayerCharacter extends Character {
+  constructor(characterName = 'Frank', startX = 1, startY = 1) {
+    super({ 
+      collider: { 
+        type: ColliderTypes.RADIUS,
+        tags: ['PLAYER']
+      }
+    });
 
     this.id = -1;
     
@@ -12,6 +18,7 @@ class PlayerCharacter extends Character { // BOOOOOOOOOOO!!!!!
     this.level = 1;
     this.strength = 1;
     this.health = 50;
+    this.maxHealth = 50;
     
     this.tx = startX;
     this.ty = startY;
@@ -33,6 +40,25 @@ class PlayerCharacter extends Character { // BOOOOOOOOOOO!!!!!
     this.x += deltaX;
     this.y += deltaY;
   }
+
+  takeDamage(amount = 0, sourceCharacter) {
+    // TODO: modifiers.
+    this.health -= amount;
+    if(this.health < 0) {
+      console.log("Overkill!!!! -> " + Math.abs(this.health) + " HP");
+      this.health = 0;
+    }
+    if(this.health === 0) {
+      this.die();
+    } else {
+      console.log("Took " + amount + " Damage.");
+    }
+  }
+
+  die() {
+    console.error("You have died.");
+  }
+
 }
 
 export default PlayerCharacter;

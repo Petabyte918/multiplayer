@@ -29,11 +29,41 @@
 }
 
 @keyframes toastClosing {
-    from { opacity: 100% }
-    to { opacity: 0 }
+  from { opacity: 100% }
+  to { opacity: 0 }
 }
 .toast.closing {
-    position: relative;
-    animation-name: toastClosing;
-    animation-duration: 2.5s;
+  position: relative;
+  animation-name: toastClosing;
+  animation-duration: 2.5s;
+}
+
+#UI_Overlay {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0; margin: 0;
+  background-color: rgba(0,0,0,0); /* alpha of zero is invisible */
+  z-index: 100;
+}
+
+#UI_Login {
+  position: relative;
+  display: block;
+  text-align: center;
+  width: 500px;
+  height: 200px;
+  top: 20%;
+  border: 1px solid #555;
+  background-color: #FFF;
+  padding: 10px; margin: 0 auto;
+}
+
+#UI_Login label {
+  display: block;
+}
+
+.hidden {
+  display: none !important;
 }

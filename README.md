@@ -30,9 +30,13 @@ Players will be able to work cooperatively or competitively. (I'm imagining that
 
 #### 2. *Controls*
 
-I'm currently imagining that directional controls will be handled by moving using the arrow keys and/or WASD, and actions will be triggered using the mouse to click. Right-click would be used to perform an action. Left-click mainly for selecting something. 
+Initially, I figured directional controls would be handled by moving using the arrow keys and/or WASD, and various actions would be triggered using the mouse to click. This would also include a hotbar for keyboard based skill triggers.
 
-There should also be a hotbar for keyboard based skill triggers.
+After thinking on it, I think I'd like to use the mouse for pointing and moving. The left click will be a "hold to move" button, while the right button can be used for interacting with NPCs and other interactable game elements.
+
+I will continue to support wasd, but they'll be used a little differently. Instead of moving north, south, east and west, they can be used for moving forward and backward toward the mouse cursor as well as possibly having an interesting arc-strafe effect. This seems like it has the potential to either be incredibly fun, or incredibly annoying. Time will tell.
+
+For now, I'll be assigning specific skill/spell actions to specific numeric keyboard buttons, but eventually I would like to make it configurable by the player.
 
 #### 3. *Classes* ?
 For now, I am not going to make a class based system, though I'm not eliminating the idea. That said, characters will ideally still be customizable. 

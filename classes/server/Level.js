@@ -27,7 +27,7 @@ Level.prototype.toJSON = function toJSON() {
     const obj = { spawnClass: GetSpriteTypeName(s), spawn: s }
     return obj
   });
-  console.log("Level JSONified: ", obj);
+  // console.log("Level JSONified: ", obj);
   return JSON.stringify(obj);
 }
 

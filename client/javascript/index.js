@@ -71,7 +71,7 @@ function startSocketClient() {
 
     switch (message.type) {
       case MessageTypes.Who:
-        sendPackage(MessageTypes.Who, { who: 'James:df8c8023ae' });
+        // sendPackage(MessageTypes.Who, { who: 'James:df8c8023ae' });
         break;
       case MessageTypes.Authentication:
         if (message.success === true) {
@@ -166,6 +166,10 @@ function startSocketClient() {
   };
 }
 
+const sendLogin = (username, password) => {
+  sendPackage(MessageTypes.Who, { who: username + ':' + password });
+}
+
 const classifySprite = function classifySprite(sprite, spriteClassTag) {
   if(!spriteClassTag) return sprite;
   const spriteClass = SpriteClassMap.get(spriteClassTag);
@@ -176,13 +180,17 @@ const classifySprite = function classifySprite(sprite, spriteClassTag) {
 
 // Pipeline message handlers
 function LoginSucceeded(message = {}) {
+
+  console.log("message: ", message);
+
   if (!message.token) return;
   client.token = message.token; // Save to global for later use.
   toast('Welcome', 'Connected to server.');
 
-  client.instanceId = JSON.parse(message.playerCharacter).instanceId;
-  //playerCharacter = Object.assign(new PlayerCharacter(), JSON.parse(message.playerCharacter));
+  hideUI('UI_Login');
 
+  client.instanceId = JSON.parse(message.playerCharacter).instanceId;
+  
   // TODO: Show loading message.
   startGame();
 }
@@ -382,6 +390,8 @@ function mouseMove(e) {
     ty: Math.floor(e.clientY / TILE_SCALE)
   };
 
+  
+
   clearCursors();
   drawCursors();
 }
@@ -391,31 +401,6 @@ function mouseClick(e) {
     start: playerCharacter.position, 
     aim: { x: e.clientX, y: e.clientY }
   });
-}
-function spawnFireball(paramsObj) {
-  // fireball is flavor like image and particle systems
-  // fireball should inherit from projectile // projectile manages speed and angle and updates position
-  // projectile should inherit from sprite // sprite is an object with a visual representation that shows up above the tiled map
-  // sprite should inherit from gameobject // Gameobject is something that belongs to a map. It has a position, but does not necessarily have a representation.
-  const fireball = new FireBall(
-    { 
-      start: paramsObj.start, // start
-      aim: paramsObj.aim, // aim at
-      speed: paramsObj.speed // speed
-    }
-  );
-  fireball.delete = () => {
-    sprites = sprites.filter(s => s !== this); // SPRITE
-  };
-  sprites.push(fireball); // SPRITE
-  drawCanvas();
-}
-
-function getCanvasCoords(info) {
-  return {
-    tx: Math.floor(info.x / TILE_SCALE) || -1,
-    ty: Math.floor(info.y / TILE_SCALE) || -1,
-  };
 }
 
 function clearCursors() {
@@ -558,6 +543,18 @@ let loopTime = performance.now();
 function updateLoop(timestamp = performance.now()) {
   if(client.socket.readyState !== WebSocket.OPEN) {
     toast("Websocket has closed.");
+    setTimeout(function() {
+      console.log("restarting socket");
+      delete client.playerCharacter;
+      delete client.level;
+      delete client.socket;
+      for (let prop of sprites) {
+        delete sprites[prop];
+      }
+      sprites.length = 0;
+      document.querySelector('#toasts').innerHTML = null;
+      startSocketClient();
+    }, 2500);
     return;
   }
   const delta = (timestamp - loopTime) / 1000;
@@ -576,3 +573,67 @@ const sendPackage = function sendPackage(type = null, attributes = {}) {
 };
 
 startSocketClient(); // TODO: Need to monitor and reconnect
+
+
+
+
+
+
+
+
+
+
+
+
+
+// TODO: Move to separate module
+/// UI Manager
+
+const UIParent = document.getElementById('UI_Overlay');
+UIParent.visibleChildren = [document.getElementById('UI_Login')];
+
+function showUI(uiElementId) {
+  // Get UI element
+  const uiElement = document.getElementById(uiElementId);
+
+  // if nothing is returned or if it's already visible we don't need to do anything
+  if(!uiElement || UIParent.visibleChildren.includes(uiElement)) return;
+
+  // otherwise remove the hidden class
+  uiElement.classList.remove("hidden");
+  UIParent.classList.remove("hidden");
+
+  // ... and keep track.
+  UIParent.visibleChildren.push(uiElement);
+}
+
+function hideUI(uiElement) {
+  
+  if(!uiElement) return;
+
+  if(typeof uiElement === typeof "") {
+    uiElement = document.querySelector(`#${uiElement}`);
+  }
+
+  uiElement.classList.add("hidden");
+
+  const index = UIParent.visibleChildren.indexOf(uiElement);
+  if(index !== -1) {
+    UIParent.visibleChildren.splice(index, 1);
+  }
+
+  if(UIParent.visibleChildren.length === 0) UIParent.classList.add("hidden");
+
+}
+
+// UI Implementation
+
+const loginButton = document.getElementById('UI_Login__Button');
+
+loginButton.addEventListener('click', (e) => {
+  e.preventDefault();
+  console.log("Login button clicked.");
+  const username = document.getElementById('UI_Username__Input').value;
+  const password = document.getElementById('UI_Password__Input').value;
+  sendLogin(username, password);
+})

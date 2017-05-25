@@ -1,17 +1,33 @@
 
 import { GameSettings } from '../GameSettings';
 import Sprite from './Sprite';
+import ColliderTypes from '../ColliderTypes';
 
 class FireBall extends Sprite {
-  constructor(paramObject = {}) {
-    super(paramObject);
+  constructor(params = {}) {
+    if(!params.collider) {
+      params.collider = { 
+        type: ColliderTypes.RADIUS,
+        tags: ['PROJECTILE', 'FIRE'],
+        collidesWith: ['PLAYER', 'WALL'],
+      };
+    } 
+    
+    if(!params.collider.type)
+      params.collider.type = ColliderTypes.RADIUS;
+    if(!params.collider.tags)
+      params.collider.tags = ['PROJECTILE', 'FIRE'];
+    if(!params.collider.collidesWith)
+      params.collider.collidesWith = ['PLAYER', 'WALL'];
 
-    const start = paramObject.start || { x: 0, y: 0 };
-    const aim = paramObject.aim || { x: -1, y: -1, placeholder: true };
-    const speed = paramObject.speed || GameSettings.TILE_SCALE * 25;
-    const owner = paramObject.owner || null;
+    super(params);
 
-    const life = paramObject.life || .5; // Seconds to live
+    const start = params.start || { x: 0, y: 0 };
+    const aim = params.aim || { x: -1, y: -1, placeholder: true };
+    const speed = params.speed || GameSettings.TILE_SCALE * 25;
+    const owner = params.owner || null;
+
+    const life = params.life || .5; // Seconds to live
 
     //console.log("Starting fireball at: ", start);
     this.setPosition(start);
@@ -20,6 +36,10 @@ class FireBall extends Sprite {
     this.angle = Math.atan2(aim.y - start.y, aim.x - start.x); // radians
     //console.log("Speed is: ", speed);
     this.speed = speed;
+
+    this.stats = {
+      damage: 10
+    }
     
     // TODO: Don't hit this fireball's owner!!!! this.owner = owner;
 
@@ -33,7 +53,7 @@ class FireBall extends Sprite {
       return;
     }
 
-    this.checkCollisions();
+    //this.checkCollisions();
 
     if(this.aim.placeholder) return;
     // SOH, CAH, TOA
@@ -47,6 +67,17 @@ class FireBall extends Sprite {
 
   delete() {
     throw new Error("Must override FireBall.delete() method on instances.");
+  }
+
+  onCollisionEnter(otherCollider) {
+    super.onCollisionEnter && super.onCollisionEnter(otherCollider);
+    
+    if(otherCollider.tags.includes('PLAYER')) {
+      const otherPlayer = otherCollider.ownerGO;
+      otherPlayer.takeDamage(this.stats.damage, this.ownerGO);
+      
+    }
+
   }
 
 }
