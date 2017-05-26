@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 28);
+/******/ 	return __webpack_require__(__webpack_require__.s = 27);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -131,11 +131,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject2 = __webpack_require__(13);
+var _GameObject2 = __webpack_require__(12);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
-var _Collider = __webpack_require__(7);
+var _Collider = __webpack_require__(8);
 
 var _Collider2 = _interopRequireDefault(_Collider);
 
@@ -234,7 +234,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _Character2 = __webpack_require__(12);
+var _Character2 = __webpack_require__(11);
 
 var _Character3 = _interopRequireDefault(_Character2);
 
@@ -244,7 +244,7 @@ var _ColliderTypes = __webpack_require__(1);
 
 var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
 
-var _gx2D = __webpack_require__(10);
+var _gx2D = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -438,7 +438,7 @@ var _PlayerCharacter = __webpack_require__(4);
 
 var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
 
-var _FireBall = __webpack_require__(8);
+var _FireBall = __webpack_require__(9);
 
 var _FireBall2 = _interopRequireDefault(_FireBall);
 
@@ -482,6 +482,41 @@ function GetSpriteTypeName(obj) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.angle2d = angle2d;
+exports.distance2d = distance2d;
+function angle2d(ax, ay, bx, by) {
+  return Math.atan2(by - ay, bx - ax);
+}
+
+// These are terrible.
+// see: https://en.wikipedia.org/wiki/Linear_interpolation
+// export function lerp1d(start, end, delta) {
+//   return ( start.y * (end.x - delta) + end.y * (delta - start.x) ) / (end.x - start.x);
+// }
+
+// export function lerp2d(startPosition, endPosition, delta) {
+//   return { 
+//     x: lerp1d(startPosition.x, endPosition.x, delta),
+//     y: lerp1d(startPosition.y, endPosition.y, delta),
+//   }
+// }
+
+function distance2d(startPosition, endPosition) {
+  var aSquared = Math.pow(startPosition.x - endPosition.x, 2);
+  var bSquared = Math.pow(startPosition.y - endPosition.y, 2);
+  return Math.sqrt(aSquared + bSquared);
+}
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 var MessageTypes = {
   Who: 'WHO',
   Authentication: 'AUTHENTICATION',
@@ -505,7 +540,7 @@ var MessageTypes = {
 exports.default = MessageTypes;
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -680,7 +715,7 @@ var CollisionStatus = exports.CollisionStatus = {
 exports.default = Collider;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -804,7 +839,7 @@ var FireBall = function (_Sprite) {
 exports.default = FireBall;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -827,43 +862,7 @@ var PlayerActions = {
 exports.default = PlayerActions;
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.angle2d = angle2d;
-exports.distance2d = distance2d;
-function angle2d(ax, ay, bx, by) {
-  return Math.atan2(by - ay, bx - ax);
-}
-
-// These are terrible.
-// see: https://en.wikipedia.org/wiki/Linear_interpolation
-// export function lerp1d(start, end, delta) {
-//   return ( start.y * (end.x - delta) + end.y * (delta - start.x) ) / (end.x - start.x);
-// }
-
-// export function lerp2d(startPosition, endPosition, delta) {
-//   return { 
-//     x: lerp1d(startPosition.x, endPosition.x, delta),
-//     y: lerp1d(startPosition.y, endPosition.y, delta),
-//   }
-// }
-
-function distance2d(startPosition, endPosition) {
-  var aSquared = Math.pow(startPosition.x - endPosition.x, 2);
-  var bSquared = Math.pow(startPosition.y - endPosition.y, 2);
-  return Math.sqrt(aSquared + bSquared);
-}
-
-/***/ }),
-/* 11 */,
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -917,7 +916,7 @@ var Character = function (_Sprite) {
 exports.default = Character;
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -945,7 +944,7 @@ var GameObject = function GameObject() {
 exports.default = GameObject;
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -962,7 +961,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 // import Client from './server/Client';
 
 
-var _messaging = __webpack_require__(29);
+var _messaging = __webpack_require__(28);
 
 Object.defineProperty(exports, 'sendPackage', {
   enumerable: true,
@@ -987,7 +986,7 @@ var _SpriteTypes = __webpack_require__(5);
 
 var _guid = __webpack_require__(2);
 
-var _LevelManager = __webpack_require__(30);
+var _LevelManager = __webpack_require__(29);
 
 var _LevelManager2 = _interopRequireDefault(_LevelManager);
 
@@ -1083,7 +1082,7 @@ var World = new GameEngine();
 exports.default = World;
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1170,19 +1169,19 @@ var Level = function () {
 exports.default = Level;
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports) {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports) {
 
 module.exports = require("mongoose");
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1195,7 +1194,7 @@ exports.hashString = hashString;
 exports.sha512 = sha512;
 exports.hashPassword = hashPassword;
 
-var _crypto = __webpack_require__(32);
+var _crypto = __webpack_require__(31);
 
 var _crypto2 = _interopRequireDefault(_crypto);
 
@@ -1235,9 +1234,9 @@ function hashPassword(password) {
 }
 
 /***/ }),
+/* 18 */,
 /* 19 */,
-/* 20 */,
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1249,7 +1248,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _gx2D = __webpack_require__(10);
+var _gx2D = __webpack_require__(6);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1295,7 +1294,7 @@ var Client = function () {
 exports.default = Client;
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1338,7 +1337,7 @@ var DbManager = new DatabaseManager();
 exports.default = DbManager;
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1348,7 +1347,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _mongoose = __webpack_require__(17);
+var _mongoose = __webpack_require__(16);
 
 var _mongoose2 = _interopRequireDefault(_mongoose);
 
@@ -1374,31 +1373,31 @@ var User = _mongoose2.default.model('User', userSchema);
 exports.default = User;
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports) {
 
 module.exports = require("express");
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = require("http");
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports) {
 
 module.exports = require("random-token");
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports) {
 
 module.exports = require("ws");
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1406,53 +1405,53 @@ module.exports = require("ws");
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _express = __webpack_require__(24);
+var _express = __webpack_require__(23);
 
 var _express2 = _interopRequireDefault(_express);
 
-var _http = __webpack_require__(25);
+var _http = __webpack_require__(24);
 
 var _http2 = _interopRequireDefault(_http);
 
-var _ws = __webpack_require__(27);
+var _ws = __webpack_require__(26);
 
 var _ws2 = _interopRequireDefault(_ws);
 
-var _randomToken = __webpack_require__(26);
+var _randomToken = __webpack_require__(25);
 
 var _randomToken2 = _interopRequireDefault(_randomToken);
 
-var _mongoose = __webpack_require__(17);
+var _mongoose = __webpack_require__(16);
 
 var _mongoose2 = _interopRequireDefault(_mongoose);
 
-var _GameEngine = __webpack_require__(14);
+var _GameEngine = __webpack_require__(13);
 
 var _GameEngine2 = _interopRequireDefault(_GameEngine);
 
 var _guid = __webpack_require__(2);
 
-var _passhashing = __webpack_require__(18);
+var _passhashing = __webpack_require__(17);
 
-var _Client = __webpack_require__(21);
+var _Client = __webpack_require__(20);
 
 var _Client2 = _interopRequireDefault(_Client);
 
-var _Level = __webpack_require__(15);
+var _Level = __webpack_require__(14);
 
 var _Level2 = _interopRequireDefault(_Level);
 
-var _DatabaseManager = __webpack_require__(22);
+var _DatabaseManager = __webpack_require__(21);
 
 var _DatabaseManager2 = _interopRequireDefault(_DatabaseManager);
 
 var _GameSettings = __webpack_require__(0);
 
-var _fs = __webpack_require__(16);
+var _fs = __webpack_require__(15);
 
 var _fs2 = _interopRequireDefault(_fs);
 
-var _FireBall = __webpack_require__(8);
+var _FireBall = __webpack_require__(9);
 
 var _FireBall2 = _interopRequireDefault(_FireBall);
 
@@ -1460,23 +1459,25 @@ var _PlayerCharacter = __webpack_require__(4);
 
 var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
 
-var _MessageTypes = __webpack_require__(6);
+var _MessageTypes = __webpack_require__(7);
 
 var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
 
-var _PlayerActions = __webpack_require__(9);
+var _PlayerActions = __webpack_require__(10);
 
 var _PlayerActions2 = _interopRequireDefault(_PlayerActions);
 
 var _SpriteTypes = __webpack_require__(5);
 
-var _Collider = __webpack_require__(7);
+var _Collider = __webpack_require__(8);
 
-var _User = __webpack_require__(23);
+var _User = __webpack_require__(22);
 
 var _User2 = _interopRequireDefault(_User);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+console.log(process.env.MONGODB_CONNECTIONSTRING);
 
 var PORT = process.env.PORT || 5555;
 
@@ -1492,7 +1493,7 @@ var PORT = process.env.PORT || 5555;
 // Game Managers
 
 
-var serverConfig = JSON.parse(_fs2.default.readFileSync('./config.json'));
+// const serverConfig = JSON.parse(fs.readFileSync('./config.json'));
 
 // Game Objects
 
@@ -1501,7 +1502,7 @@ var serverConfig = JSON.parse(_fs2.default.readFileSync('./config.json'));
 
 
 // Database related
-_mongoose2.default.connect(serverConfig.MONGODB_CONNECTIONSTRING);
+_mongoose2.default.connect(process.env.MONGODB_CONNECTIONSTRING);
 
 
 // Application Globals
@@ -1879,7 +1880,7 @@ setInterval(function () {
 }, 1000 / 60);
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1890,11 +1891,11 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.broadcastPackage = exports.sendPackage = exports.MessageTypes = undefined;
 
-var _MessageTypes = __webpack_require__(6);
+var _MessageTypes = __webpack_require__(7);
 
 var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
 
-var _GameEngine = __webpack_require__(14);
+var _GameEngine = __webpack_require__(13);
 
 var _GameEngine2 = _interopRequireDefault(_GameEngine);
 
@@ -1928,7 +1929,7 @@ var broadcastPackage = exports.broadcastPackage = function broadcastPackage() {
 };
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1940,11 +1941,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _fs = __webpack_require__(16);
+var _fs = __webpack_require__(15);
 
 var _fs2 = _interopRequireDefault(_fs);
 
-var _Level = __webpack_require__(15);
+var _Level = __webpack_require__(14);
 
 var _Level2 = _interopRequireDefault(_Level);
 
@@ -1998,8 +1999,8 @@ var levelManager = new LevelManager();
 exports.default = levelManager;
 
 /***/ }),
-/* 31 */,
-/* 32 */
+/* 30 */,
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = require("crypto");

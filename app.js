@@ -1,4 +1,6 @@
 
+console.log(process.env.MONGODB_CONNECTIONSTRING);
+
 const PORT = process.env.PORT || 5555;
 
 // External Dependencies
@@ -24,7 +26,7 @@ import { GameSettings } from  './classes/GameSettings';
 
 import fs from 'fs';
 
-const serverConfig = JSON.parse(fs.readFileSync('./config.json'));
+// const serverConfig = JSON.parse(fs.readFileSync('./config.json'));
 
 // Game Objects
 import FireBall from './classes/shared/FireBall';
@@ -37,7 +39,7 @@ import { SpriteTypes } from './classes/SpriteTypes';
 import { CollisionStatus } from './classes/shared/Collider';
 
 // Database related
-mongoose.connect(serverConfig.MONGODB_CONNECTIONSTRING);
+mongoose.connect(process.env.MONGODB_CONNECTIONSTRING);
 import User from './models/User';
 
 // Application Globals

@@ -408,10 +408,13 @@ let lastMovePackage = +Date.now();
 const moveInterval = 250;
 function mouseMove(e) {
 
-  const angle = angle2d(playerCharacter.position.x, playerCharacter.position.y, e.clientX, e.clientY);
+  let angle = 0;
+  if(playerCharacter.position) {
+    angle = angle2d(playerCharacter.position.x, playerCharacter.position.y, e.clientX, e.clientY);
+  }
   // Local only
   if(!playerCharacter.isWalking) {
-    playerCharacter.angle = angle + Math.PI / 2;
+    playerCharacter.angle = angle + Math.PI / 2; // Player character starts facing the wrong way. 
   }
 
   mousePosition = { x: e.clientX, y: e.clientY };

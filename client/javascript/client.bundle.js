@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 31);
+/******/ 	return __webpack_require__(__webpack_require__.s = 30);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -131,11 +131,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject2 = __webpack_require__(13);
+var _GameObject2 = __webpack_require__(12);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
-var _Collider = __webpack_require__(7);
+var _Collider = __webpack_require__(8);
 
 var _Collider2 = _interopRequireDefault(_Collider);
 
@@ -234,7 +234,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _Character2 = __webpack_require__(12);
+var _Character2 = __webpack_require__(11);
 
 var _Character3 = _interopRequireDefault(_Character2);
 
@@ -244,7 +244,7 @@ var _ColliderTypes = __webpack_require__(1);
 
 var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
 
-var _gx2D = __webpack_require__(10);
+var _gx2D = __webpack_require__(6);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -438,7 +438,7 @@ var _PlayerCharacter = __webpack_require__(4);
 
 var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
 
-var _FireBall = __webpack_require__(8);
+var _FireBall = __webpack_require__(9);
 
 var _FireBall2 = _interopRequireDefault(_FireBall);
 
@@ -482,6 +482,41 @@ function GetSpriteTypeName(obj) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.angle2d = angle2d;
+exports.distance2d = distance2d;
+function angle2d(ax, ay, bx, by) {
+  return Math.atan2(by - ay, bx - ax);
+}
+
+// These are terrible.
+// see: https://en.wikipedia.org/wiki/Linear_interpolation
+// export function lerp1d(start, end, delta) {
+//   return ( start.y * (end.x - delta) + end.y * (delta - start.x) ) / (end.x - start.x);
+// }
+
+// export function lerp2d(startPosition, endPosition, delta) {
+//   return { 
+//     x: lerp1d(startPosition.x, endPosition.x, delta),
+//     y: lerp1d(startPosition.y, endPosition.y, delta),
+//   }
+// }
+
+function distance2d(startPosition, endPosition) {
+  var aSquared = Math.pow(startPosition.x - endPosition.x, 2);
+  var bSquared = Math.pow(startPosition.y - endPosition.y, 2);
+  return Math.sqrt(aSquared + bSquared);
+}
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 var MessageTypes = {
   Who: 'WHO',
   Authentication: 'AUTHENTICATION',
@@ -505,7 +540,7 @@ var MessageTypes = {
 exports.default = MessageTypes;
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -680,7 +715,7 @@ var CollisionStatus = exports.CollisionStatus = {
 exports.default = Collider;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -804,7 +839,7 @@ var FireBall = function (_Sprite) {
 exports.default = FireBall;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -827,43 +862,7 @@ var PlayerActions = {
 exports.default = PlayerActions;
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.angle2d = angle2d;
-exports.distance2d = distance2d;
-function angle2d(ax, ay, bx, by) {
-  return Math.atan2(by - ay, bx - ax);
-}
-
-// These are terrible.
-// see: https://en.wikipedia.org/wiki/Linear_interpolation
-// export function lerp1d(start, end, delta) {
-//   return ( start.y * (end.x - delta) + end.y * (delta - start.x) ) / (end.x - start.x);
-// }
-
-// export function lerp2d(startPosition, endPosition, delta) {
-//   return { 
-//     x: lerp1d(startPosition.x, endPosition.x, delta),
-//     y: lerp1d(startPosition.y, endPosition.y, delta),
-//   }
-// }
-
-function distance2d(startPosition, endPosition) {
-  var aSquared = Math.pow(startPosition.x - endPosition.x, 2);
-  var bSquared = Math.pow(startPosition.y - endPosition.y, 2);
-  return Math.sqrt(aSquared + bSquared);
-}
-
-/***/ }),
-/* 11 */,
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -917,7 +916,7 @@ var Character = function (_Sprite) {
 exports.default = Character;
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -945,12 +944,12 @@ var GameObject = function GameObject() {
 exports.default = GameObject;
 
 /***/ }),
+/* 13 */,
 /* 14 */,
 /* 15 */,
 /* 16 */,
 /* 17 */,
-/* 18 */,
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1002,7 +1001,7 @@ function debounce(func, wait, immediate) {
 }
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1023,6 +1022,7 @@ var TileTypes = {
 exports.default = TileTypes;
 
 /***/ }),
+/* 20 */,
 /* 21 */,
 /* 22 */,
 /* 23 */,
@@ -1032,8 +1032,7 @@ exports.default = TileTypes;
 /* 27 */,
 /* 28 */,
 /* 29 */,
-/* 30 */,
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1049,25 +1048,25 @@ var _Sprite = __webpack_require__(3);
 
 var _Sprite2 = _interopRequireDefault(_Sprite);
 
-var _MessageTypes = __webpack_require__(6);
+var _MessageTypes = __webpack_require__(7);
 
 var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
 
-var _TileTypes = __webpack_require__(20);
+var _TileTypes = __webpack_require__(19);
 
 var _TileTypes2 = _interopRequireDefault(_TileTypes);
 
 var _SpriteTypes = __webpack_require__(5);
 
-var _PlayerActions = __webpack_require__(9);
+var _PlayerActions = __webpack_require__(10);
 
 var _PlayerActions2 = _interopRequireDefault(_PlayerActions);
 
 var _GameSettings = __webpack_require__(0);
 
-var _gx2D = __webpack_require__(10);
+var _gx2D = __webpack_require__(6);
 
-var _throttling = __webpack_require__(19);
+var _throttling = __webpack_require__(18);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1499,10 +1498,13 @@ var lastMovePackage = +Date.now();
 var moveInterval = 250;
 function mouseMove(e) {
 
-  var angle = (0, _gx2D.angle2d)(playerCharacter.position.x, playerCharacter.position.y, e.clientX, e.clientY);
+  var angle = 0;
+  if (playerCharacter.position) {
+    angle = (0, _gx2D.angle2d)(playerCharacter.position.x, playerCharacter.position.y, e.clientX, e.clientY);
+  }
   // Local only
   if (!playerCharacter.isWalking) {
-    playerCharacter.angle = angle + Math.PI / 2;
+    playerCharacter.angle = angle + Math.PI / 2; // Player character starts facing the wrong way. 
   }
 
   mousePosition = { x: e.clientX, y: e.clientY };
