@@ -8,6 +8,7 @@ export const SpriteTypes = {
   FIREBALL: 'SpriteTypes.FIREBALL',
 };
 
+
 export const SpriteClassMap = new Map();
 SpriteClassMap.set(SpriteTypes.PLAYER, PlayerCharacter);
 SpriteClassMap.set(SpriteTypes.FIREBALL, FireBall);

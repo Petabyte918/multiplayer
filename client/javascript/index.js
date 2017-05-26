@@ -1,6 +1,7 @@
 // Game Objects
-import FireBall from '../../classes/shared/FireBall';
+// import FireBall from '../../classes/shared/FireBall';
 import PlayerCharacter from '../../classes/shared/PlayerCharacter';
+import Sprite from '../../classes/shared/Sprite';
 
 // Constants & Enumerations
 import MessageTypes from '../../classes/MessageTypes';
@@ -10,6 +11,10 @@ import PlayerActions from '../../classes/PlayerActions';
 
 // Game Managers
 import { GameSettings } from '../../classes/GameSettings';
+
+// Helpers
+import { angle2d } from '../../classes/Helpers/gx2D';
+import { throttle } from '../../classes/Helpers/throttling';
 
 // tile canvas
 const tileCanvas = document.querySelector('#tileCanvas');
@@ -54,6 +59,8 @@ let playerCharacter = null;
 let tileMap = [];
 let sprites = []; // SPRITE
 
+let mousePosition = {};
+
 // Start socket
 function startSocketClient() {
   // TODO: Does this cause conflicts if called more than once?
@@ -92,7 +99,7 @@ function startSocketClient() {
             sprites[s.instanceId] = s;
           });
           
-          playerCharacter = sprites.find(s => s.instanceId === client.instanceId); // SPRITE
+          playerCharacter = sprites.find(s => s.instanceId === message.playerCharacter.instanceId); // SPRITE
           playerCharacter.setPosition(message.playerCharacter.position);
 
           // TODO: Can we determine if this is a first load?
@@ -117,7 +124,7 @@ function startSocketClient() {
         }
         const spawnClass = SpriteClassMap.get(message.spawnClass);
         if(message.spawn.instanceId === playerCharacter.instanceId) return;
-        const newSpawn = Object.assign(new spawnClass(), message.spawn);
+        const newSpawn = Object.assign(new Sprite(), message.spawn, { type: message.spawnClass });
         sprites.push(newSpawn);
         sprites[newSpawn.instanceId] = newSpawn;
         break;
@@ -125,6 +132,9 @@ function startSocketClient() {
         // console.log('Despawn Message: ', message); // message.spawnId
         sprites.splice(sprites.findIndex(s => s.instanceId === message.spawnId), 1);
         sprites[message.spawnId] = undefined;
+        if(message.spawnId === playerCharacter.instanceId) {
+          // TODO: respawn
+        }
         delete sprites[message.spawnId];
         break;
       case MessageTypes.FrameQueue:
@@ -133,7 +143,7 @@ function startSocketClient() {
         message.queue.forEach((item) => {
           if(item.type === MessageTypes.UpdateSprite) {
             const spriteUpdateInfo = JSON.parse(item.sprite);
-            if(spriteUpdateInfo.instanceId === playerCharacter.instanceId) return;
+            // if(spriteUpdateInfo.instanceId === playerCharacter.instanceId) return;
             //console.log(spriteUpdateInfo.position);
             const spriteToUpdate = sprites[spriteUpdateInfo.instanceId];
             if(spriteToUpdate) {
@@ -183,13 +193,13 @@ function LoginSucceeded(message = {}) {
 
   console.log("message: ", message);
 
-  if (!message.token) return;
-  client.token = message.token; // Save to global for later use.
+  if (!message.instanceId) return;
+  client.instanceId = message.instanceId; // Save to global for later use.
   toast('Welcome', 'Connected to server.');
 
   hideUI('UI_Login');
 
-  client.instanceId = JSON.parse(message.playerCharacter).instanceId;
+  //client.instanceId = JSON.parse(message.playerCharacter).instanceId;
   
   // TODO: Show loading message.
   startGame();
@@ -273,18 +283,18 @@ const drawSprites = function drawSprites() {
   spriteContext.clearRect(0, 0, spriteCanvas.width, spriteCanvas.height);
 
   sprites.forEach((sprite) => {  // SPRITE
-    // DEBUG: console.log("SPRITES: ", sprites);
-    const color = sprite.color || TileColorMap.get(sprite.type) || '#FFFFFF';
 
-    if (sprite instanceof FireBall) {
-      drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(SpriteTypes.FIREBALL), sprite.angle);
-    } else if (sprite instanceof PlayerCharacter) {
+    // if (sprite instanceof FireBall) {
+    //   drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(SpriteTypes.FIREBALL), sprite.angle);
+    // } else 
+    if (sprite instanceof PlayerCharacter) {
       drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(SpriteTypes.PLAYER), sprite.angle || 0);
       //drawCircle(sprite.tx, sprite.ty, (TILE_SCALE / 2) - 2, color);
     } else {
-      // console.log("Other type of sprite: ", sprite.type, sprite.position, typeof sprite);
-
-      drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(sprite.type));
+      // console.log("Other type of sprite: ", sprite.type, sprite.position, typeof sprite, sprite);
+      const imageSource = sprite.image || SpriteTextureMap.get(sprite.type);
+      if(imageSource === undefined) console.log("undefined darnit.", sprite);
+      drawSprite(sprite.position.x, sprite.position.y, imageSource, sprite.angle || 0);
     }
   });
 };
@@ -335,13 +345,13 @@ const drawSprite = function drawSprite(x, y, imageSource, angle = null) {
   }
 };
 
-function keyPressed(keyName) {
+function keyPressed(keyName, message = {}) {
   // If the keyName starts with Unmapped...
   if (keyName.toUpperCase().indexOf('UNMAPPED') === 0) {
     const code = parseInt(keyName.split(':')[1], 10);
     console.log(`Unmapped key pressed: ${code}`);
   } else {
-    sendPackage(MessageTypes.KeyPressed, { action: keyName });
+    sendPackage(MessageTypes.KeyPressed, { action: keyName, message: message });
   }
 }
 function keyReleased(keyName) {
@@ -365,13 +375,23 @@ const keyMap = [
   { code: 83, action: PlayerActions.DOWN }, // s
   { code: 40, action: PlayerActions.DOWN }, // down arrow
   { code: 16, action: PlayerActions.SHIFT },
+  { code: 32, action: PlayerActions.SHOOT_PROJECTILE }, // space bar
 ];
 
 // Low Level Event Handlers
 function keyDown(e) {
   const keyInfo = keyMap.find(k => k.code === e.keyCode);
   if (keyInfo) {
-    keyPressed(keyInfo.action);
+    let message = {};
+    switch(keyInfo.action) {
+      case PlayerActions.SHOOT_PROJECTILE:
+        // console.log("trying to shoot fireball");
+        shootFireball(mousePosition);
+        break;
+      default:
+        keyPressed(keyInfo.action, message);
+        break;
+    }
   } else {
     keyPressed(`${PlayerActions.UNMAPPED}:${e.keyCode}`);
   }
@@ -384,22 +404,74 @@ function keyUp(e) {
     keyReleased(`${PlayerActions.UNMAPPED}:${e.keyCode}`);
   }
 }
+let lastMovePackage = +Date.now();
+const moveInterval = 250;
 function mouseMove(e) {
-  cursorCanvas.focusedTileCoords = {
-    tx: Math.floor(e.clientX / TILE_SCALE),
-    ty: Math.floor(e.clientY / TILE_SCALE)
-  };
+
+  const angle = angle2d(playerCharacter.position.x, playerCharacter.position.y, e.clientX, e.clientY);
+  // Local only
+  if(!playerCharacter.isWalking) {
+    playerCharacter.angle = angle + Math.PI / 2;
+  }
+
+  mousePosition = { x: e.clientX, y: e.clientY };
+
+  if(+Date.now() > lastMovePackage + moveInterval) {
+    // console.log("sending move package");
+    sendPackage(MessageTypes.MouseMove, { aim: mousePosition });
+    lastMovePackage = +Date.now();
+  }
+
+
+  // cursorCanvas.focusedTileCoords = {
+  //   tx: Math.floor(e.clientX / TILE_SCALE),
+  //   ty: Math.floor(e.clientY / TILE_SCALE)
+  // };
 
   
 
-  clearCursors();
-  drawCursors();
+  // clearCursors();
+  // drawCursors();
 }
 function mouseClick(e) {
+  // sendPackage(MessageTypes.MouseClick, { 
+  //   button: e.button,
+  //   x: e.clientX,
+  //   y: e.clientY
+  // });
+}
+function mouseDown(e) {
+  if(e.button === 2) {
+    console.log("DOWN: " + e.button);
+    e.preventDefault();
+    return;
+  } else {
+    sendPackage(MessageTypes.MouseDown, { 
+      button: e.button,
+      x: e.clientX,
+      y: e.clientY
+    });
+  }
+}
+function mouseUp(e) {
+  if(e.button === 2) {
+    console.log("UP: " + e.button);
+    e.preventDefault();
+    return;
+  } else {
+    sendPackage(MessageTypes.MouseUp, { 
+      button: e.button,
+      x: e.clientX,
+      y: e.clientY
+    });
+  }
+}
+
+function shootFireball(towardPosition) {
   sendPackage(MessageTypes.KeyPressed, { 
-    action: PlayerActions.MOUSE_ACTION_1, 
+    action: PlayerActions.SHOOT_PROJECTILE, 
     start: playerCharacter.position, 
-    aim: { x: e.clientX, y: e.clientY }
+    aim: { x: towardPosition.x, y: towardPosition.y }
   });
 }
 
@@ -499,24 +571,12 @@ const isWalkable = function isWalkable(tile) {
 function initEventHandlers() {
   document.onkeydown = keyDown;
   document.onkeyup = keyUp;
-  document.addEventListener('mousemove', mouseMove);
+  document.addEventListener('mousemove', throttle(mouseMove, 50));
   document.addEventListener('click', mouseClick);
   window.onresize = handleResize;
   document.ondragstart = (e) => e.preventDefault();
-  document.addEventListener('mousedown', function(e) {
-    if(e.button === 2) {
-      console.log("DOWN: " + e.button);
-      e.preventDefault();
-      return;
-    }
-  })
-  document.addEventListener('mouseup', function(e) {
-    if(e.button === 2) {
-      console.log("UP: " + e.button);
-      e.preventDefault();
-      return;
-    }
-  })
+  document.addEventListener('mousedown', mouseDown);
+  document.addEventListener('mouseup', mouseUp)
   document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
   })
@@ -543,18 +603,18 @@ let loopTime = performance.now();
 function updateLoop(timestamp = performance.now()) {
   if(client.socket.readyState !== WebSocket.OPEN) {
     toast("Websocket has closed.");
-    setTimeout(function() {
-      console.log("restarting socket");
-      delete client.playerCharacter;
-      delete client.level;
-      delete client.socket;
-      for (let prop of sprites) {
-        delete sprites[prop];
-      }
-      sprites.length = 0;
-      document.querySelector('#toasts').innerHTML = null;
-      startSocketClient();
-    }, 2500);
+    // setTimeout(function() {
+    //   console.log("restarting socket");
+    //   delete client.playerCharacter;
+    //   delete client.level;
+    //   delete client.socket;
+    //   for (let prop of sprites) {
+    //     delete sprites[prop];
+    //   }
+    //   sprites.length = 0;
+    //   document.querySelector('#toasts').innerHTML = null;
+    //   startSocketClient();
+    // }, 2500);
     return;
   }
   const delta = (timestamp - loopTime) / 1000;

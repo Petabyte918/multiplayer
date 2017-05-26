@@ -1,7 +1,9 @@
 export function throttle(fn, threshhold, scope) {
+  console.log("throttling.!!!");
   threshhold || (threshhold = 250);
   var last, deferTimer;
   return function () {
+    
     var context = scope || this;
 
     var now = +new Date, args = arguments;

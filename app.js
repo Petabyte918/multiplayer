@@ -8,20 +8,27 @@ import WebSocket from 'ws';
 import randomToken from 'random-token';
 import mongoose from 'mongoose';
 
+import World from './classes/GameEngine';
+
 // Helpers
 import { guid } from './classes/Helpers/guid';
 import { hashPassword } from './classes/Helpers/passhashing';
 
 // Internal Dependencies
 import Client from './classes/server/Client';
-import Level from './classes/server/Level';
+import Level from './classes/shared/Level';
 
 // Game Managers
 import DatabaseManager from './classes/server/DatabaseManager';
 import { GameSettings } from  './classes/GameSettings';
 
+import fs from 'fs';
+
+const serverConfig = JSON.parse(fs.readFileSync('./config.json'));
+
 // Game Objects
 import FireBall from './classes/shared/FireBall';
+import PlayerCharacter from './classes/shared/PlayerCharacter';
 
 // Constants & Enumerations
 import MessageTypes from './classes/MessageTypes';
@@ -30,14 +37,14 @@ import { SpriteTypes } from './classes/SpriteTypes';
 import { CollisionStatus } from './classes/shared/Collider';
 
 // Database related
-mongoose.connect(GameSettings.MONGODB_CONNECTIONSTRING);
+mongoose.connect(serverConfig.MONGODB_CONNECTIONSTRING);
 import User from './models/User';
 
 // Application Globals
-const world = {
-  levels: {},
-  clients: {}
-};
+// const World = {
+//   levels: {},
+//   clients: {}
+// };
 
 // Helpers & Abstractions
 const log = console.log; // TODO: log things to a file for production.
@@ -72,22 +79,23 @@ const authenticate = async function authenticate(client, authString) { // TODO: 
 // Serving front end items (web pages, client scripts, images, etc.)
 const app = express();
 app.use(express.static('client'));
-http.createServer(app).listen(PORT, () => log('App started.'));
+const server = http.createServer(app).listen(PORT, () => log('App started.'));
 
 // Socket Event Handlers
 const initiateClient = (socket) => {
   // Add socket to client list.
-  let clientToken = randomToken(16);
-  while (world.clients[clientToken]) {
-    clientToken = randomToken(16);
+  let instanceId = guid();
+  while (World.clients[instanceId]) {
+    instanceId = guid();
   }
   const client = new Client({
-    token: clientToken,
+    instanceId,
     socket,
     playerCharacter: null,
     model: null,
   });
-  world.clients[clientToken] = client;
+  //World.clients[clientToken] = client;
+  World.addClient(client);
 
   // Define socket behaviors
   socket.on('message', clientMessage.bind(client));
@@ -100,8 +108,9 @@ const initiateClient = (socket) => {
 
 const broadcastPackage = function broadcastPackage(type = null, attributes = {}) {
   // TODO: only affect clients that are in range and can see (but for now everybody)
-  Object.keys(world.clients).forEach(clientKey => {
-    const c = world.clients[clientKey];
+  Object.keys(World.clients).forEach(clientKey => {
+    // console.log("broadcasting port package to: " + clientKey, World.clients[clientKey]);
+    const c = World.clients[clientKey];
     if(c) sendPackage(c.socket, type, attributes);
   })
 }
@@ -128,7 +137,7 @@ const clientMessage = async function clientMessage(incoming = '{}') {
         sendPackage(
           this.socket,
           MessageTypes.Authentication,
-          { success: true, token: this.token, playerCharacter: JSON.stringify(this.playerCharacter) }
+          { success: true, instanceId: this.instanceId, playerCharacter: JSON.stringify(this.playerCharacter) }
         );
       } else {
         sendPackage(
@@ -141,16 +150,16 @@ const clientMessage = async function clientMessage(incoming = '{}') {
     case MessageTypes.Port: 
       // incoming -> message: { levelId }
       let level = null;
-      if( world.levels[message.levelId]) {
-        level = world.levels[message.levelId];
+      if( World.levels[message.levelId]) {
+        level = World.levels[message.levelId];
       } else {
-        level = new Level(message.levelId);
-        world.levels[message.levelId] = level;
+        level = World.getLevel(message.levelId); // new Level(message.levelId);
+        World.levels[message.levelId] = level;
       }
       const pc = this.playerCharacter;
-      pc.tx = level.start.tx;
+      //pc.tx = level.start.tx;
       pc.position.x = level.start.tx * GameSettings.TILE_SCALE;
-      pc.ty = level.start.ty;
+      //pc.ty = level.start.ty;
       pc.position.y = level.start.ty * GameSettings.TILE_SCALE;
       pc.levelId = level.id;
       // TODO: Update this WHOOOOOLE file with pc.getLevel() instead of levelId
@@ -159,12 +168,14 @@ const clientMessage = async function clientMessage(incoming = '{}') {
 
       // TODO: Will need to check whether player is "allowed" to port here.
       //  For example, are they currently near a portal to this area?
+      // console.log("sending port package to: " + this.instanceId, this);
       sendPackage(
         this.socket,
         MessageTypes.Port,
         { success: true, level, playerCharacter: pc }
       );
-      // console.log("sent port package");
+      console.log("sent port package");
+      console.log("broadcasting port package");
       broadcastPackage(
         MessageTypes.Spawn,
         { spawnClass: SpriteTypes.PLAYER, spawn: pc }
@@ -176,6 +187,11 @@ const clientMessage = async function clientMessage(incoming = '{}') {
       break;
     case MessageTypes.KeyReleased:
       handleKeyReleased(this, message);
+      break;
+    case MessageTypes.MouseDown:
+    case MessageTypes.MouseUp:
+    case MessageTypes.MouseMove:
+      handleMouseEvent(this, message);
       break;
     case MessageTypes.Cast:
       castSpell(this, message);
@@ -190,7 +206,7 @@ const clientClose = function clientClose() {
   this.socket = null;
   // TODO: Then save any relevant client data to the database
   //   Note: should save with a separate function so that we can also auto-save periodically.
-  // Then remove the client from the world. 
+  // Then remove the client from the World. 
   // TODO: When above TODO is finished, this should be a callback.
   {
     if(this.playerCharacter) {
@@ -199,10 +215,23 @@ const clientClose = function clientClose() {
         const levelIndex = level.sprites.indexOf(this.playerCharacter);
         level.sprites.splice(levelIndex, 1);
         level.sprites[this.playerCharacter.instanceId] = undefined;
-        world.clients[this.token] = undefined;
+        World.clients[this.instanceId] = undefined; // TODO: use GameEngine.removeClient();
         broadcastPackage(MessageTypes.Despawn, { spawnId: this.playerCharacter.instanceId });
       }
     }
+  }
+}
+
+const handleMouseEvent = function handleMouseEvent(client, message) {
+  if(message.type === MessageTypes.MouseDown) {
+    // console.log("Mouse down", message);
+    client.setMouseDown(message);
+  } else if (message.type === MessageTypes.MouseUp) {
+    // console.log("Mouse up");
+    client.setMouseUp();
+  } else {
+    // console.log("Mouse move: " + Date.now());
+    client.setMousePosition(message.aim);
   }
 }
 
@@ -215,7 +244,8 @@ const handleKeyPressed = function handleKeyPressed(client, message) {
     case PlayerActions.DOWN:
       handlePlayerMoveRequest(client, message);
       break;
-    case PlayerActions.MOUSE_ACTION_1:
+    case PlayerActions.SHOOT_PROJECTILE:
+      // log("Got shoot request: ", message);
       handlePlayerFireRequest(client, message);
       break;
     default:
@@ -225,7 +255,7 @@ const handleKeyPressed = function handleKeyPressed(client, message) {
 };
 const handleKeyReleased = function handleKeyReleased(client, message) {
   const action = message.action;
-  log(action);
+  // log("Released: " + action);
 };
 
 const handlePlayerMoveRequest = function handlePlayerMoveRequest(client, message) {
@@ -277,7 +307,7 @@ const handlePlayerFireRequest = function handlePlayerFireRequest(client, message
   const fireball = new FireBall(
     {
       start: pc.position,
-      aim: message.aim,
+      aim: pc.hasMoveTarget ? pc.moveTarget : message.aim,
       speed: GameSettings.TILE_SCALE * 12, // TODO: up to 12 when things seem good.
       // owner: pc,
       collider: {
@@ -286,7 +316,7 @@ const handlePlayerFireRequest = function handlePlayerFireRequest(client, message
     }
   );
   pc.collider.ignoresIds.push(fireball.instanceId);
-  let sprites = world.levels[pc.levelId].sprites;
+  let sprites = World.levels[pc.levelId].sprites;
   sprites.push(fireball);
   broadcastPackage(MessageTypes.Spawn, { spawnClass: SpriteTypes.FIREBALL, spawn: fireball });
 
@@ -295,8 +325,8 @@ const handlePlayerFireRequest = function handlePlayerFireRequest(client, message
     broadcastPackage(MessageTypes.Despawn, { spawnId: fireball.instanceId });
   };
 
-  // log("Number of sprites in level: " + world.levels[pc.levelId].sprites.length);
-  // log("Level sprites: ", world.levels[pc.levelId].sprites);
+  // log("Number of sprites in level: " + World.levels[pc.levelId].sprites.length);
+  // log("Level sprites: ", World.levels[pc.levelId].sprites);
 }
 
 const castSpell = function castSpell(client, message) {
@@ -308,8 +338,8 @@ const castSpell = function castSpell(client, message) {
 
 // Serving the game service.
 const gameServer = new WebSocket.Server({
+  server,
   perMessageDeflate: false,
-  port: PORT,
 });
 gameServer.on('connection', initiateClient);
 
@@ -324,7 +354,7 @@ setInterval(function() {
   const delta = thisUpdate - lastUpdate;
   lastUpdate = thisUpdate;
 
-  const levelsArray = Object.keys(world.levels).map(key => world.levels[key]);
+  const levelsArray = Object.keys(World.levels).map(key => World.levels[key]);
 
   // Update all gameobjects
   levelsArray.forEach(level => {
@@ -333,9 +363,12 @@ setInterval(function() {
         const preSprite = JSON.stringify(sprite, (k,v) => k === 'owner' ? undefined : v);
         sprite.update(delta);
         const postSprite = JSON.stringify(sprite, (k,v) => k === 'owner' ? undefined : v);
+        // if(sprite instanceof PlayerCharacter && sprite.moving) {
+        //   console.log("PRE: ", preSprite, "POST: ", postSprite);
+        // }
         // If updates exist and prop changes are made, add updates to a package
         if (postSprite !== preSprite) {
-          level.frameQueue.push({ 
+          level.frameQueue.push({
             type: MessageTypes.UpdateSprite,
             sprite: postSprite
           });
@@ -360,12 +393,12 @@ setInterval(function() {
     });
   });
 
-  Object.keys(world.clients)
-    .map(id => world.clients[id])
+  Object.keys(World.clients)
+    .map(id => World.clients[id])
     .forEach((client) => {
       if(!client || !client.playerCharacter || !client.socket) return;
       
-      const level = world.levels[client.playerCharacter.levelId];
+      const level = World.levels[client.playerCharacter.levelId];
       if(!level) return;
       
       // send update package to all connected clients on a per-level basis.

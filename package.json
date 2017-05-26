@@ -13,6 +13,7 @@
   "dependencies": {
     "express": "^4.15.2",
     "fs": "0.0.1-security",
+    "lerp": "^1.0.3",
     "mongoose": "^4.10.2",
     "random-token": "^0.0.8",
     "uuid": "^3.0.1",

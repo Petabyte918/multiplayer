@@ -7,5 +7,6 @@ const PlayerActions = {
   SHIFT: 'SHIFT',
   MOUSE_ACTION_1: 'MOUSE_ACTION_1',
   MOUSE_ACTION_2: 'MOUSE_ACTION_2',
+  SHOOT_PROJECTILE: 'SHOOT_PROJECTILE',
 };
 export default PlayerActions;

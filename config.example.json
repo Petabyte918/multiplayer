@@ -1,0 +1,5 @@
+{
+  "MONGODB_CONNECTIONSTRING": "mongodb://<username>:<password>@<subdomain>.mlab.com:51951/multiplayer",
+  "// Database Setup ": "You will have to set up your own mongo database. MLab provides a decent free service for development. Replace <subdomain>, <username> and <password> with your databases settings which can be found / set up in MLab",
+  "// Remove these": "Remember to remove JSON attributes like this one that start with '//'. they're just hacked comments cause you can't use normal comments in JSON"
+}

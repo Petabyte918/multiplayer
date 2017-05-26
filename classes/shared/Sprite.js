@@ -11,6 +11,9 @@ class Sprite extends GameObject {
     // TODO: shall we take this one level deeper and put it on GameObject?
     //        Since base game object technically doesn't move, it should only have collider if it is a wall, trigger or switch.
     this.collider = new Collider(params.collider, params.owner || this);
+
+    this.moving = params.moving || false;
+    this.aim = params.aim || { x: -1, y: -1, placeholder: true };
   }
 
   checkCollision(target) {
@@ -36,6 +39,21 @@ class Sprite extends GameObject {
       output.collider.ownerGO = undefined;
     } 
     return output;
+  }
+
+
+  update(delta) {
+    if(this.moving) {
+      console.log("Updating");
+      if(this.aim.placeholder) return;
+      // SOH, CAH, TOA
+      const deltaY = Math.sin(this.angle) * this.speed * delta / 1000;
+      const deltaX = Math.cos(this.angle) * this.speed * delta / 1000;
+      this.setPosition({
+        x: this.position.x + deltaX,
+        y: this.position.y + deltaY
+      });
+    }
   }
 }
 

@@ -4,6 +4,10 @@ const MessageTypes = {
   Port: 'PORT',
   KeyPressed: 'KEY_PRESSED',
   KeyReleased: 'KEY_RELEASED',
+  MouseDown: 'MOUSE_DOWN',
+  MouseUp: 'MOUSE_UP',
+  MouseClick: 'MOUSE_CLICK',
+  MouseMove: 'MOUSE_MOVE',
   MoveTo: 'MOVE_TO',
   Cast: 'CAST',
   Spawn: 'SPAWN',
@@ -11,5 +15,7 @@ const MessageTypes = {
   DEBUG: 'DEBUG',
   UpdateSprite: 'UPDATE_SPRITE',
   FrameQueue: 'FRAME_QUEUE',
+  TakeDamage: 'TAKE_DAMAGE',
+  PlayerDeath: 'PLAYER_DEATH',
 };
 export default MessageTypes;

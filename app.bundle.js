@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 23);
+/******/ 	return __webpack_require__(__webpack_require__.s = 28);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -76,9 +76,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+// GameSettings is a shared settings file that will share info to both the server and the client.
 var GameSettings = exports.GameSettings = {
-  TILE_SCALE: 32,
-  MONGODB_CONNECTIONSTRING: 'mongodb://multiplayerAdmin:1234@ds151951.mlab.com:51951/multiplayer'
+  TILE_SCALE: 32
 };
 
 /***/ }),
@@ -131,129 +131,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _GameSettings = __webpack_require__(0);
-
-var _Sprite2 = __webpack_require__(4);
-
-var _Sprite3 = _interopRequireDefault(_Sprite2);
-
-var _ColliderTypes = __webpack_require__(1);
-
-var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var FireBall = function (_Sprite) {
-  _inherits(FireBall, _Sprite);
-
-  function FireBall() {
-    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, FireBall);
-
-    if (!params.collider) {
-      params.collider = {
-        type: _ColliderTypes2.default.RADIUS,
-        tags: ['PROJECTILE', 'FIRE'],
-        collidesWith: ['PLAYER', 'WALL']
-      };
-    }
-
-    if (!params.collider.type) params.collider.type = _ColliderTypes2.default.RADIUS;
-    if (!params.collider.tags) params.collider.tags = ['PROJECTILE', 'FIRE'];
-    if (!params.collider.collidesWith) params.collider.collidesWith = ['PLAYER', 'WALL'];
-
-    var _this = _possibleConstructorReturn(this, (FireBall.__proto__ || Object.getPrototypeOf(FireBall)).call(this, params));
-
-    var start = params.start || { x: 0, y: 0 };
-    var aim = params.aim || { x: -1, y: -1, placeholder: true };
-    var speed = params.speed || _GameSettings.GameSettings.TILE_SCALE * 25;
-    var owner = params.owner || null;
-
-    var life = params.life || .5; // Seconds to live
-
-    //console.log("Starting fireball at: ", start);
-    _this.setPosition(start);
-    _this.aim = aim;
-    // https://gist.github.com/conorbuck/2606166
-    _this.angle = Math.atan2(aim.y - start.y, aim.x - start.x); // radians
-    //console.log("Speed is: ", speed);
-    _this.speed = speed;
-
-    _this.stats = {
-      damage: 10
-    };
-
-    // TODO: Don't hit this fireball's owner!!!! this.owner = owner;
-
-    _this.livesUntil = Date.now() + life * 1000; // 3 seconds.
-    return _this;
-  }
-
-  _createClass(FireBall, [{
-    key: 'update',
-    value: function update(delta) {
-      if (Date.now() > this.livesUntil) {
-        // console.log("Deleting fireball.");
-        this.delete();
-        return;
-      }
-
-      //this.checkCollisions();
-
-      if (this.aim.placeholder) return;
-      // SOH, CAH, TOA
-      var deltaY = Math.sin(this.angle) * this.speed * delta / 1000;
-      var deltaX = Math.cos(this.angle) * this.speed * delta / 1000;
-      this.setPosition({
-        x: this.position.x + deltaX,
-        y: this.position.y + deltaY
-      });
-    }
-  }, {
-    key: 'delete',
-    value: function _delete() {
-      throw new Error("Must override FireBall.delete() method on instances.");
-    }
-  }, {
-    key: 'onCollisionEnter',
-    value: function onCollisionEnter(otherCollider) {
-      _get(FireBall.prototype.__proto__ || Object.getPrototypeOf(FireBall.prototype), 'onCollisionEnter', this) && _get(FireBall.prototype.__proto__ || Object.getPrototypeOf(FireBall.prototype), 'onCollisionEnter', this).call(this, otherCollider);
-
-      if (otherCollider.tags.includes('PLAYER')) {
-        var otherPlayer = otherCollider.ownerGO;
-        otherPlayer.takeDamage(this.stats.damage, this.ownerGO);
-      }
-    }
-  }]);
-
-  return FireBall;
-}(_Sprite3.default);
-
-exports.default = FireBall;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameObject2 = __webpack_require__(11);
+var _GameObject2 = __webpack_require__(13);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
@@ -284,6 +162,9 @@ var Sprite = function (_GameObject) {
     // TODO: shall we take this one level deeper and put it on GameObject?
     //        Since base game object technically doesn't move, it should only have collider if it is a wall, trigger or switch.
     _this.collider = new _Collider2.default(params.collider, params.owner || _this);
+
+    _this.moving = params.moving || false;
+    _this.aim = params.aim || { x: -1, y: -1, placeholder: true };
     return _this;
   }
 
@@ -316,6 +197,21 @@ var Sprite = function (_GameObject) {
       }
       return output;
     }
+  }, {
+    key: 'update',
+    value: function update(delta) {
+      if (this.moving) {
+        console.log("Updating");
+        if (this.aim.placeholder) return;
+        // SOH, CAH, TOA
+        var deltaY = Math.sin(this.angle) * this.speed * delta / 1000;
+        var deltaX = Math.cos(this.angle) * this.speed * delta / 1000;
+        this.setPosition({
+          x: this.position.x + deltaX,
+          y: this.position.y + deltaY
+        });
+      }
+    }
   }]);
 
   return Sprite;
@@ -324,7 +220,7 @@ var Sprite = function (_GameObject) {
 exports.default = Sprite;
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -338,7 +234,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _Character2 = __webpack_require__(10);
+var _Character2 = __webpack_require__(12);
 
 var _Character3 = _interopRequireDefault(_Character2);
 
@@ -348,6 +244,8 @@ var _ColliderTypes = __webpack_require__(1);
 
 var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
 
+var _gx2D = __webpack_require__(10);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -356,13 +254,13 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+//import World, { MessageTypes, sendPackage, broadcastPackage  } from '../GameEngine';
+
 var PlayerCharacter = function (_Character) {
   _inherits(PlayerCharacter, _Character);
 
   function PlayerCharacter() {
     var characterName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Frank';
-    var startX = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-    var startY = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
 
     _classCallCheck(this, PlayerCharacter);
 
@@ -376,13 +274,21 @@ var PlayerCharacter = function (_Character) {
     _this.id = -1;
 
     _this.name = characterName;
+    _this.stats = {
+      level: 1,
+      strength: 1,
+      hp: 50,
+      maxHp: 50,
+      maxVelocity: 8 * _GameSettings.GameSettings.TILE_SCALE,
+      acceleration: 16 * _GameSettings.GameSettings.TILE_SCALE
+    };
     _this.level = 1;
     _this.strength = 1;
     _this.health = 50;
     _this.maxHealth = 50;
+    _this.velocity = 0;
 
-    _this.tx = startX;
-    _this.ty = startY;
+    _this.moveTarget = {};
 
     _this.color = '#3aadd1'; // TODO: Do we want to keep this property?
     return _this;
@@ -398,12 +304,52 @@ var PlayerCharacter = function (_Character) {
       if (this.ty < 0) this.ty = 0;
     }
   }, {
+    key: 'setMoveTarget',
+    value: function setMoveTarget(x, y) {
+      this.moveTarget = { x: x, y: y };
+    }
+  }, {
+    key: 'clearMoveTarget',
+    value: function clearMoveTarget() {
+      this.moveTarget = undefined;
+      this.moveAngle = undefined;
+    }
+  }, {
     key: 'update',
     value: function update(delta) {
-      var deltaY = Math.sin(this.angle) * this.velocity * delta;
-      var deltaX = Math.cos(this.angle) * this.velocity * delta;
-      this.x += deltaX;
-      this.y += deltaY;
+      if (this.hasMoveTarget) {
+        this.isWalking = true;
+
+        // TODO: make 8 = some STOPPING_DISTANCE constant ... GameSettings?
+        if ((0, _gx2D.distance2d)(this.position, this.moveTarget) < 8) {
+          this.clearMoveTarget();
+          return;
+        }
+
+        this.moveAngle = (0, _gx2D.angle2d)(this.position.x, this.position.y, this.moveTarget.x, this.moveTarget.y);
+        this.angle = this.moveAngle + Math.PI / 2;
+
+        if (this.velocity < this.stats.maxVelocity) {
+          // console.log('accelerating from: ' + this.velocity, "DELTA: " + delta, "ANGLE: " + this.angle);
+          this.velocity += this.stats.acceleration * delta / 1000;
+          if (this.velocity > this.stats.maxVelocity) this.velocity = this.stats.maxVelocity;
+          // console.log('New velocity: ' + this.velocity + '/' + this.stats.maxVelocity);
+        }
+
+        var deltaY = Math.sin(this.moveAngle) * this.velocity * (delta / 1000);
+        var deltaX = Math.cos(this.moveAngle) * this.velocity * (delta / 1000);
+
+        var newPosition = {
+          x: this.position.x + deltaX,
+          y: this.position.y + deltaY
+        };
+        //console.log(this.position, newPosition);
+        this.setPosition(newPosition);
+      } else {
+        this.isWalking = false;
+        if (this.hasMoveTarget) this.clearMoveTarget();
+        this.velocity = 0;
+      }
     }
   }, {
     key: 'takeDamage',
@@ -413,20 +359,60 @@ var PlayerCharacter = function (_Character) {
 
       // TODO: modifiers.
       this.health -= amount;
+      var overkill = 0;
       if (this.health < 0) {
-        console.log("Overkill!!!! -> " + Math.abs(this.health) + " HP");
+        overkill = Math.abs(this.health);
+        console.log("Overkill!!!! -> " + overkill + " HP");
         this.health = 0;
       }
+
+      var damagePackage = {
+        playerId: this.instanceId,
+        remaining: [this.stats.hp, this.stats.maxHp],
+        amount: amount,
+        overkill: overkill,
+        source: sourceCharacter.instanceId
+      };
+
+      // sendPackage(
+      //   World.getClientByPlayerCharacter(this).socket,
+      //   MessageTypes.TakeDamage,
+      //   damagePackage 
+      // );
+      // broadcastPackage(
+      //   MessageTypes.TakeDamage,
+      //   damagePackage
+      // );
+      console.log("Took " + amount + " Damage.");
+
       if (this.health === 0) {
         this.die();
-      } else {
-        console.log("Took " + amount + " Damage.");
       }
     }
   }, {
     key: 'die',
     value: function die() {
+      // broadcastPackage(
+      //   MessageTypes.PlayerDeath,
+      //   {
+      //     instanceId: this.instanceId,
+      //     position: this.position
+      //   }
+      // );
+      // setTimeout(function() {
+      //   broadcastPackage(
+      //     MessageTypes.Despawn,
+      //     {
+      //       spawnId: this.instanceId
+      //     }
+      //   )
+      // }, 3500);
       console.error("You have died.");
+    }
+  }, {
+    key: 'hasMoveTarget',
+    get: function get() {
+      return this.moveTarget && this.moveTarget.x && this.moveTarget.y;
     }
   }]);
 
@@ -436,7 +422,7 @@ var PlayerCharacter = function (_Character) {
 exports.default = PlayerCharacter;
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -448,11 +434,11 @@ Object.defineProperty(exports, "__esModule", {
 exports.SpriteClassMap = exports.SpriteTypes = undefined;
 exports.GetSpriteTypeName = GetSpriteTypeName;
 
-var _PlayerCharacter = __webpack_require__(5);
+var _PlayerCharacter = __webpack_require__(4);
 
 var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
 
-var _FireBall = __webpack_require__(3);
+var _FireBall = __webpack_require__(8);
 
 var _FireBall2 = _interopRequireDefault(_FireBall);
 
@@ -485,6 +471,38 @@ function GetSpriteTypeName(obj) {
   console.warn("didn't find it.");
   return undefined;
 }
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var MessageTypes = {
+  Who: 'WHO',
+  Authentication: 'AUTHENTICATION',
+  Port: 'PORT',
+  KeyPressed: 'KEY_PRESSED',
+  KeyReleased: 'KEY_RELEASED',
+  MouseDown: 'MOUSE_DOWN',
+  MouseUp: 'MOUSE_UP',
+  MouseClick: 'MOUSE_CLICK',
+  MouseMove: 'MOUSE_MOVE',
+  MoveTo: 'MOVE_TO',
+  Cast: 'CAST',
+  Spawn: 'SPAWN',
+  Despawn: 'DESPAWN',
+  DEBUG: 'DEBUG',
+  UpdateSprite: 'UPDATE_SPRITE',
+  FrameQueue: 'FRAME_QUEUE',
+  TakeDamage: 'TAKE_DAMAGE',
+  PlayerDeath: 'PLAYER_DEATH'
+};
+exports.default = MessageTypes;
 
 /***/ }),
 /* 7 */
@@ -671,21 +689,119 @@ exports.default = Collider;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var MessageTypes = {
-  Who: 'WHO',
-  Authentication: 'AUTHENTICATION',
-  Port: 'PORT',
-  KeyPressed: 'KEY_PRESSED',
-  KeyReleased: 'KEY_RELEASED',
-  MoveTo: 'MOVE_TO',
-  Cast: 'CAST',
-  Spawn: 'SPAWN',
-  Despawn: 'DESPAWN',
-  DEBUG: 'DEBUG',
-  UpdateSprite: 'UPDATE_SPRITE',
-  FrameQueue: 'FRAME_QUEUE'
-};
-exports.default = MessageTypes;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _GameSettings = __webpack_require__(0);
+
+var _Sprite2 = __webpack_require__(3);
+
+var _Sprite3 = _interopRequireDefault(_Sprite2);
+
+var _ColliderTypes = __webpack_require__(1);
+
+var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+//import World from '../GameEngine'; // Gonna break!!!
+
+var FireBall = function (_Sprite) {
+  _inherits(FireBall, _Sprite);
+
+  function FireBall() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, FireBall);
+
+    if (!params.collider) {
+      params.collider = {
+        type: _ColliderTypes2.default.RADIUS,
+        tags: ['PROJECTILE', 'FIRE'],
+        collidesWith: ['PLAYER', 'WALL']
+      };
+    }
+
+    if (!params.collider.type) params.collider.type = _ColliderTypes2.default.RADIUS;
+    if (!params.collider.tags) params.collider.tags = ['PROJECTILE', 'FIRE'];
+    if (!params.collider.collidesWith) params.collider.collidesWith = ['PLAYER', 'WALL'];
+
+    var _this = _possibleConstructorReturn(this, (FireBall.__proto__ || Object.getPrototypeOf(FireBall)).call(this, params));
+
+    var start = params.start || { x: 0, y: 0 };
+    var aim = params.aim || { x: -1, y: -1, placeholder: true };
+    var speed = params.speed || _GameSettings.GameSettings.TILE_SCALE * 25;
+    var owner = params.owner || null;
+
+    var life = params.life || .5; // Seconds to live
+
+    //console.log("Starting fireball at: ", start);
+    _this.setPosition(start);
+    _this.aim = aim;
+    // https://gist.github.com/conorbuck/2606166
+    _this.angle = Math.atan2(aim.y - start.y, aim.x - start.x); // radians
+    //console.log("Speed is: ", speed);
+    _this.speed = speed;
+
+    _this.stats = {
+      damage: 10
+    };
+
+    // TODO: Don't hit this fireball's owner!!!! this.owner = owner;
+
+    _this.livesUntil = Date.now() + life * 1000; // 3 seconds.
+    return _this;
+  }
+
+  _createClass(FireBall, [{
+    key: 'update',
+    value: function update(delta) {
+      if (Date.now() > this.livesUntil) {
+        // console.log("Deleting fireball.");
+        this.delete();
+        return;
+      }
+
+      //this.checkCollisions();
+
+      if (this.aim.placeholder) return;
+      // SOH, CAH, TOA
+      var deltaY = Math.sin(this.angle) * this.speed * delta / 1000;
+      var deltaX = Math.cos(this.angle) * this.speed * delta / 1000;
+      this.setPosition({
+        x: this.position.x + deltaX,
+        y: this.position.y + deltaY
+      });
+    }
+  }, {
+    key: 'delete',
+    value: function _delete() {
+      throw new Error("Must override FireBall.delete() method on instances.");
+    }
+  }, {
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(otherCollider) {
+      _get(FireBall.prototype.__proto__ || Object.getPrototypeOf(FireBall.prototype), 'onCollisionEnter', this) && _get(FireBall.prototype.__proto__ || Object.getPrototypeOf(FireBall.prototype), 'onCollisionEnter', this).call(this, otherCollider);
+
+      if (otherCollider.tags.includes('PLAYER')) {
+        var otherPlayer = otherCollider.ownerGO;
+        otherPlayer.takeDamage(this.stats.damage, this.ownerGO);
+      }
+    }
+  }]);
+
+  return FireBall;
+}(_Sprite3.default);
+
+exports.default = FireBall;
 
 /***/ }),
 /* 9 */
@@ -705,7 +821,8 @@ var PlayerActions = {
   DOWN: 'DOWN',
   SHIFT: 'SHIFT',
   MOUSE_ACTION_1: 'MOUSE_ACTION_1',
-  MOUSE_ACTION_2: 'MOUSE_ACTION_2'
+  MOUSE_ACTION_2: 'MOUSE_ACTION_2',
+  SHOOT_PROJECTILE: 'SHOOT_PROJECTILE'
 };
 exports.default = PlayerActions;
 
@@ -719,10 +836,46 @@ exports.default = PlayerActions;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.angle2d = angle2d;
+exports.distance2d = distance2d;
+function angle2d(ax, ay, bx, by) {
+  return Math.atan2(by - ay, bx - ax);
+}
+
+// These are terrible.
+// see: https://en.wikipedia.org/wiki/Linear_interpolation
+// export function lerp1d(start, end, delta) {
+//   return ( start.y * (end.x - delta) + end.y * (delta - start.x) ) / (end.x - start.x);
+// }
+
+// export function lerp2d(startPosition, endPosition, delta) {
+//   return { 
+//     x: lerp1d(startPosition.x, endPosition.x, delta),
+//     y: lerp1d(startPosition.y, endPosition.y, delta),
+//   }
+// }
+
+function distance2d(startPosition, endPosition) {
+  var aSquared = Math.pow(startPosition.x - endPosition.x, 2);
+  var bSquared = Math.pow(startPosition.y - endPosition.y, 2);
+  return Math.sqrt(aSquared + bSquared);
+}
+
+/***/ }),
+/* 11 */,
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Sprite2 = __webpack_require__(4);
+var _Sprite2 = __webpack_require__(3);
 
 var _Sprite3 = _interopRequireDefault(_Sprite2);
 
@@ -764,7 +917,7 @@ var Character = function (_Sprite) {
 exports.default = Character;
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -792,13 +945,244 @@ var GameObject = function GameObject() {
 exports.default = GameObject;
 
 /***/ }),
-/* 12 */
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MessageTypes = exports.broadcastPackage = exports.sendPackage = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+// Game elements
+// import Client from './server/Client';
+
+
+var _messaging = __webpack_require__(29);
+
+Object.defineProperty(exports, 'sendPackage', {
+  enumerable: true,
+  get: function get() {
+    return _messaging.sendPackage;
+  }
+});
+Object.defineProperty(exports, 'broadcastPackage', {
+  enumerable: true,
+  get: function get() {
+    return _messaging.broadcastPackage;
+  }
+});
+Object.defineProperty(exports, 'MessageTypes', {
+  enumerable: true,
+  get: function get() {
+    return _messaging.MessageTypes;
+  }
+});
+
+var _SpriteTypes = __webpack_require__(5);
+
+var _guid = __webpack_require__(2);
+
+var _LevelManager = __webpack_require__(30);
+
+var _LevelManager2 = _interopRequireDefault(_LevelManager);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// Database elements???
+
+var clients = {};
+// const levels = {};
+
+var GameEngine = function () {
+  _createClass(GameEngine, [{
+    key: 'levels',
+
+
+    // read only so that we cannot reassign from outside.
+    get: function get() {
+      return _LevelManager2.default.levels;
+    }
+  }, {
+    key: 'clients',
+    get: function get() {
+      return clients;
+    }
+  }]);
+
+  function GameEngine() {
+    _classCallCheck(this, GameEngine);
+
+    this.getLevel = _LevelManager2.default.getLevel.bind(_LevelManager2.default);
+  }
+
+  // So at this point, it's pretty clear that sprites are bound to their map. 
+
+
+  _createClass(GameEngine, [{
+    key: 'spawnSprite',
+    value: function spawnSprite(levelId, spriteTypeName, attributes) {
+      var classType = _SpriteTypes.SpriteClassMap.get(spriteTypeName);
+      var spawn = new classType(attributes);
+      _LevelManager2.default.addSprite(levelId, spawn);
+      return spawn;
+    }
+
+    // Clients
+
+  }, {
+    key: 'addClient',
+    value: function addClient(client) {
+      if (!client.instanceId) client.instanceId = (0, _guid.guid)();
+      clients[client.instanceId] = client;
+    }
+  }, {
+    key: 'addClientWithAttributes',
+    value: function addClientWithAttributes(attributes) {}
+  }, {
+    key: 'removeClient',
+    value: function removeClient(client) {
+      delete clients[client.instanceId];
+    }
+  }, {
+    key: 'getClientByInstanceId',
+    value: function getClientByInstanceId(instanceId) {
+      return clients[instanceId];
+    }
+  }, {
+    key: 'getClientByPlayerCharacter',
+    value: function getClientByPlayerCharacter(character) {
+      return clients.find(function (c) {
+        return c.playerCharacter === character;
+      });
+    }
+  }, {
+    key: 'getPlayerByInstanceId',
+    value: function getPlayerByInstanceId(instanceId) {
+      // Can pass either the client's instance Id or the character's instanceId
+      return clients.find(function (c) {
+        return c.instanceId === instanceId || c.playerCharacter && c.playerCharacter.instanceId === instanceId;
+      });
+    }
+  }]);
+
+  return GameEngine;
+}();
+
+// Ensures singleton (I think)
+
+
+var World = new GameEngine();
+
+exports.default = World;
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Sprite = __webpack_require__(3);
+
+var _Sprite2 = _interopRequireDefault(_Sprite);
+
+var _GameSettings = __webpack_require__(0);
+
+var _SpriteTypes = __webpack_require__(5);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Level = function () {
+  function Level(levelId) {
+    _classCallCheck(this, Level);
+
+    // Initialize defaults
+    this.start = { tx: -1, ty: -1 };
+    this.tileMap = [];
+    this.sprites = [];
+
+    this.frameQueue = [];
+
+    // Load data (this may overwrite defaults)
+    if (levelId) {
+      this.id = levelId;
+    } else {
+      throw new Error("Didn't provide level ID");
+    }
+  }
+
+  _createClass(Level, [{
+    key: 'populate',
+    value: function populate(levelData) {
+      this.start = levelData.start;
+      this.tileMap = levelData.tileMap;
+      this.sprites = levelData.sprites.map(function (s) {
+        var sprite = Object.assign(new _Sprite2.default(), s);
+        sprite.setPosition({
+          x: s.tx * _GameSettings.GameSettings.TILE_SCALE,
+          y: s.ty * _GameSettings.GameSettings.TILE_SCALE
+        });
+        return sprite;
+      });
+    }
+  }, {
+    key: 'toJSON',
+    value: function toJSON() {
+      var obj = Object.assign({}, this);
+      obj.sprites = obj.sprites.map(function (s) {
+        var obj = { spawnClass: (0, _SpriteTypes.GetSpriteTypeName)(s), spawn: s };
+        return obj;
+      });
+      // console.log("Level JSONified: ", obj);
+      return JSON.stringify(obj);
+    }
+  }, {
+    key: 'addSprite',
+    value: function addSprite(sprite) {
+      // TODO: something more robust.
+      this.sprites.push(sprite);
+    }
+  }]);
+
+  return Level;
+}();
+
+// Level.prototype.loadFromJSONFile = function loadFromJSONFile(filename) {
+//   const levelData = JSON.parse(fs.readFileSync(filename, 'utf-8'));
+// };
+
+
+exports.default = Level;
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports) {
+
+module.exports = require("fs");
+
+/***/ }),
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = require("mongoose");
 
 /***/ }),
-/* 13 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -811,7 +1195,7 @@ exports.hashString = hashString;
 exports.sha512 = sha512;
 exports.hashPassword = hashPassword;
 
-var _crypto = __webpack_require__(25);
+var _crypto = __webpack_require__(32);
 
 var _crypto2 = _interopRequireDefault(_crypto);
 
@@ -851,27 +1235,9 @@ function hashPassword(password) {
 }
 
 /***/ }),
-/* 14 */,
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = Client;
-function Client(info) {
-  this.socket = info.socket;
-  this.token = info.token;
-  this.authenticated = info.authenticated || false;
-  this.ipAddress = this.socket.upgradeReq.headers['x-forwarded-for'] || this.socket.upgradeReq.connection.remoteAddress;
-  this.playerCharacter = info.playerCharacter || null;
-}
-
-/***/ }),
-/* 16 */
+/* 19 */,
+/* 20 */,
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -883,7 +1249,65 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _PlayerCharacter = __webpack_require__(5);
+var _gx2D = __webpack_require__(10);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Client = function () {
+  function Client(info) {
+    _classCallCheck(this, Client);
+
+    this.socket = info.socket;
+    this.token = info.token;
+    this.authenticated = info.authenticated || false;
+    this.ipAddress = this.socket.upgradeReq.headers['x-forwarded-for'] || this.socket.upgradeReq.connection.remoteAddress;
+    this.playerCharacter = info.playerCharacter || null;
+  }
+
+  _createClass(Client, [{
+    key: 'setMouseDown',
+    value: function setMouseDown(params) {
+      // console.log("setting playercharacter to moving.");
+      // this.playerCharacter.moving = true;
+      this.playerCharacter.setMoveTarget(params.x, params.y);
+    }
+  }, {
+    key: 'setMouseUp',
+    value: function setMouseUp() {
+      this.playerCharacter.moving = false;
+    }
+  }, {
+    key: 'setMousePosition',
+    value: function setMousePosition(aim) {
+      // console.error("setting position");
+      var pc = this.playerCharacter;
+      if (pc && !pc.hasMoveTarget) {
+        pc.aim = aim;
+        pc.angle = (0, _gx2D.angle2d)(pc.position.x, pc.position.y, aim.x, aim.y) + Math.PI / 2;
+        // console.log('angle: ', pc.angle);
+      }
+    }
+  }]);
+
+  return Client;
+}();
+
+exports.default = Client;
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _PlayerCharacter = __webpack_require__(4);
 
 var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
 
@@ -914,7 +1338,7 @@ var DbManager = new DatabaseManager();
 exports.default = DbManager;
 
 /***/ }),
-/* 17 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -924,76 +1348,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _fs = __webpack_require__(26);
-
-var _fs2 = _interopRequireDefault(_fs);
-
-var _Sprite = __webpack_require__(4);
-
-var _Sprite2 = _interopRequireDefault(_Sprite);
-
-var _GameSettings = __webpack_require__(0);
-
-var _SpriteTypes = __webpack_require__(6);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function Level(levelId) {
-
-  // Initialize defaults
-  this.start = { tx: -1, ty: -1 };
-  this.tileMap = [];
-  this.sprites = [];
-
-  this.frameQueue = [];
-
-  // Load data (this may overwrite defaults)
-  if (levelId) {
-    this.id = levelId;
-    this.loadFromJSONFile('./levels/level_' + levelId + '.json');
-  } else {
-    throw new Error("Didn't provide level ID");
-  }
-}
-
-Level.prototype.toJSON = function toJSON() {
-  var obj = Object.assign({}, this);
-  obj.sprites = obj.sprites.map(function (s) {
-    var obj = { spawnClass: (0, _SpriteTypes.GetSpriteTypeName)(s), spawn: s };
-    return obj;
-  });
-  // console.log("Level JSONified: ", obj);
-  return JSON.stringify(obj);
-};
-
-Level.prototype.loadFromJSONFile = function loadFromJSONFile(filename) {
-  var levelData = JSON.parse(_fs2.default.readFileSync(filename, 'utf-8'));
-  this.start = levelData.start;
-  this.tileMap = levelData.tileMap;
-  this.sprites = levelData.sprites.map(function (s) {
-    var sprite = Object.assign(new _Sprite2.default(), s);
-    sprite.setPosition({
-      x: s.tx * _GameSettings.GameSettings.TILE_SCALE,
-      y: s.ty * _GameSettings.GameSettings.TILE_SCALE
-    });
-    return sprite;
-  });
-};
-
-exports.default = Level;
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _mongoose = __webpack_require__(12);
+var _mongoose = __webpack_require__(17);
 
 var _mongoose2 = _interopRequireDefault(_mongoose);
 
@@ -1019,37 +1374,113 @@ var User = _mongoose2.default.model('User', userSchema);
 exports.default = User;
 
 /***/ }),
-/* 19 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = require("express");
 
 /***/ }),
-/* 20 */
+/* 25 */
 /***/ (function(module, exports) {
 
 module.exports = require("http");
 
 /***/ }),
-/* 21 */
+/* 26 */
 /***/ (function(module, exports) {
 
 module.exports = require("random-token");
 
 /***/ }),
-/* 22 */
+/* 27 */
 /***/ (function(module, exports) {
 
 module.exports = require("ws");
 
 /***/ }),
-/* 23 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }(); // External Dependencies
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _express = __webpack_require__(24);
+
+var _express2 = _interopRequireDefault(_express);
+
+var _http = __webpack_require__(25);
+
+var _http2 = _interopRequireDefault(_http);
+
+var _ws = __webpack_require__(27);
+
+var _ws2 = _interopRequireDefault(_ws);
+
+var _randomToken = __webpack_require__(26);
+
+var _randomToken2 = _interopRequireDefault(_randomToken);
+
+var _mongoose = __webpack_require__(17);
+
+var _mongoose2 = _interopRequireDefault(_mongoose);
+
+var _GameEngine = __webpack_require__(14);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+var _guid = __webpack_require__(2);
+
+var _passhashing = __webpack_require__(18);
+
+var _Client = __webpack_require__(21);
+
+var _Client2 = _interopRequireDefault(_Client);
+
+var _Level = __webpack_require__(15);
+
+var _Level2 = _interopRequireDefault(_Level);
+
+var _DatabaseManager = __webpack_require__(22);
+
+var _DatabaseManager2 = _interopRequireDefault(_DatabaseManager);
+
+var _GameSettings = __webpack_require__(0);
+
+var _fs = __webpack_require__(16);
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _FireBall = __webpack_require__(8);
+
+var _FireBall2 = _interopRequireDefault(_FireBall);
+
+var _PlayerCharacter = __webpack_require__(4);
+
+var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
+
+var _MessageTypes = __webpack_require__(6);
+
+var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
+
+var _PlayerActions = __webpack_require__(9);
+
+var _PlayerActions2 = _interopRequireDefault(_PlayerActions);
+
+var _SpriteTypes = __webpack_require__(5);
+
+var _Collider = __webpack_require__(7);
+
+var _User = __webpack_require__(23);
+
+var _User2 = _interopRequireDefault(_User);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var PORT = process.env.PORT || 5555;
+
+// External Dependencies
 
 
 // Helpers
@@ -1061,86 +1492,28 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 // Game Managers
 
 
+var serverConfig = JSON.parse(_fs2.default.readFileSync('./config.json'));
+
 // Game Objects
 
 
 // Constants & Enumerations
 
 
-var _express = __webpack_require__(19);
-
-var _express2 = _interopRequireDefault(_express);
-
-var _http = __webpack_require__(20);
-
-var _http2 = _interopRequireDefault(_http);
-
-var _ws = __webpack_require__(22);
-
-var _ws2 = _interopRequireDefault(_ws);
-
-var _randomToken = __webpack_require__(21);
-
-var _randomToken2 = _interopRequireDefault(_randomToken);
-
-var _mongoose = __webpack_require__(12);
-
-var _mongoose2 = _interopRequireDefault(_mongoose);
-
-var _guid = __webpack_require__(2);
-
-var _passhashing = __webpack_require__(13);
-
-var _Client = __webpack_require__(15);
-
-var _Client2 = _interopRequireDefault(_Client);
-
-var _Level = __webpack_require__(17);
-
-var _Level2 = _interopRequireDefault(_Level);
-
-var _DatabaseManager = __webpack_require__(16);
-
-var _DatabaseManager2 = _interopRequireDefault(_DatabaseManager);
-
-var _GameSettings = __webpack_require__(0);
-
-var _FireBall = __webpack_require__(3);
-
-var _FireBall2 = _interopRequireDefault(_FireBall);
-
-var _MessageTypes = __webpack_require__(8);
-
-var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
-
-var _PlayerActions = __webpack_require__(9);
-
-var _PlayerActions2 = _interopRequireDefault(_PlayerActions);
-
-var _SpriteTypes = __webpack_require__(6);
-
-var _Collider = __webpack_require__(7);
-
-var _User = __webpack_require__(18);
-
-var _User2 = _interopRequireDefault(_User);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 // Database related
-_mongoose2.default.connect(_GameSettings.GameSettings.MONGODB_CONNECTIONSTRING);
+_mongoose2.default.connect(serverConfig.MONGODB_CONNECTIONSTRING);
 
 
 // Application Globals
-var world = {
-  levels: {},
-  clients: {}
-};
+// const World = {
+//   levels: {},
+//   clients: {}
+// };
 
 // Helpers & Abstractions
 var log = console.log; // TODO: log things to a file for production.
 
-var authenticate = async function authenticate(authString) {
+var authenticate = async function authenticate(client, authString) {
   // TODO: add function name and explain why!
   // TODO: Faking user authentication. Need the real thing.
   var _authString$split = authString.split(':'),
@@ -1148,7 +1521,6 @@ var authenticate = async function authenticate(authString) {
       username = _authString$split2[0],
       password = _authString$split2[1];
 
-  console.log("what's happening?");
   if (username && password) {
     try {
       var user = await _User2.default.findOne({ user: username }); // , 'user pass');
@@ -1156,7 +1528,7 @@ var authenticate = async function authenticate(authString) {
       var hashedPass = (0, _passhashing.hashPassword)(password, user.pass.salt);
       if (hashedPass.hash === user.pass.hash) {
         // TODO: retrieve character info???
-        console.log("Password correct.");
+        client.model = user;
         return true;
       } else if (username.toLowerCase() === 'james') {
         console.log("Password incorrect.");
@@ -1167,8 +1539,6 @@ var authenticate = async function authenticate(authString) {
       // This is probably a promise error.
       console.error("Exception occurred: ", exception);
     }
-  } else {
-    console.log("Tings were not provided.");
   }
 
   return false;
@@ -1177,26 +1547,27 @@ var authenticate = async function authenticate(authString) {
 // Serving front end items (web pages, client scripts, images, etc.)
 var app = (0, _express2.default)();
 app.use(_express2.default.static('client'));
-_http2.default.createServer(app).listen(5555, function () {
+var server = _http2.default.createServer(app).listen(PORT, function () {
   return log('App started.');
 });
 
 // Socket Event Handlers
 var initiateClient = function initiateClient(socket) {
   // Add socket to client list.
-  var clientToken = (0, _randomToken2.default)(16);
-  while (world.clients.clientToken) {
-    clientToken = (0, _randomToken2.default)(16);
+  var instanceId = (0, _guid.guid)();
+  while (_GameEngine2.default.clients[instanceId]) {
+    instanceId = (0, _guid.guid)();
   }
   var client = new _Client2.default({
-    token: clientToken,
+    instanceId: instanceId,
     socket: socket,
-    playerCharacter: null
+    playerCharacter: null,
+    model: null
   });
-  world.clients[clientToken] = client;
+  //World.clients[clientToken] = client;
+  _GameEngine2.default.addClient(client);
 
   // Define socket behaviors
-  console.log("initiated client");
   socket.on('message', clientMessage.bind(client));
   socket.on('close', clientClose.bind(client));
 
@@ -1204,7 +1575,6 @@ var initiateClient = function initiateClient(socket) {
     log(info);
   });
 
-  console.log("tryin to send package.");
   sendPackage(socket, _MessageTypes2.default.Who);
 };
 
@@ -1213,8 +1583,9 @@ var broadcastPackage = function broadcastPackage() {
   var attributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
   // TODO: only affect clients that are in range and can see (but for now everybody)
-  Object.keys(world.clients).forEach(function (clientKey) {
-    var c = world.clients[clientKey];
+  Object.keys(_GameEngine2.default.clients).forEach(function (clientKey) {
+    // console.log("broadcasting port package to: " + clientKey, World.clients[clientKey]);
+    var c = _GameEngine2.default.clients[clientKey];
     if (c) sendPackage(c.socket, type, attributes);
   });
 };
@@ -1235,15 +1606,15 @@ var clientMessage = async function clientMessage() {
   var incoming = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '{}';
 
   // 'this' === the client that generated this message
-
+  // const client = this; ????
   var message = JSON.parse(incoming);
 
   switch (message.type) {
     case _MessageTypes2.default.Who:
-      if (await authenticate(message.who)) {
+      if (await authenticate(this, message.who)) {
         log("Getting player.");
         this.playerCharacter = _DatabaseManager2.default.getPlayer('James');
-        sendPackage(this.socket, _MessageTypes2.default.Authentication, { success: true, token: this.token, playerCharacter: JSON.stringify(this.playerCharacter) });
+        sendPackage(this.socket, _MessageTypes2.default.Authentication, { success: true, instanceId: this.instanceId, playerCharacter: JSON.stringify(this.playerCharacter) });
       } else {
         sendPackage(this.socket, _MessageTypes2.default.Authentication, { success: false, errorMessage: 'Authentication failed.' });
       }
@@ -1251,16 +1622,16 @@ var clientMessage = async function clientMessage() {
     case _MessageTypes2.default.Port:
       // incoming -> message: { levelId }
       var level = null;
-      if (world.levels[message.levelId]) {
-        level = world.levels[message.levelId];
+      if (_GameEngine2.default.levels[message.levelId]) {
+        level = _GameEngine2.default.levels[message.levelId];
       } else {
-        level = new _Level2.default(message.levelId);
-        world.levels[message.levelId] = level;
+        level = _GameEngine2.default.getLevel(message.levelId); // new Level(message.levelId);
+        _GameEngine2.default.levels[message.levelId] = level;
       }
       var pc = this.playerCharacter;
-      pc.tx = level.start.tx;
+      //pc.tx = level.start.tx;
       pc.position.x = level.start.tx * _GameSettings.GameSettings.TILE_SCALE;
-      pc.ty = level.start.ty;
+      //pc.ty = level.start.ty;
       pc.position.y = level.start.ty * _GameSettings.GameSettings.TILE_SCALE;
       pc.levelId = level.id;
       // TODO: Update this WHOOOOOLE file with pc.getLevel() instead of levelId
@@ -1271,8 +1642,10 @@ var clientMessage = async function clientMessage() {
 
       // TODO: Will need to check whether player is "allowed" to port here.
       //  For example, are they currently near a portal to this area?
+      // console.log("sending port package to: " + this.instanceId, this);
       sendPackage(this.socket, _MessageTypes2.default.Port, { success: true, level: level, playerCharacter: pc });
-      // console.log("sent port package");
+      console.log("sent port package");
+      console.log("broadcasting port package");
       broadcastPackage(_MessageTypes2.default.Spawn, { spawnClass: _SpriteTypes.SpriteTypes.PLAYER, spawn: pc });
       console.log("broadcast port package");
       break;
@@ -1281,6 +1654,11 @@ var clientMessage = async function clientMessage() {
       break;
     case _MessageTypes2.default.KeyReleased:
       handleKeyReleased(this, message);
+      break;
+    case _MessageTypes2.default.MouseDown:
+    case _MessageTypes2.default.MouseUp:
+    case _MessageTypes2.default.MouseMove:
+      handleMouseEvent(this, message);
       break;
     case _MessageTypes2.default.Cast:
       castSpell(this, message);
@@ -1295,7 +1673,7 @@ var clientClose = function clientClose() {
   this.socket = null;
   // TODO: Then save any relevant client data to the database
   //   Note: should save with a separate function so that we can also auto-save periodically.
-  // Then remove the client from the world. 
+  // Then remove the client from the World. 
   // TODO: When above TODO is finished, this should be a callback.
   {
     if (this.playerCharacter) {
@@ -1304,10 +1682,23 @@ var clientClose = function clientClose() {
         var levelIndex = level.sprites.indexOf(this.playerCharacter);
         level.sprites.splice(levelIndex, 1);
         level.sprites[this.playerCharacter.instanceId] = undefined;
-        world.clients[this.token] = undefined;
+        _GameEngine2.default.clients[this.instanceId] = undefined; // TODO: use GameEngine.removeClient();
         broadcastPackage(_MessageTypes2.default.Despawn, { spawnId: this.playerCharacter.instanceId });
       }
     }
+  }
+};
+
+var handleMouseEvent = function handleMouseEvent(client, message) {
+  if (message.type === _MessageTypes2.default.MouseDown) {
+    // console.log("Mouse down", message);
+    client.setMouseDown(message);
+  } else if (message.type === _MessageTypes2.default.MouseUp) {
+    // console.log("Mouse up");
+    client.setMouseUp();
+  } else {
+    // console.log("Mouse move: " + Date.now());
+    client.setMousePosition(message.aim);
   }
 };
 
@@ -1320,7 +1711,8 @@ var handleKeyPressed = function handleKeyPressed(client, message) {
     case _PlayerActions2.default.DOWN:
       handlePlayerMoveRequest(client, message);
       break;
-    case _PlayerActions2.default.MOUSE_ACTION_1:
+    case _PlayerActions2.default.SHOOT_PROJECTILE:
+      // log("Got shoot request: ", message);
       handlePlayerFireRequest(client, message);
       break;
     default:
@@ -1330,7 +1722,7 @@ var handleKeyPressed = function handleKeyPressed(client, message) {
 };
 var handleKeyReleased = function handleKeyReleased(client, message) {
   var action = message.action;
-  log(action);
+  // log("Released: " + action);
 };
 
 var handlePlayerMoveRequest = function handlePlayerMoveRequest(client, message) {
@@ -1377,7 +1769,7 @@ var handlePlayerFireRequest = function handlePlayerFireRequest(client, message) 
   //console.log("Firing from: ", client.playerCharacter.position);
   var fireball = new _FireBall2.default({
     start: pc.position,
-    aim: message.aim,
+    aim: pc.hasMoveTarget ? pc.moveTarget : message.aim,
     speed: _GameSettings.GameSettings.TILE_SCALE * 12, // TODO: up to 12 when things seem good.
     // owner: pc,
     collider: {
@@ -1385,7 +1777,7 @@ var handlePlayerFireRequest = function handlePlayerFireRequest(client, message) 
     }
   });
   pc.collider.ignoresIds.push(fireball.instanceId);
-  var sprites = world.levels[pc.levelId].sprites;
+  var sprites = _GameEngine2.default.levels[pc.levelId].sprites;
   sprites.push(fireball);
   broadcastPackage(_MessageTypes2.default.Spawn, { spawnClass: _SpriteTypes.SpriteTypes.FIREBALL, spawn: fireball });
 
@@ -1394,8 +1786,8 @@ var handlePlayerFireRequest = function handlePlayerFireRequest(client, message) 
     broadcastPackage(_MessageTypes2.default.Despawn, { spawnId: fireball.instanceId });
   };
 
-  // log("Number of sprites in level: " + world.levels[pc.levelId].sprites.length);
-  // log("Level sprites: ", world.levels[pc.levelId].sprites);
+  // log("Number of sprites in level: " + World.levels[pc.levelId].sprites.length);
+  // log("Level sprites: ", World.levels[pc.levelId].sprites);
 };
 
 var castSpell = function castSpell(client, message) {
@@ -1407,8 +1799,8 @@ var castSpell = function castSpell(client, message) {
 
 // Serving the game service.
 var gameServer = new _ws2.default.Server({
-  perMessageDeflate: false,
-  port: 8080
+  server: server,
+  perMessageDeflate: false
 });
 gameServer.on('connection', initiateClient);
 
@@ -1422,8 +1814,8 @@ setInterval(function () {
   var delta = thisUpdate - lastUpdate;
   lastUpdate = thisUpdate;
 
-  var levelsArray = Object.keys(world.levels).map(function (key) {
-    return world.levels[key];
+  var levelsArray = Object.keys(_GameEngine2.default.levels).map(function (key) {
+    return _GameEngine2.default.levels[key];
   });
 
   // Update all gameobjects
@@ -1437,6 +1829,9 @@ setInterval(function () {
         var postSprite = JSON.stringify(sprite, function (k, v) {
           return k === 'owner' ? undefined : v;
         });
+        // if(sprite instanceof PlayerCharacter && sprite.moving) {
+        //   console.log("PRE: ", preSprite, "POST: ", postSprite);
+        // }
         // If updates exist and prop changes are made, add updates to a package
         if (postSprite !== preSprite) {
           level.frameQueue.push({
@@ -1463,12 +1858,12 @@ setInterval(function () {
     });
   });
 
-  Object.keys(world.clients).map(function (id) {
-    return world.clients[id];
+  Object.keys(_GameEngine2.default.clients).map(function (id) {
+    return _GameEngine2.default.clients[id];
   }).forEach(function (client) {
     if (!client || !client.playerCharacter || !client.socket) return;
 
-    var level = world.levels[client.playerCharacter.levelId];
+    var level = _GameEngine2.default.levels[client.playerCharacter.levelId];
     if (!level) return;
 
     // send update package to all connected clients on a per-level basis.
@@ -1484,17 +1879,130 @@ setInterval(function () {
 }, 1000 / 60);
 
 /***/ }),
-/* 24 */,
-/* 25 */
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.broadcastPackage = exports.sendPackage = exports.MessageTypes = undefined;
+
+var _MessageTypes = __webpack_require__(6);
+
+var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
+
+var _GameEngine = __webpack_require__(14);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.MessageTypes = _MessageTypes2.default;
+var sendPackage = exports.sendPackage = function sendPackage(socket) {
+  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var attributes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  if (socket === null) throw new Error('Socket must be specified.'); // TODO: instanceof what?
+  if (type === null) throw new Error('Package type must be specified.');
+
+  if (socket.readyState !== WebSocket.OPEN) return;
+
+  socket.send(JSON.stringify(Object.assign({ type: type }, attributes)));
+};
+
+var broadcastPackage = exports.broadcastPackage = function broadcastPackage() {
+  var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var attributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var clientIdList = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+  clientIdList = clientIdList || Object.keys(_GameEngine2.default.clients);
+  // TODO: only affect clients that are in range and can see (but for now everybody)
+  clientIdList.forEach(function (clientKey) {
+    console.log("broadcasting port package to: " + clientKey, _GameEngine2.default.clients[clientKey]);
+    var c = _GameEngine2.default.clients[clientKey];
+    if (c) sendPackage(c.socket, type, attributes);
+  });
+};
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _fs = __webpack_require__(16);
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _Level = __webpack_require__(15);
+
+var _Level2 = _interopRequireDefault(_Level);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var levels = {};
+
+var LevelManager = function () {
+  function LevelManager() {
+    _classCallCheck(this, LevelManager);
+  }
+
+  _createClass(LevelManager, [{
+    key: 'getLevel',
+    value: function getLevel(levelId) {
+      if (!this.levels[levelId]) {
+
+        var level = new _Level2.default(levelId);
+        level.populate(this.loadFromJSONFile('./levels/level_' + levelId + '.json'));
+
+        if (!level) throw new Error("Level did not load. This is probably because of an invalid level ID.");
+
+        this.levels[levelId] = level;
+      }
+      return this.levels[levelId];
+    }
+  }, {
+    key: 'loadFromJSONFile',
+    value: function loadFromJSONFile(filename) {
+      return JSON.parse(_fs2.default.readFileSync(filename, 'utf-8'));
+    }
+  }, {
+    key: 'addSprite',
+    value: function addSprite(levelId, sprite) {
+      this.getLevel(levelId).addSprite(sprite);
+    }
+  }, {
+    key: 'levels',
+    get: function get() {
+      return levels;
+    }
+  }]);
+
+  return LevelManager;
+}();
+
+var levelManager = new LevelManager();
+
+exports.default = levelManager;
+
+/***/ }),
+/* 31 */,
+/* 32 */
 /***/ (function(module, exports) {
 
 module.exports = require("crypto");
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports) {
-
-module.exports = require("fs");
 
 /***/ })
 /******/ ]);

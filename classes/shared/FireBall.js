@@ -3,6 +3,8 @@ import { GameSettings } from '../GameSettings';
 import Sprite from './Sprite';
 import ColliderTypes from '../ColliderTypes';
 
+//import World from '../GameEngine'; // Gonna break!!!
+
 class FireBall extends Sprite {
   constructor(params = {}) {
     if(!params.collider) {

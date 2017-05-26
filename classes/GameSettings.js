@@ -1,5 +1,5 @@
-
+// GameSettings is a shared settings file that will share info to both the server and the client.
 export const GameSettings = {
   TILE_SCALE: 32,
-  MONGODB_CONNECTIONSTRING: 'mongodb://multiplayerAdmin:1234@ds151951.mlab.com:51951/multiplayer'
+  //MONGODB_CONNECTIONSTRING: serverConfig.MONGODB_CONNECTIONSTRING
 }
