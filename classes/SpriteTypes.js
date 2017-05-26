@@ -1,20 +1,19 @@
 
 import PlayerCharacter from './shared/PlayerCharacter';
-import FireBall from './shared/FireBall';
 
 export const SpriteTypes = {
   PLAYER: 'SpriteTypes.PLAYER',
   CHEST: 'SpriteTypes.CHEST',
   FIREBALL: 'SpriteTypes.FIREBALL',
+  EXPLOSION: 'SpriteTypes.EXPLOSION',
 };
 
 
-export const SpriteClassMap = new Map();
-SpriteClassMap.set(SpriteTypes.PLAYER, PlayerCharacter);
-SpriteClassMap.set(SpriteTypes.FIREBALL, FireBall);
+export const ClientSpriteClassMap = new Map();
+ClientSpriteClassMap.set(SpriteTypes.PLAYER, PlayerCharacter);
 
 export function GetSpriteTypeName(obj) {
-  var iterator = SpriteClassMap.entries();
+  var iterator = ClientSpriteClassMap.entries();
   let mapCursor = {};
 
   do {

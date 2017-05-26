@@ -1,7 +1,10 @@
 
 import Sprite from '../shared/Sprite';
 import { GameSettings } from '../GameSettings';
-import { SpriteClassMap, GetSpriteTypeName } from '../SpriteTypes';
+import MessageTypes from '../MessageTypes';
+import { GetSpriteTypeName } from '../SpriteClassMap';
+
+import World, { broadcastPackage } from '../GameEngine';
 
 export default class Level {
   
@@ -39,7 +42,7 @@ export default class Level {
     const obj = Object.assign({}, this);
     obj.sprites = obj.sprites.map(s => {
       const obj = { spawnClass: GetSpriteTypeName(s), spawn: s }
-      return obj
+      return obj;
     });
     // console.log("Level JSONified: ", obj);
     return JSON.stringify(obj);
@@ -48,6 +51,12 @@ export default class Level {
   addSprite(sprite) {
     // TODO: something more robust.
     this.sprites.push(sprite);
+    broadcastPackage(MessageTypes.Spawn, { spawnClass: GetSpriteTypeName(sprite), spawn: sprite });
+  }
+
+  removeSprite(sprite) {
+    this.sprites.splice(this.sprites.indexOf(sprite), 1);
+    broadcastPackage(MessageTypes.Despawn, { spawnId: sprite.instanceId });
   }
 
 }

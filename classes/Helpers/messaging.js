@@ -1,4 +1,6 @@
 
+import WebSocket from 'ws';
+
 import MessageTypes from '../MessageTypes';
 export { MessageTypes };
 
@@ -17,7 +19,7 @@ export const broadcastPackage = function broadcastPackage(type = null, attribute
   clientIdList = clientIdList || Object.keys(World.clients);
   // TODO: only affect clients that are in range and can see (but for now everybody)
   clientIdList.forEach(clientKey => {
-    console.log("broadcasting port package to: " + clientKey, World.clients[clientKey]);
+    // console.log("broadcasting package to: " + clientKey, type, attributes);
     const c = World.clients[clientKey];
     if(c) sendPackage(c.socket, type, attributes);
   });

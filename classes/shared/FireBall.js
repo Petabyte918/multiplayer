@@ -2,8 +2,10 @@
 import { GameSettings } from '../GameSettings';
 import Sprite from './Sprite';
 import ColliderTypes from '../ColliderTypes';
+import { SpriteTypes } from '../SpriteTypes';
+import MessageTypes from '../MessageTypes';
 
-//import World from '../GameEngine'; // Gonna break!!!
+import World, { broadcastPackage } from '../GameEngine';
 
 class FireBall extends Sprite {
   constructor(params = {}) {
@@ -30,6 +32,8 @@ class FireBall extends Sprite {
     const owner = params.owner || null;
 
     const life = params.life || .5; // Seconds to live
+
+    this.setTexture('./images/FireballStatic.png');
 
     //console.log("Starting fireball at: ", start);
     this.setPosition(start);
@@ -76,9 +80,17 @@ class FireBall extends Sprite {
     
     if(otherCollider.tags.includes('PLAYER')) {
       const otherPlayer = otherCollider.ownerGO;
+      console.log("Spawning explosion at target player position.");
       otherPlayer.takeDamage(this.stats.damage, this.ownerGO);
-      
+      World.spawnSprite(otherPlayer.levelId, SpriteTypes.EXPLOSION, { start: this.position });
+      broadcastPackage(MessageTypes.TakeDamage, { damage: this.stats.damage, target: otherPlayer });
+    } else {
+      console.log("Spawning explosion at fireball position.");
+      World.spawnSprite(World.getLevelBySprite(this).id, SpriteTypes.EXPLOSION, { start: this.position });
     }
+
+    console.log("despawning fireball. From level: " + World.getLevelBySprite(this).levelId);
+    World.despawnSpriteByLevel(World.getLevelBySprite(this).id, this);
 
   }
 

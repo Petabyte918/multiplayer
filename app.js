@@ -1,13 +1,12 @@
 
-console.log(process.env.MONGODB_CONNECTIONSTRING);
-
+// Environment
 const PORT = process.env.PORT || 5555;
 
 // External Dependencies
 import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
-import randomToken from 'random-token';
+// import randomToken from 'random-token';
 import mongoose from 'mongoose';
 
 import World from './classes/GameEngine';
@@ -15,6 +14,7 @@ import World from './classes/GameEngine';
 // Helpers
 import { guid } from './classes/Helpers/guid';
 import { hashPassword } from './classes/Helpers/passhashing';
+import { sendPackage, broadcastPackage } from './classes/Helpers/messaging';
 
 // Internal Dependencies
 import Client from './classes/server/Client';
@@ -109,23 +109,23 @@ const initiateClient = (socket) => {
   sendPackage(socket, MessageTypes.Who);
 };
 
-const broadcastPackage = function broadcastPackage(type = null, attributes = {}) {
-  // TODO: only affect clients that are in range and can see (but for now everybody)
-  Object.keys(World.clients).forEach(clientKey => {
-    // console.log("broadcasting port package to: " + clientKey, World.clients[clientKey]);
-    const c = World.clients[clientKey];
-    if(c) sendPackage(c.socket, type, attributes);
-  })
-}
+// const broadcastPackage = function broadcastPackage(type = null, attributes = {}) {
+//   // TODO: only affect clients that are in range and can see (but for now everybody)
+//   Object.keys(World.clients).forEach(clientKey => {
+//     // console.log("broadcasting port package to: " + clientKey, World.clients[clientKey]);
+//     const c = World.clients[clientKey];
+//     if(c) sendPackage(c.socket, type, attributes);
+//   })
+// }
 
-const sendPackage = function sendPackage(socket, type = null, attributes = {}) {
-  if (socket === null) throw new Error('Socket must be specified.'); // TODO: instanceof what?
-  if (type === null) throw new Error('Package type must be specified.');
+// const sendPackage = function sendPackage(socket, type = null, attributes = {}) {
+//   if (socket === null) throw new Error('Socket must be specified.'); // TODO: instanceof what?
+//   if (type === null) throw new Error('Package type must be specified.');
 
-  if (socket.readyState !== WebSocket.OPEN) return;
+//   if (socket.readyState !== WebSocket.OPEN) return;
 
-  socket.send(JSON.stringify(Object.assign({ type }, attributes)));
-};
+//   socket.send(JSON.stringify(Object.assign({ type }, attributes)));
+// };
 
 const clientMessage = async function clientMessage(incoming = '{}') {
   // 'this' === the client that generated this message
@@ -133,6 +133,9 @@ const clientMessage = async function clientMessage(incoming = '{}') {
   const message = JSON.parse(incoming);
 
   switch (message.type) {
+    case MessageTypes.PING:
+      sendPackage(this.socket, MessageTypes.PONG, {});
+      break;
     case MessageTypes.Who:
       if (await authenticate(this, message.who)) {
         log("Getting player.");
@@ -213,7 +216,7 @@ const clientClose = function clientClose() {
   // TODO: When above TODO is finished, this should be a callback.
   {
     if(this.playerCharacter) {
-      const level = this.playerCharacter.getLevel();
+      const level = World.getLevel(this.playerCharacter.levelId);
       if(level) {
         const levelIndex = level.sprites.indexOf(this.playerCharacter);
         level.sprites.splice(levelIndex, 1);

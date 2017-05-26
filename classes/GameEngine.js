@@ -1,5 +1,5 @@
 
-import { SpriteClassMap } from './SpriteTypes';
+import { SpriteClassMap } from './SpriteClassMap';
 import { guid } from './Helpers/guid';
 
 // Game elements
@@ -21,23 +21,34 @@ class GameEngine {
 
   constructor() {
     this.getLevel = LevelManager.getLevel.bind(LevelManager);
+    this.getLevelBySprite = LevelManager.getLevelBySprite.bind(LevelManager);
   }
 
   // So at this point, it's pretty clear that sprites are bound to their map. 
   spawnSprite(levelId, spriteTypeName, attributes) {
+    console.log("Spawning sprite");
     const classType = SpriteClassMap.get(spriteTypeName);
     const spawn = new classType(attributes);
     LevelManager.addSprite(levelId, spawn);
     return spawn;
   }
 
+  despawnSprite(sprite) {
+    LevelManager.removeSprite(this.getLevelBySprite(sprite).id, sprite);
+  }
+  despawnSpriteByLevel(levelId, sprite) {
+    LevelManager.removeSprite(levelId, sprite);
+  }
+
   // Clients
   addClient(client) {
+    
     if(!client.instanceId) client.instanceId = guid();
     clients[client.instanceId] = client;
   }
   addClientWithAttributes(attributes) {
-
+    // TODO: Is there a use for this?
+    throw new Error("Not implemented");
   }
   removeClient(client) {
     delete clients[client.instanceId];

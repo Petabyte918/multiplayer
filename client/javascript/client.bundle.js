@@ -63,45 +63,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 30);
+/******/ 	return __webpack_require__(__webpack_require__.s = 33);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-// GameSettings is a shared settings file that will share info to both the server and the client.
-var GameSettings = exports.GameSettings = {
-  TILE_SCALE: 32
-};
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var ColliderTypes = {
-  NONE: 'NONE',
-  RADIUS: 'RADIUS',
-  RECTANGLE: 'RECTANGLE'
-};
-
-exports.default = ColliderTypes;
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -119,7 +85,7 @@ function guid() {
 }
 
 /***/ }),
-/* 3 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -131,11 +97,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _GameObject2 = __webpack_require__(12);
+var _GameObject2 = __webpack_require__(11);
 
 var _GameObject3 = _interopRequireDefault(_GameObject2);
 
-var _Collider = __webpack_require__(8);
+var _Collider = __webpack_require__(9);
 
 var _Collider2 = _interopRequireDefault(_Collider);
 
@@ -165,10 +131,19 @@ var Sprite = function (_GameObject) {
 
     _this.moving = params.moving || false;
     _this.aim = params.aim || { x: -1, y: -1, placeholder: true };
+
+    _this.texture = './images/SpritePlaceholder.png';
+    // TODO: Add sprite frame dimensions
+    // TODO: Add framerate.
     return _this;
   }
 
   _createClass(Sprite, [{
+    key: 'setTexture',
+    value: function setTexture(imageSource) {
+      this.texture = imageSource;
+    }
+  }, {
     key: 'checkCollision',
     value: function checkCollision(target) {
       if (this.collider) return this.collider.getCollisionStatus(target);
@@ -176,7 +151,9 @@ var Sprite = function (_GameObject) {
     }
   }, {
     key: 'setPosition',
-    value: function setPosition(position) {
+    value: function setPosition() {
+      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
+
       this.position.x = position.x;
       this.position.y = position.y;
     }
@@ -220,7 +197,22 @@ var Sprite = function (_GameObject) {
 exports.default = Sprite;
 
 /***/ }),
-/* 4 */
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+// GameSettings is a shared settings file that will share info to both the server and the client.
+var GameSettings = exports.GameSettings = {
+  TILE_SCALE: 32
+};
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -234,17 +226,17 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _Character2 = __webpack_require__(11);
+var _Character2 = __webpack_require__(13);
 
 var _Character3 = _interopRequireDefault(_Character2);
 
-var _GameSettings = __webpack_require__(0);
+var _GameSettings = __webpack_require__(2);
 
-var _ColliderTypes = __webpack_require__(1);
+var _ColliderTypes = __webpack_require__(4);
 
 var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
 
-var _gx2D = __webpack_require__(6);
+var _gx2D = __webpack_require__(8);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -267,7 +259,8 @@ var PlayerCharacter = function (_Character) {
     var _this = _possibleConstructorReturn(this, (PlayerCharacter.__proto__ || Object.getPrototypeOf(PlayerCharacter)).call(this, {
       collider: {
         type: _ColliderTypes2.default.RADIUS,
-        tags: ['PLAYER']
+        tags: ['PLAYER'],
+        radius: 5
       }
     }));
 
@@ -282,7 +275,7 @@ var PlayerCharacter = function (_Character) {
       maxVelocity: 8 * _GameSettings.GameSettings.TILE_SCALE,
       acceleration: 16 * _GameSettings.GameSettings.TILE_SCALE
     };
-    _this.level = 1;
+    _this.levelId = 1;
     _this.strength = 1;
     _this.health = 50;
     _this.maxHealth = 50;
@@ -352,64 +345,6 @@ var PlayerCharacter = function (_Character) {
       }
     }
   }, {
-    key: 'takeDamage',
-    value: function takeDamage() {
-      var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-      var sourceCharacter = arguments[1];
-
-      // TODO: modifiers.
-      this.health -= amount;
-      var overkill = 0;
-      if (this.health < 0) {
-        overkill = Math.abs(this.health);
-        console.log("Overkill!!!! -> " + overkill + " HP");
-        this.health = 0;
-      }
-
-      var damagePackage = {
-        playerId: this.instanceId,
-        remaining: [this.stats.hp, this.stats.maxHp],
-        amount: amount,
-        overkill: overkill,
-        source: sourceCharacter.instanceId
-      };
-
-      // sendPackage(
-      //   World.getClientByPlayerCharacter(this).socket,
-      //   MessageTypes.TakeDamage,
-      //   damagePackage 
-      // );
-      // broadcastPackage(
-      //   MessageTypes.TakeDamage,
-      //   damagePackage
-      // );
-      console.log("Took " + amount + " Damage.");
-
-      if (this.health === 0) {
-        this.die();
-      }
-    }
-  }, {
-    key: 'die',
-    value: function die() {
-      // broadcastPackage(
-      //   MessageTypes.PlayerDeath,
-      //   {
-      //     instanceId: this.instanceId,
-      //     position: this.position
-      //   }
-      // );
-      // setTimeout(function() {
-      //   broadcastPackage(
-      //     MessageTypes.Despawn,
-      //     {
-      //       spawnId: this.instanceId
-      //     }
-      //   )
-      // }, 3500);
-      console.error("You have died.");
-    }
-  }, {
     key: 'hasMoveTarget',
     get: function get() {
       return this.moveTarget && this.moveTarget.x && this.moveTarget.y;
@@ -422,6 +357,25 @@ var PlayerCharacter = function (_Character) {
 exports.default = PlayerCharacter;
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var ColliderTypes = {
+  NONE: 'NONE',
+  RADIUS: 'RADIUS',
+  RECTANGLE: 'RECTANGLE'
+};
+
+exports.default = ColliderTypes;
+
+/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -431,31 +385,61 @@ exports.default = PlayerCharacter;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SpriteClassMap = exports.SpriteTypes = undefined;
+var MessageTypes = {
+  Who: 'WHO',
+  Authentication: 'AUTHENTICATION',
+  Port: 'PORT',
+  KeyPressed: 'KEY_PRESSED',
+  KeyReleased: 'KEY_RELEASED',
+  MouseDown: 'MOUSE_DOWN',
+  MouseUp: 'MOUSE_UP',
+  MouseClick: 'MOUSE_CLICK',
+  MouseMove: 'MOUSE_MOVE',
+  MoveTo: 'MOVE_TO',
+  Cast: 'CAST',
+  Spawn: 'SPAWN',
+  Despawn: 'DESPAWN',
+  DEBUG: 'DEBUG',
+  UpdateSprite: 'UPDATE_SPRITE',
+  FrameQueue: 'FRAME_QUEUE',
+  TakeDamage: 'TAKE_DAMAGE',
+  PlayerDeath: 'PLAYER_DEATH',
+  PING: 'PING',
+  PONG: 'PONG'
+};
+exports.default = MessageTypes;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ClientSpriteClassMap = exports.SpriteTypes = undefined;
 exports.GetSpriteTypeName = GetSpriteTypeName;
 
-var _PlayerCharacter = __webpack_require__(4);
+var _PlayerCharacter = __webpack_require__(3);
 
 var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
-
-var _FireBall = __webpack_require__(9);
-
-var _FireBall2 = _interopRequireDefault(_FireBall);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var SpriteTypes = exports.SpriteTypes = {
   PLAYER: 'SpriteTypes.PLAYER',
   CHEST: 'SpriteTypes.CHEST',
-  FIREBALL: 'SpriteTypes.FIREBALL'
+  FIREBALL: 'SpriteTypes.FIREBALL',
+  EXPLOSION: 'SpriteTypes.EXPLOSION'
 };
 
-var SpriteClassMap = exports.SpriteClassMap = new Map();
-SpriteClassMap.set(SpriteTypes.PLAYER, _PlayerCharacter2.default);
-SpriteClassMap.set(SpriteTypes.FIREBALL, _FireBall2.default);
+var ClientSpriteClassMap = exports.ClientSpriteClassMap = new Map();
+ClientSpriteClassMap.set(SpriteTypes.PLAYER, _PlayerCharacter2.default);
 
 function GetSpriteTypeName(obj) {
-  var iterator = SpriteClassMap.entries();
+  var iterator = ClientSpriteClassMap.entries();
   var mapCursor = {};
 
   do {
@@ -473,7 +457,8 @@ function GetSpriteTypeName(obj) {
 }
 
 /***/ }),
-/* 6 */
+/* 7 */,
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -508,39 +493,7 @@ function distance2d(startPosition, endPosition) {
 }
 
 /***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var MessageTypes = {
-  Who: 'WHO',
-  Authentication: 'AUTHENTICATION',
-  Port: 'PORT',
-  KeyPressed: 'KEY_PRESSED',
-  KeyReleased: 'KEY_RELEASED',
-  MouseDown: 'MOUSE_DOWN',
-  MouseUp: 'MOUSE_UP',
-  MouseClick: 'MOUSE_CLICK',
-  MouseMove: 'MOUSE_MOVE',
-  MoveTo: 'MOVE_TO',
-  Cast: 'CAST',
-  Spawn: 'SPAWN',
-  Despawn: 'DESPAWN',
-  DEBUG: 'DEBUG',
-  UpdateSprite: 'UPDATE_SPRITE',
-  FrameQueue: 'FRAME_QUEUE',
-  TakeDamage: 'TAKE_DAMAGE',
-  PlayerDeath: 'PLAYER_DEATH'
-};
-exports.default = MessageTypes;
-
-/***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -553,9 +506,9 @@ exports.CollisionStatus = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _guid = __webpack_require__(2);
+var _guid = __webpack_require__(0);
 
-var _ColliderTypes = __webpack_require__(1);
+var _ColliderTypes = __webpack_require__(4);
 
 var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
 
@@ -715,130 +668,6 @@ var CollisionStatus = exports.CollisionStatus = {
 exports.default = Collider;
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _GameSettings = __webpack_require__(0);
-
-var _Sprite2 = __webpack_require__(3);
-
-var _Sprite3 = _interopRequireDefault(_Sprite2);
-
-var _ColliderTypes = __webpack_require__(1);
-
-var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-//import World from '../GameEngine'; // Gonna break!!!
-
-var FireBall = function (_Sprite) {
-  _inherits(FireBall, _Sprite);
-
-  function FireBall() {
-    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, FireBall);
-
-    if (!params.collider) {
-      params.collider = {
-        type: _ColliderTypes2.default.RADIUS,
-        tags: ['PROJECTILE', 'FIRE'],
-        collidesWith: ['PLAYER', 'WALL']
-      };
-    }
-
-    if (!params.collider.type) params.collider.type = _ColliderTypes2.default.RADIUS;
-    if (!params.collider.tags) params.collider.tags = ['PROJECTILE', 'FIRE'];
-    if (!params.collider.collidesWith) params.collider.collidesWith = ['PLAYER', 'WALL'];
-
-    var _this = _possibleConstructorReturn(this, (FireBall.__proto__ || Object.getPrototypeOf(FireBall)).call(this, params));
-
-    var start = params.start || { x: 0, y: 0 };
-    var aim = params.aim || { x: -1, y: -1, placeholder: true };
-    var speed = params.speed || _GameSettings.GameSettings.TILE_SCALE * 25;
-    var owner = params.owner || null;
-
-    var life = params.life || .5; // Seconds to live
-
-    //console.log("Starting fireball at: ", start);
-    _this.setPosition(start);
-    _this.aim = aim;
-    // https://gist.github.com/conorbuck/2606166
-    _this.angle = Math.atan2(aim.y - start.y, aim.x - start.x); // radians
-    //console.log("Speed is: ", speed);
-    _this.speed = speed;
-
-    _this.stats = {
-      damage: 10
-    };
-
-    // TODO: Don't hit this fireball's owner!!!! this.owner = owner;
-
-    _this.livesUntil = Date.now() + life * 1000; // 3 seconds.
-    return _this;
-  }
-
-  _createClass(FireBall, [{
-    key: 'update',
-    value: function update(delta) {
-      if (Date.now() > this.livesUntil) {
-        // console.log("Deleting fireball.");
-        this.delete();
-        return;
-      }
-
-      //this.checkCollisions();
-
-      if (this.aim.placeholder) return;
-      // SOH, CAH, TOA
-      var deltaY = Math.sin(this.angle) * this.speed * delta / 1000;
-      var deltaX = Math.cos(this.angle) * this.speed * delta / 1000;
-      this.setPosition({
-        x: this.position.x + deltaX,
-        y: this.position.y + deltaY
-      });
-    }
-  }, {
-    key: 'delete',
-    value: function _delete() {
-      throw new Error("Must override FireBall.delete() method on instances.");
-    }
-  }, {
-    key: 'onCollisionEnter',
-    value: function onCollisionEnter(otherCollider) {
-      _get(FireBall.prototype.__proto__ || Object.getPrototypeOf(FireBall.prototype), 'onCollisionEnter', this) && _get(FireBall.prototype.__proto__ || Object.getPrototypeOf(FireBall.prototype), 'onCollisionEnter', this).call(this, otherCollider);
-
-      if (otherCollider.tags.includes('PLAYER')) {
-        var otherPlayer = otherCollider.ownerGO;
-        otherPlayer.takeDamage(this.stats.damage, this.ownerGO);
-      }
-    }
-  }]);
-
-  return FireBall;
-}(_Sprite3.default);
-
-exports.default = FireBall;
-
-/***/ }),
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -874,11 +703,56 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Sprite2 = __webpack_require__(3);
+var _guid = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var GameObject = function () {
+  function GameObject() {
+    _classCallCheck(this, GameObject);
+
+    // (paramObject = {}) {
+    this.position = {
+      x: 0,
+      y: 0
+    };
+    this.instanceId = (0, _guid.guid)();
+  }
+
+  _createClass(GameObject, [{
+    key: 'setPosition',
+    value: function setPosition() {
+      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
+
+      this.position.x = position.x;
+      this.position.y = position.y;
+    }
+  }]);
+
+  return GameObject;
+}();
+
+exports.default = GameObject;
+
+/***/ }),
+/* 12 */,
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Sprite2 = __webpack_require__(1);
 
 var _Sprite3 = _interopRequireDefault(_Sprite2);
 
-var _ColliderTypes = __webpack_require__(1);
+var _ColliderTypes = __webpack_require__(4);
 
 var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
 
@@ -908,6 +782,61 @@ var Character = function (_Sprite) {
       // TODO: Check if the character has the spell in their spellbook and if it's not on cooldown.
       return true;
     }
+  }, {
+    key: 'takeDamage',
+    value: function takeDamage() {
+      var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var sourceCharacter = arguments[1];
+
+      // TODO: modifiers.
+      this.health -= amount;
+      var overkill = 0;
+      if (this.health < 0) {
+        overkill = Math.abs(this.health);
+        console.log("Overkill!!!! -> " + overkill + " HP");
+        this.health = 0;
+      }
+
+      var damagePackage = {
+        playerId: this.instanceId,
+        remaining: [this.stats.hp, this.stats.maxHp],
+        amount: amount,
+        overkill: overkill,
+        source: sourceCharacter ? sourceCharacter.instanceId : null
+      };
+
+      // TODO: factor out hacked in code to work with library somehow. Shared codebase is causing issues with this.
+      // broadcastPackage(
+      //   MessageTypes.TakeDamage,
+      //   damagePackage
+      // );
+
+      console.log("Took " + amount + " Damage.");
+
+      if (this.health === 0) {
+        this.die();
+      }
+    }
+  }, {
+    key: 'die',
+    value: function die() {
+      // broadcastPackage(
+      //   MessageTypes.PlayerDeath,
+      //   {
+      //     instanceId: this.instanceId,
+      //     position: this.position
+      //   }
+      // );
+      // setTimeout(function() {
+      //   broadcastPackage(
+      //     MessageTypes.Despawn,
+      //     {
+      //       spawnId: this.instanceId
+      //     }
+      //   )
+      // }, 3500);
+      console.error("You have died.");
+    }
   }]);
 
   return Character;
@@ -916,40 +845,14 @@ var Character = function (_Sprite) {
 exports.default = Character;
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _guid = __webpack_require__(2);
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var GameObject = function GameObject() {
-  _classCallCheck(this, GameObject);
-
-  // (paramObject = {}) {
-  this.position = {
-    x: 0,
-    y: 0
-  };
-  this.instanceId = (0, _guid.guid)();
-};
-
-exports.default = GameObject;
-
-/***/ }),
-/* 13 */,
 /* 14 */,
 /* 15 */,
 /* 16 */,
 /* 17 */,
-/* 18 */
+/* 18 */,
+/* 19 */,
+/* 20 */,
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1001,7 +904,7 @@ function debounce(func, wait, immediate) {
 }
 
 /***/ }),
-/* 19 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1022,17 +925,111 @@ var TileTypes = {
 exports.default = TileTypes;
 
 /***/ }),
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */,
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _GameObject2 = __webpack_require__(11);
+
+var _GameObject3 = _interopRequireDefault(_GameObject2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var defaults = {
+  fillStyle: "red",
+  font: "14px Comic Sans MS",
+  lifeTime: 5 * 1000,
+  position: { x: 0, y: 0 },
+  text: "Hello World"
+};
+
+var CombatText = function (_GameObject) {
+  _inherits(CombatText, _GameObject);
+
+  function CombatText(params, deleteCallback) {
+    _classCallCheck(this, CombatText);
+
+    if (!deleteCallback) throw new Error("Please provide a callback for combat text deleteCallback.");
+
+    var _this = _possibleConstructorReturn(this, (CombatText.__proto__ || Object.getPrototypeOf(CombatText)).call(this));
+
+    _this.deleteCallback = deleteCallback || function () {
+      throw new Error("Please provide a callback for combat text deleteCallback.");
+    };
+
+    _this.fillStyle = params.fillStyle || defaults.fillStyle;
+    _this.setFont(params.font || defaults.font);
+    _this.setPosition(params.position || defaults.position);
+    _this.text = params.text || defaults.text;
+    _this.lifeTime = params.lifeTime || defaults.lifeTime;
+    _this.livesUntil = +Date.now() + _this.lifeTime;
+
+    console.log("TTL: " + (params.lifeTime || defaults.lifeTime));
+    _this.cancelTimeout = setTimeout(function () {
+      console.log("Deleting");
+      _this.delete();
+    }, params.lifeTime || defaults.lifeTime);
+
+    console.log("Created combat text: ", _this);
+    return _this;
+  }
+
+  _createClass(CombatText, [{
+    key: "draw",
+    value: function draw(ctx) {
+      ctx.globalAlpha = (this.livesUntil - Date.now()) / this.lifeTime;
+      ctx.font = this.font;
+      ctx.fillStyle = this.fillStyle;
+      ctx.fillText(this.text, this.position.x, this.position.y);
+      ctx.globalAlpha = 1;
+    }
+  }, {
+    key: "setFont",
+    value: function setFont(font) {
+      this.font = font || defaults.font;
+    }
+  }, {
+    key: "update",
+    value: function update(delta) {
+      this.position.y -= 48 * delta / 1000;
+    }
+  }, {
+    key: "delete",
+    value: function _delete() {
+      this.deleteCallback();
+    }
+  }]);
+
+  return CombatText;
+}(_GameObject3.default);
+
+exports.default = CombatText;
+
+/***/ }),
 /* 24 */,
 /* 25 */,
 /* 26 */,
 /* 27 */,
 /* 28 */,
 /* 29 */,
-/* 30 */
+/* 30 */,
+/* 31 */,
+/* 32 */,
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1040,33 +1037,37 @@ exports.default = TileTypes;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _PlayerCharacter = __webpack_require__(4);
+var _PlayerCharacter = __webpack_require__(3);
 
 var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
 
-var _Sprite = __webpack_require__(3);
+var _Sprite = __webpack_require__(1);
 
 var _Sprite2 = _interopRequireDefault(_Sprite);
 
-var _MessageTypes = __webpack_require__(7);
+var _CombatText = __webpack_require__(23);
+
+var _CombatText2 = _interopRequireDefault(_CombatText);
+
+var _MessageTypes = __webpack_require__(5);
 
 var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
 
-var _TileTypes = __webpack_require__(19);
+var _TileTypes = __webpack_require__(22);
 
 var _TileTypes2 = _interopRequireDefault(_TileTypes);
 
-var _SpriteTypes = __webpack_require__(5);
+var _SpriteTypes = __webpack_require__(6);
 
 var _PlayerActions = __webpack_require__(10);
 
 var _PlayerActions2 = _interopRequireDefault(_PlayerActions);
 
-var _GameSettings = __webpack_require__(0);
+var _GameSettings = __webpack_require__(2);
 
-var _gx2D = __webpack_require__(6);
+var _gx2D = __webpack_require__(8);
 
-var _throttling = __webpack_require__(18);
+var _throttling = __webpack_require__(21);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1089,7 +1090,9 @@ var tileContext = tileCanvas.getContext('2d');
 // sprite canvas
 var spriteCanvas = document.querySelector('#spriteCanvas');
 var spriteContext = spriteCanvas.getContext('2d');
-// UI canvas / div ---- // TODO???
+// UI canvas 
+var uiCanvas = document.querySelector('#uiCanvas');
+var uiContext = uiCanvas.getContext('2d');
 // Cursor canvas
 var cursorCanvas = document.querySelector('#cursorCanvas');
 var cursorContext = cursorCanvas.getContext('2d');
@@ -1125,26 +1128,57 @@ var playerCharacter = null;
 // level tiles / objects for map the player is currently on.
 var tileMap = [];
 var sprites = []; // SPRITE
+var ui = {
+  textSprites: [],
+  addCombatText: function addCombatText(text) {
+    this.textSprites.push(text);
+  },
+  removeCombatText: function removeCombatText(text) {
+    console.log("Removing from index: " + this.textSprites.indexOf(text));
+    this.textSprites.splice(this.textSprites.indexOf(text), 1);
+    drawCanvas();
+  }
+};
 
 var mousePosition = {};
 
-// Start socket
-function startSocketClient() {
-  // TODO: Does this cause conflicts if called more than once?
+function openClientSocket() {
+  console.log("Opening socket");
   var sock = null;
   try {
     var protocol = window.location.protocol === "https:" ? "wss" : "ws";
     sock = client.socket || new WebSocket(protocol + '://' + location.hostname + ':' + location.port + '/');
     client.socket = sock;
   } catch (ex) {
+    // Errors will be thrown if not using http, as location object data will not look the same.
     console.log("Error: ", ex);
     console.log("If you're testing on the server, did you remember to use localhost?");
   }
+  console.log("Sending socket back");
+  return sock;
+}
+
+// Start socket
+function startSocketClient() {
+  // TODO: Does this cause conflicts if called more than once?
+  var sock = openClientSocket();
+  // try {
+  //   const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+  //   sock = client.socket || new WebSocket(`${protocol}://${location.hostname}:${location.port}/`);
+  //   client.socket = sock;
+  // } catch(ex) {
+  //   // Errors will be thrown if not using http, as location object data will not look the same.
+  //   console.log("Error: ", ex);
+  //   console.log("If you're testing on the server, did you remember to use localhost?")
+  // }
 
   sock.onmessage = function onmessage(event) {
     var message = JSON.parse(event.data);
 
     switch (message.type) {
+      case _MessageTypes2.default.PONG:
+        console.log("Pong received.");
+        break;
       case _MessageTypes2.default.Who:
         // sendPackage(MessageTypes.Who, { who: 'James:df8c8023ae' });
         break;
@@ -1186,7 +1220,7 @@ function startSocketClient() {
         drawSprites();
         break;
       case _MessageTypes2.default.Spawn:
-        // console.log('Spawn info: ', message);
+        console.log('Spawn info: ', message);
         if (!message.spawnClass) {
           console.error("No spawn class provided.");
           return;
@@ -1194,7 +1228,7 @@ function startSocketClient() {
         if (message.spawnClass === _SpriteTypes.SpriteTypes.PLAYER) {
           console.log("Player spawned: ", message.spawn.instanceId);
         }
-        var spawnClass = _SpriteTypes.SpriteClassMap.get(message.spawnClass);
+        // const spawnClass = SpriteClassMap.get(message.spawnClass);
         if (message.spawn.instanceId === playerCharacter.instanceId) return;
         var newSpawn = Object.assign(new _Sprite2.default(), message.spawn, { type: message.spawnClass });
         sprites.push(newSpawn);
@@ -1213,23 +1247,24 @@ function startSocketClient() {
         break;
       case _MessageTypes2.default.FrameQueue:
         // TODO: finish below
-        //    ... console.log("FrameQueue received: ", message.queue);
         message.queue.forEach(function (item) {
           if (item.type === _MessageTypes2.default.UpdateSprite) {
             var spriteUpdateInfo = JSON.parse(item.sprite);
-            // if(spriteUpdateInfo.instanceId === playerCharacter.instanceId) return;
-            //console.log(spriteUpdateInfo.position);
             var spriteToUpdate = sprites[spriteUpdateInfo.instanceId];
             if (spriteToUpdate) {
               Object.assign(spriteToUpdate, spriteUpdateInfo);
-              //console.log(spriteToUpdate);
             } else {
               console.log("couldn't find sprite.", spriteUpdateInfo);
             }
+          } else {
+            console.log("Invalid frame action");
           }
         });
         drawSprites();
         // TODO: Draw sprite changes all in one go - DO NOT draw them in each iteration above.
+        break;
+      case _MessageTypes2.default.TakeDamage:
+        handleTakeDamage(message);
         break;
       case _MessageTypes2.default.DEBUG:
         console.log('Debug package received. Message: ' + message.message);
@@ -1242,7 +1277,7 @@ function startSocketClient() {
 
   sock.onclose = function onclose(something) {
     console.log('Socket Closed -> ', something);
-    // TODO: Set a timer to attempt to reconnect.
+    // TODO: If user did not purposely disconnect, attempt to reconnect
   };
   sock.onerror = function onerror(something) {
     console.log('Some Error -> ', something);
@@ -1250,13 +1285,27 @@ function startSocketClient() {
   };
 }
 
+var handleTakeDamage = function handleTakeDamage(message) {
+  var target = message.target;
+  var damage = message.damage;
+  var text = new _CombatText2.default({
+    text: '-' + damage,
+    lifeTime: 1000,
+    position: target.position
+  }, function () {
+    console.log("trying to remove combat text.");
+    ui.removeCombatText(text);
+  });
+  ui.addCombatText(text);
+};
+
 var sendLogin = function sendLogin(username, password) {
   sendPackage(_MessageTypes2.default.Who, { who: username + ':' + password });
 };
 
 var classifySprite = function classifySprite(sprite, spriteClassTag) {
   if (!spriteClassTag) return sprite;
-  var spriteClass = _SpriteTypes.SpriteClassMap.get(spriteClassTag);
+  var spriteClass = _SpriteTypes.ClientSpriteClassMap.get(spriteClassTag);
   if (sprite instanceof spriteClass) return;
   var classifiedSprite = Object.assign(new spriteClass(), sprite);
   return classifiedSprite;
@@ -1275,9 +1324,7 @@ function LoginSucceeded() {
 
   hideUI('UI_Login');
 
-  //client.instanceId = JSON.parse(message.playerCharacter).instanceId;
-
-  // TODO: Show loading message.
+  // TODO: Show loading message / spinner
   startGame();
 }
 
@@ -1285,9 +1332,8 @@ function LoginFailed() {
   var error = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'not defined';
 
   /* eslint-disable no-alert */
-  toast('YOU FAILED!!!');
-  toast("PS. Who doesn't hate alerts?");
-  toast('Oh and the error was: ', error);
+  toast('YOU FAILED (to log in)!!!');
+  // toast('Oh and the error was: ', error);
 }
 
 function toast() {
@@ -1334,8 +1380,8 @@ function handleResize() {
 
 // Draw canvas
 function drawCanvas() {
-  tileContext.fillStyle = 'cyan';
   // clear bg
+  tileContext.fillStyle = 'cyan'; // clear color
   tileContext.fillRect(0, 0, tileCanvas.width, tileCanvas.height);
 
   // draw background tiles
@@ -1344,7 +1390,8 @@ function drawCanvas() {
   // draw sprites
   drawSprites();
 
-  // TODO: draw HUD
+  // draw HUD
+  drawHUD();
 }
 
 var drawBackground = function drawBackground() {
@@ -1368,17 +1415,24 @@ var drawSprites = function drawSprites() {
   sprites.forEach(function (sprite) {
     // SPRITE
 
-    // if (sprite instanceof FireBall) {
-    //   drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(SpriteTypes.FIREBALL), sprite.angle);
-    // } else 
     if (sprite instanceof _PlayerCharacter2.default) {
       drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(_SpriteTypes.SpriteTypes.PLAYER), sprite.angle || 0);
-      //drawCircle(sprite.tx, sprite.ty, (TILE_SCALE / 2) - 2, color);
     } else {
       // console.log("Other type of sprite: ", sprite.type, sprite.position, typeof sprite, sprite);
-      var imageSource = sprite.image || SpriteTextureMap.get(sprite.type);
+      var imageSource = sprite.texture || SpriteTextureMap.get(sprite.type);
       if (imageSource === undefined) console.log("undefined darnit.", sprite);
       drawSprite(sprite.position.x, sprite.position.y, imageSource, sprite.angle || 0);
+    }
+  });
+};
+
+var drawHUD = function drawHUD() {
+  // TODO: draw HUD
+  uiContext.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
+  ui.textSprites.forEach(function (cbText) {
+    console.log("Drawing text: " + cbText.text);
+    if (cbText.draw) {
+      cbText.draw(uiContext);
     }
   });
 };
@@ -1500,6 +1554,8 @@ var moveInterval = 250;
 function mouseMove(e) {
 
   var angle = 0;
+  if (!playerCharacter) return;
+
   if (playerCharacter.position) {
     angle = (0, _gx2D.angle2d)(playerCharacter.position.x, playerCharacter.position.y, e.clientX, e.clientY);
   }
@@ -1520,7 +1576,6 @@ function mouseMove(e) {
   //   tx: Math.floor(e.clientX / TILE_SCALE),
   //   ty: Math.floor(e.clientY / TILE_SCALE)
   // };
-
 
   // clearCursors();
   // drawCursors();
@@ -1677,15 +1732,6 @@ function initEventHandlers() {
   });
 }
 
-// server side
-// function updateSprites(delta) {
-//   sprites.forEach((sprite) => { // SPRITE
-//     if (sprite.update) {
-//       sprite.update(delta);
-//     }
-//   });
-// }
-
 // Initiate game
 function startGame() {
   initCanvas();
@@ -1697,40 +1743,54 @@ function startGame() {
 var loopTime = performance.now();
 function updateLoop() {
   var timestamp = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : performance.now();
-
+  // TODO: Rename. (drawLoop() ??? )
   if (client.socket.readyState !== WebSocket.OPEN) {
-    toast("Websocket has closed.");
-    // setTimeout(function() {
-    //   console.log("restarting socket");
-    //   delete client.playerCharacter;
-    //   delete client.level;
-    //   delete client.socket;
-    //   for (let prop of sprites) {
-    //     delete sprites[prop];
-    //   }
-    //   sprites.length = 0;
-    //   document.querySelector('#toasts').innerHTML = null;
-    //   startSocketClient();
-    // }, 2500);
+    toast("Websocket has closed.", "stopped drawing");
     return;
   }
-  var delta = (timestamp - loopTime) / 1000;
-  loopTime = timestamp;
-  // updateSprites(delta);
-  drawCanvas();
 
+  var delta = timestamp - loopTime;
+
+  updateHUD(delta);
+
+  loopTime = timestamp;
+
+  drawCanvas();
   // ensure next frame runs.
   window.requestAnimationFrame(updateLoop);
 }
 
-var sendPackage = function sendPackage() {
+var updateHUD = function updateHUD(delta) {
+  ui.textSprites.forEach(function (cbText) {
+    console.log("Drawing text: " + cbText.text);
+    if (cbText.update) {
+      cbText.update(delta);
+    }
+  });
+};
+
+var sendPackage = async function sendPackage() {
   var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
   var attributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var reconnect = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
 
   if (type === null) throw new Error('Package type must be specified.');
 
+  if ([WebSocket.CLOSED, WebSocket.CLOSING].includes(client.socket.readyState)) {
+    if (reconnect) {
+      console.log("Reconnecting.");
+      client.socket = await openClientSocket();
+    } else {
+      console.log("Socket is closed. This will not work.");
+    }
+  }
   client.socket.send(JSON.stringify(Object.assign({ type: type }, attributes)));
 };
+
+setInterval(function pingPong() {
+  sendPackage(_MessageTypes2.default.PING, {});
+  console.log("Ping sent.");
+}, 25000);
 
 startSocketClient(); // TODO: Need to monitor and reconnect
 

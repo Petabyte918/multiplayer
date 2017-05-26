@@ -2,11 +2,12 @@
 // import FireBall from '../../classes/shared/FireBall';
 import PlayerCharacter from '../../classes/shared/PlayerCharacter';
 import Sprite from '../../classes/shared/Sprite';
+import CombatText from '../../classes/client/CombatText';
 
 // Constants & Enumerations
 import MessageTypes from '../../classes/MessageTypes';
 import TileTypes from '../../classes/TileTypes';
-import { SpriteTypes, SpriteClassMap } from '../../classes/SpriteTypes';
+import { SpriteTypes, ClientSpriteClassMap } from '../../classes/SpriteTypes';
 import PlayerActions from '../../classes/PlayerActions';
 
 // Game Managers
@@ -22,7 +23,9 @@ const tileContext = tileCanvas.getContext('2d');
 // sprite canvas
 const spriteCanvas = document.querySelector('#spriteCanvas');
 const spriteContext = spriteCanvas.getContext('2d');
-// UI canvas / div ---- // TODO???
+// UI canvas 
+const uiCanvas = document.querySelector('#uiCanvas');
+const uiContext = uiCanvas.getContext('2d');
 // Cursor canvas
 const cursorCanvas = document.querySelector('#cursorCanvas');
 const cursorContext = cursorCanvas.getContext('2d');
@@ -58,26 +61,57 @@ let playerCharacter = null;
 // level tiles / objects for map the player is currently on.
 let tileMap = [];
 let sprites = []; // SPRITE
+let ui = {
+  textSprites: [],
+  addCombatText(text) {
+    this.textSprites.push(text);
+  },
+  removeCombatText(text) {
+    console.log("Removing from index: " + this.textSprites.indexOf(text));
+    this.textSprites.splice(this.textSprites.indexOf(text), 1);
+    drawCanvas();
+  }
+};
 
 let mousePosition = {};
 
-// Start socket
-function startSocketClient() {
-  // TODO: Does this cause conflicts if called more than once?
+function openClientSocket() {
+  console.log("Opening socket");
   let sock = null;
   try {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     sock = client.socket || new WebSocket(`${protocol}://${location.hostname}:${location.port}/`);
     client.socket = sock;
   } catch(ex) {
+    // Errors will be thrown if not using http, as location object data will not look the same.
     console.log("Error: ", ex);
     console.log("If you're testing on the server, did you remember to use localhost?")
   }
+  console.log("Sending socket back");
+  return sock;
+}
+
+// Start socket
+function startSocketClient() {
+  // TODO: Does this cause conflicts if called more than once?
+  let sock = openClientSocket();
+  // try {
+  //   const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+  //   sock = client.socket || new WebSocket(`${protocol}://${location.hostname}:${location.port}/`);
+  //   client.socket = sock;
+  // } catch(ex) {
+  //   // Errors will be thrown if not using http, as location object data will not look the same.
+  //   console.log("Error: ", ex);
+  //   console.log("If you're testing on the server, did you remember to use localhost?")
+  // }
 
   sock.onmessage = function onmessage(event) {
     const message = JSON.parse(event.data);
 
     switch (message.type) {
+      case MessageTypes.PONG:
+        console.log("Pong received.");
+        break;
       case MessageTypes.Who:
         // sendPackage(MessageTypes.Who, { who: 'James:df8c8023ae' });
         break;
@@ -115,7 +149,7 @@ function startSocketClient() {
         drawSprites();
         break;
       case MessageTypes.Spawn:
-        // console.log('Spawn info: ', message);
+        console.log('Spawn info: ', message);
         if(!message.spawnClass) {
           console.error("No spawn class provided.");
           return;
@@ -123,7 +157,7 @@ function startSocketClient() {
         if(message.spawnClass === SpriteTypes.PLAYER) {
           console.log("Player spawned: ", message.spawn.instanceId);
         }
-        const spawnClass = SpriteClassMap.get(message.spawnClass);
+        // const spawnClass = SpriteClassMap.get(message.spawnClass);
         if(message.spawn.instanceId === playerCharacter.instanceId) return;
         const newSpawn = Object.assign(new Sprite(), message.spawn, { type: message.spawnClass });
         sprites.push(newSpawn);
@@ -140,23 +174,24 @@ function startSocketClient() {
         break;
       case MessageTypes.FrameQueue:
         // TODO: finish below
-        //    ... console.log("FrameQueue received: ", message.queue);
         message.queue.forEach((item) => {
           if(item.type === MessageTypes.UpdateSprite) {
             const spriteUpdateInfo = JSON.parse(item.sprite);
-            // if(spriteUpdateInfo.instanceId === playerCharacter.instanceId) return;
-            //console.log(spriteUpdateInfo.position);
             const spriteToUpdate = sprites[spriteUpdateInfo.instanceId];
             if(spriteToUpdate) {
               Object.assign(spriteToUpdate, spriteUpdateInfo);
-              //console.log(spriteToUpdate);
             } else {
               console.log("couldn't find sprite.", spriteUpdateInfo);
             }
+          } else {
+            console.log("Invalid frame action");
           }
         });
         drawSprites();
         // TODO: Draw sprite changes all in one go - DO NOT draw them in each iteration above.
+        break;
+      case MessageTypes.TakeDamage:
+        handleTakeDamage(message);
         break;
       case MessageTypes.DEBUG:
         console.log('Debug package received. Message: ' + message.message);
@@ -169,12 +204,29 @@ function startSocketClient() {
 
   sock.onclose = function onclose(something) {
     console.log('Socket Closed -> ', something);
-    // TODO: Set a timer to attempt to reconnect.
+    // TODO: If user did not purposely disconnect, attempt to reconnect
   };
   sock.onerror = function onerror(something) {
     console.log('Some Error -> ', something);
     // TODO: Determine conditions for reconnect and then use them to create reconnect logic.
   };
+}
+
+const handleTakeDamage = function handleTakeDamage(message) {
+  const target = message.target;
+  const damage = message.damage;
+  const text = new CombatText(
+    { 
+      text: '-' + damage, 
+      lifeTime: 1000,
+      position: target.position
+    }, 
+    function() {
+      console.log("trying to remove combat text.");
+      ui.removeCombatText(text);
+    }
+  );
+  ui.addCombatText(text);
 }
 
 const sendLogin = (username, password) => {
@@ -183,7 +235,7 @@ const sendLogin = (username, password) => {
 
 const classifySprite = function classifySprite(sprite, spriteClassTag) {
   if(!spriteClassTag) return sprite;
-  const spriteClass = SpriteClassMap.get(spriteClassTag);
+  const spriteClass = ClientSpriteClassMap.get(spriteClassTag);
   if(sprite instanceof spriteClass) return;
   const classifiedSprite = Object.assign(new spriteClass(), sprite);
   return classifiedSprite;
@@ -199,18 +251,15 @@ function LoginSucceeded(message = {}) {
   toast('Welcome', 'Connected to server.');
 
   hideUI('UI_Login');
-
-  //client.instanceId = JSON.parse(message.playerCharacter).instanceId;
   
-  // TODO: Show loading message.
+  // TODO: Show loading message / spinner
   startGame();
 }
 
 function LoginFailed(error = 'not defined') {
   /* eslint-disable no-alert */
-  toast('YOU FAILED!!!');
-  toast("PS. Who doesn't hate alerts?");
-  toast('Oh and the error was: ', error);
+  toast('YOU FAILED (to log in)!!!');
+  // toast('Oh and the error was: ', error);
 }
 
 function toast(title = 'Toast', message) {
@@ -252,8 +301,8 @@ function handleResize() {
 
 // Draw canvas
 function drawCanvas() {
-  tileContext.fillStyle = 'cyan';
   // clear bg
+  tileContext.fillStyle = 'cyan'; // clear color
   tileContext.fillRect(0, 0, tileCanvas.width, tileCanvas.height);
 
   // draw background tiles
@@ -262,7 +311,8 @@ function drawCanvas() {
   // draw sprites
   drawSprites();
 
-  // TODO: draw HUD
+  // draw HUD
+  drawHUD();
 }
 
 const drawBackground = function drawBackground() {
@@ -285,20 +335,27 @@ const drawSprites = function drawSprites() {
 
   sprites.forEach((sprite) => {  // SPRITE
 
-    // if (sprite instanceof FireBall) {
-    //   drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(SpriteTypes.FIREBALL), sprite.angle);
-    // } else 
     if (sprite instanceof PlayerCharacter) {
       drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(SpriteTypes.PLAYER), sprite.angle || 0);
-      //drawCircle(sprite.tx, sprite.ty, (TILE_SCALE / 2) - 2, color);
     } else {
       // console.log("Other type of sprite: ", sprite.type, sprite.position, typeof sprite, sprite);
-      const imageSource = sprite.image || SpriteTextureMap.get(sprite.type);
+      const imageSource = sprite.texture || SpriteTextureMap.get(sprite.type);
       if(imageSource === undefined) console.log("undefined darnit.", sprite);
       drawSprite(sprite.position.x, sprite.position.y, imageSource, sprite.angle || 0);
     }
   });
 };
+
+const drawHUD = function drawHUD() {
+  // TODO: draw HUD
+  uiContext.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
+  ui.textSprites.forEach((cbText) => {
+    console.log("Drawing text: " + cbText.text);
+    if(cbText.draw) {
+      cbText.draw(uiContext);
+    }
+  });
+}
 
 // Canvas helper functions
 const drawCircle = function drawCircle(x, y, radius = TILE_SCALE, fill = '#FFFFFF', strokeColor = '#000000') {
@@ -410,6 +467,8 @@ const moveInterval = 250;
 function mouseMove(e) {
 
   let angle = 0;
+  if(!playerCharacter) return;
+
   if(playerCharacter.position) {
     angle = angle2d(playerCharacter.position.x, playerCharacter.position.y, e.clientX, e.clientY);
   }
@@ -426,13 +485,10 @@ function mouseMove(e) {
     lastMovePackage = +Date.now();
   }
 
-
   // cursorCanvas.focusedTileCoords = {
   //   tx: Math.floor(e.clientX / TILE_SCALE),
   //   ty: Math.floor(e.clientY / TILE_SCALE)
   // };
-
-  
 
   // clearCursors();
   // drawCursors();
@@ -586,15 +642,6 @@ function initEventHandlers() {
   })
 }
 
-// server side
-// function updateSprites(delta) {
-//   sprites.forEach((sprite) => { // SPRITE
-//     if (sprite.update) {
-//       sprite.update(delta);
-//     }
-//   });
-// }
-
 // Initiate game
 function startGame() {
   initCanvas();
@@ -604,37 +651,51 @@ function startGame() {
 }
 
 let loopTime = performance.now();
-function updateLoop(timestamp = performance.now()) {
+function updateLoop(timestamp = performance.now()) { // TODO: Rename. (drawLoop() ??? )
   if(client.socket.readyState !== WebSocket.OPEN) {
-    toast("Websocket has closed.");
-    // setTimeout(function() {
-    //   console.log("restarting socket");
-    //   delete client.playerCharacter;
-    //   delete client.level;
-    //   delete client.socket;
-    //   for (let prop of sprites) {
-    //     delete sprites[prop];
-    //   }
-    //   sprites.length = 0;
-    //   document.querySelector('#toasts').innerHTML = null;
-    //   startSocketClient();
-    // }, 2500);
+    toast("Websocket has closed.", "stopped drawing");
     return;
   }
-  const delta = (timestamp - loopTime) / 1000;
-  loopTime = timestamp;
-  // updateSprites(delta);
-  drawCanvas();
 
+  let delta = timestamp - loopTime;
+  
+  updateHUD(delta);
+
+  loopTime = timestamp;
+
+  drawCanvas();
   // ensure next frame runs.
   window.requestAnimationFrame(updateLoop);
 }
 
-const sendPackage = function sendPackage(type = null, attributes = {}) {
+const updateHUD = function updateHUD(delta) {
+  ui.textSprites.forEach((cbText) => {
+    console.log("Drawing text: " + cbText.text);
+    if(cbText.update) {
+      cbText.update(delta);
+    }
+  });
+}
+
+const sendPackage = async function sendPackage(type = null, attributes = {}, reconnect = true) {
   if (type === null) throw new Error('Package type must be specified.');
 
+  if([WebSocket.CLOSED, WebSocket.CLOSING].includes(client.socket.readyState)) {
+    if(reconnect) {
+      console.log("Reconnecting.");
+      client.socket = await openClientSocket();
+    } else {
+      console.log("Socket is closed. This will not work.");
+    }
+  }
   client.socket.send(JSON.stringify(Object.assign({ type }, attributes)));
 };
+
+
+setInterval(function pingPong() {
+  sendPackage(MessageTypes.PING, {});
+  console.log("Ping sent.");
+}, 25000);
 
 startSocketClient(); // TODO: Need to monitor and reconnect
 

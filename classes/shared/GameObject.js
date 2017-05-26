@@ -8,4 +8,9 @@ export default class GameObject {
     }
     this.instanceId = guid();
   }
+
+  setPosition(position = { x: 0, y: 0 }) {
+    this.position.x = position.x;
+    this.position.y = position.y;
+  }
 }

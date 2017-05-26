@@ -12,7 +12,8 @@ class PlayerCharacter extends Character {
     super({
       collider: {
         type: ColliderTypes.RADIUS,
-        tags: ['PLAYER']
+        tags: ['PLAYER'],
+        radius: 5
       }
     });
 
@@ -27,7 +28,7 @@ class PlayerCharacter extends Character {
       maxVelocity: 8 * GameSettings.TILE_SCALE,
       acceleration: 16 * GameSettings.TILE_SCALE,
     };
-    this.level = 1;
+    this.levelId = 1;
     this.strength = 1;
     this.health = 50;
     this.maxHealth = 50;
@@ -92,60 +93,6 @@ class PlayerCharacter extends Character {
       if(this.hasMoveTarget) this.clearMoveTarget();
       this.velocity = 0;
     }
-  }
-
-  takeDamage(amount = 0, sourceCharacter) {
-    // TODO: modifiers.
-    this.health -= amount;
-    let overkill = 0;
-    if (this.health < 0) {
-      overkill = Math.abs(this.health);
-      console.log("Overkill!!!! -> " + overkill  + " HP");
-      this.health = 0;
-    }
-
-    const damagePackage = {
-      playerId: this.instanceId,
-      remaining: [ this.stats.hp, this.stats.maxHp ],
-      amount,
-      overkill,
-      source: sourceCharacter.instanceId
-    }
-
-    // sendPackage(
-    //   World.getClientByPlayerCharacter(this).socket,
-    //   MessageTypes.TakeDamage,
-    //   damagePackage 
-    // );
-    // broadcastPackage(
-    //   MessageTypes.TakeDamage,
-    //   damagePackage
-    // );
-    console.log("Took " + amount + " Damage.");
-
-    if (this.health === 0) {
-      this.die();
-    }
-
-  }
-
-  die() {
-    // broadcastPackage(
-    //   MessageTypes.PlayerDeath,
-    //   {
-    //     instanceId: this.instanceId,
-    //     position: this.position
-    //   }
-    // );
-    // setTimeout(function() {
-    //   broadcastPackage(
-    //     MessageTypes.Despawn,
-    //     {
-    //       spawnId: this.instanceId
-    //     }
-    //   )
-    // }, 3500);
-    console.error("You have died.");
   }
 
 }

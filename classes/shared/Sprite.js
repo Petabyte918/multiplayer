@@ -14,6 +14,14 @@ class Sprite extends GameObject {
 
     this.moving = params.moving || false;
     this.aim = params.aim || { x: -1, y: -1, placeholder: true };
+
+    this.texture = './images/SpritePlaceholder.png';
+    // TODO: Add sprite frame dimensions
+    // TODO: Add framerate.
+  }
+
+  setTexture(imageSource) {
+    this.texture = imageSource;
   }
 
   checkCollision(target) {
@@ -21,7 +29,7 @@ class Sprite extends GameObject {
     return CollisionStatus.NONE;
   }
 
-  setPosition(position) {
+  setPosition(position = { x: 0, y: 0 }) {
     this.position.x = position.x;
     this.position.y = position.y;
   }
