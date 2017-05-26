@@ -67,9 +67,7 @@ let ui = {
     this.textSprites.push(text);
   },
   removeCombatText(text) {
-    console.log("Removing from index: " + this.textSprites.indexOf(text));
     this.textSprites.splice(this.textSprites.indexOf(text), 1);
-    drawCanvas();
   }
 };
 
@@ -110,7 +108,7 @@ function startSocketClient() {
 
     switch (message.type) {
       case MessageTypes.PONG:
-        console.log("Pong received.");
+        // console.log("Pong received.");
         break;
       case MessageTypes.Who:
         // sendPackage(MessageTypes.Who, { who: 'James:df8c8023ae' });
@@ -222,7 +220,6 @@ const handleTakeDamage = function handleTakeDamage(message) {
       position: target.position
     }, 
     function() {
-      console.log("trying to remove combat text.");
       ui.removeCombatText(text);
     }
   );
@@ -350,7 +347,6 @@ const drawHUD = function drawHUD() {
   // TODO: draw HUD
   uiContext.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
   ui.textSprites.forEach((cbText) => {
-    console.log("Drawing text: " + cbText.text);
     if(cbText.draw) {
       cbText.draw(uiContext);
     }
@@ -670,7 +666,6 @@ function updateLoop(timestamp = performance.now()) { // TODO: Rename. (drawLoop(
 
 const updateHUD = function updateHUD(delta) {
   ui.textSprites.forEach((cbText) => {
-    console.log("Drawing text: " + cbText.text);
     if(cbText.update) {
       cbText.update(delta);
     }
@@ -694,7 +689,7 @@ const sendPackage = async function sendPackage(type = null, attributes = {}, rec
 
 setInterval(function pingPong() {
   sendPackage(MessageTypes.PING, {});
-  console.log("Ping sent.");
+  // console.log("Ping sent.");
 }, 25000);
 
 startSocketClient(); // TODO: Need to monitor and reconnect

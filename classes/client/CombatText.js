@@ -3,7 +3,7 @@ import GameObject from '../shared/GameObject';
 
 const defaults = {
   fillStyle: "red",
-  font: "14px Comic Sans MS",
+  font: "14px Arial",
   lifeTime: 5 * 1000,
   position: { x: 0, y: 0 },
   text: "Hello World",
@@ -25,7 +25,6 @@ export default class CombatText extends GameObject {
 
     console.log("TTL: " + (params.lifeTime || defaults.lifeTime));
     this.cancelTimeout = setTimeout(() => {
-      console.log("Deleting");
       this.delete();
     }, params.lifeTime || defaults.lifeTime);
 

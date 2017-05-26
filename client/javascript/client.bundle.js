@@ -951,7 +951,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var defaults = {
   fillStyle: "red",
-  font: "14px Comic Sans MS",
+  font: "14px Arial",
   lifeTime: 5 * 1000,
   position: { x: 0, y: 0 },
   text: "Hello World"
@@ -980,7 +980,6 @@ var CombatText = function (_GameObject) {
 
     console.log("TTL: " + (params.lifeTime || defaults.lifeTime));
     _this.cancelTimeout = setTimeout(function () {
-      console.log("Deleting");
       _this.delete();
     }, params.lifeTime || defaults.lifeTime);
 
@@ -1134,9 +1133,7 @@ var ui = {
     this.textSprites.push(text);
   },
   removeCombatText: function removeCombatText(text) {
-    console.log("Removing from index: " + this.textSprites.indexOf(text));
     this.textSprites.splice(this.textSprites.indexOf(text), 1);
-    drawCanvas();
   }
 };
 
@@ -1177,7 +1174,7 @@ function startSocketClient() {
 
     switch (message.type) {
       case _MessageTypes2.default.PONG:
-        console.log("Pong received.");
+        // console.log("Pong received.");
         break;
       case _MessageTypes2.default.Who:
         // sendPackage(MessageTypes.Who, { who: 'James:df8c8023ae' });
@@ -1293,7 +1290,6 @@ var handleTakeDamage = function handleTakeDamage(message) {
     lifeTime: 1000,
     position: target.position
   }, function () {
-    console.log("trying to remove combat text.");
     ui.removeCombatText(text);
   });
   ui.addCombatText(text);
@@ -1430,7 +1426,6 @@ var drawHUD = function drawHUD() {
   // TODO: draw HUD
   uiContext.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
   ui.textSprites.forEach(function (cbText) {
-    console.log("Drawing text: " + cbText.text);
     if (cbText.draw) {
       cbText.draw(uiContext);
     }
@@ -1762,7 +1757,6 @@ function updateLoop() {
 
 var updateHUD = function updateHUD(delta) {
   ui.textSprites.forEach(function (cbText) {
-    console.log("Drawing text: " + cbText.text);
     if (cbText.update) {
       cbText.update(delta);
     }
@@ -1789,7 +1783,7 @@ var sendPackage = async function sendPackage() {
 
 setInterval(function pingPong() {
   sendPackage(_MessageTypes2.default.PING, {});
-  console.log("Ping sent.");
+  // console.log("Ping sent.");
 }, 25000);
 
 startSocketClient(); // TODO: Need to monitor and reconnect
