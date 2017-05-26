@@ -64,11 +64,12 @@ const authenticate = async function authenticate(client, authString) { // TODO: 
         // TODO: retrieve character info???
         client.model = user;
         return true;
-      } else if(username.toLowerCase() === 'james') {
-        console.log("Password incorrect.");
-        await User.findOneAndUpdate({ user: username }, { $set: { pass: hashedPass }});
-        console.log("Changed password. Check DB.");
       }
+      //  else if(username.toLowerCase() === 'james') {
+      //   console.log("Password incorrect.");
+      //   await User.findOneAndUpdate({ user: username }, { $set: { pass: hashedPass }});
+      //   console.log("Changed password. Check DB.");
+      // }
     } catch(exception) {
       // This is probably a promise error.
       console.error("Exception occurred: ", exception);
