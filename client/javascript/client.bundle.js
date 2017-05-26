@@ -1133,7 +1133,8 @@ function startSocketClient() {
   // TODO: Does this cause conflicts if called more than once?
   var sock = null;
   try {
-    sock = client.socket || new WebSocket('ws://' + location.hostname + ':' + location.port + '/');
+    var protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    sock = client.socket || new WebSocket(protocol + '://' + location.hostname + ':' + location.port + '/');
     client.socket = sock;
   } catch (ex) {
     console.log("Error: ", ex);
