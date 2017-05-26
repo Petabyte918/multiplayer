@@ -11,6 +11,9 @@
   },
   "author": "James Marks",
   "license": "MIT",
+  "engines": {
+    "node": "7.9.0"
+  },
   "dependencies": {
     "express": "^4.15.2",
     "fs": "0.0.1-security",
