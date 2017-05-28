@@ -1,3 +1,8 @@
+
+// import { SpriteTextureMap } from '../SpriteTypes';
+
+import MediaManager  from '../client/MediaManager';
+
 import GameObject from './GameObject';
 import Collider, { CollisionStatus } from './Collider';
 
@@ -16,8 +21,11 @@ class Sprite extends GameObject {
     this.aim = params.aim || { x: -1, y: -1, placeholder: true };
 
     this.texture = './images/SpritePlaceholder.png';
+
+    if(!this.angle) this.angle = params.angle || 0;
     // TODO: Add sprite frame dimensions
     // TODO: Add framerate.
+    // TODO: ANIMATE!!! Yay!
   }
 
   setTexture(imageSource) {
@@ -37,7 +45,7 @@ class Sprite extends GameObject {
   onCollisionEnter(otherCollider) {
     // console.log("OTHER Collider is: ", otherCollider.ownerGO);
 
-    console.log("Collision detected between: ", this.instanceId, otherCollider.ownerGO.instanceId);
+    // console.log("Collision detected between: ", this.instanceId, otherCollider.ownerGO.instanceId);
   }
 
   toJSON() {
@@ -51,17 +59,43 @@ class Sprite extends GameObject {
 
 
   update(delta) {
-    if(this.moving) {
-      console.log("Updating");
-      if(this.aim.placeholder) return;
-      // SOH, CAH, TOA
-      const deltaY = Math.sin(this.angle) * this.speed * delta / 1000;
-      const deltaX = Math.cos(this.angle) * this.speed * delta / 1000;
-      this.setPosition({
-        x: this.position.x + deltaX,
-        y: this.position.y + deltaY
-      });
+    // console.log("updating sprite");
+    super.update(delta);
+    // if(this.moving) {
+    //   console.log("Updating");
+    //   if(this.aim.placeholder) return;
+    //   // SOH, CAH, TOA
+    //   const deltaY = Math.sin(this.angle) * this.speed * delta / 1000;
+    //   const deltaX = Math.cos(this.angle) * this.speed * delta / 1000;
+    //   this.setPosition({
+    //     x: this.position.x + deltaX,
+    //     y: this.position.y + deltaY
+    //   });
+    // }
+  }
+
+  draw(context) {
+    if(!this.texture) return;
+    let imgElement = MediaManager.loadImage(this.texture);
+
+    let rotAngle = 0;
+    if (this.angle) {
+      rotAngle = this.angle;
     }
+    context.translate(this.position.x, this.position.y);
+    context.rotate(rotAngle);
+    context.drawImage(imgElement, -16, -16);
+    context.rotate(-rotAngle);
+    context.translate(-this.position.x, -this.position.y);
+
+    if(this.children) {
+      this.children.forEach(child => {
+        if(child.draw) {
+          child.draw(context);
+        }
+      })
+    }
+
   }
 }
 

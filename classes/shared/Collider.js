@@ -30,6 +30,8 @@ class Collider {
     // If I have the sprite and not the collider, try to get the collider
     if(!(otherCollider instanceof Collider)) otherCollider = otherCollider.collider;
     if(!(otherCollider instanceof Collider)) return CollisionStatus.NONE;
+    // If the other collider's game object is not active.
+    if(!otherCollider.ownerGO.isActive()) return CollisionStatus.NONE;
 
     // If I'm colliding with myself return CollisionStatus.NONE;
     if(otherCollider === this) return CollisionStatus.NONE;
@@ -60,7 +62,7 @@ class Collider {
       }
       if(isOverlapping && !this.currentCollisions.includes(otherCollider.instanceId)) {
         // console.log("collision enter");
-        console.log("Collided with tags: ", collidedTags);
+        // console.log("Collided with tags: ", collidedTags);
         this.currentCollisions.push(otherCollider.instanceId);
         return CollisionStatus.ENTER;
       } else if(isOverlapping) {

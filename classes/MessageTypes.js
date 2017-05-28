@@ -17,6 +17,7 @@ const MessageTypes = {
   FrameQueue: 'FRAME_QUEUE',
   TakeDamage: 'TAKE_DAMAGE',
   PlayerDeath: 'PLAYER_DEATH',
+  PlayerRespawn: 'PLAYER_RESPAWN',
   PING: 'PING',
   PONG: 'PONG',
 };

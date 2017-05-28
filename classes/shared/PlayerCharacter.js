@@ -30,14 +30,18 @@ class PlayerCharacter extends Character {
     };
     this.levelId = 1;
     this.strength = 1;
-    this.health = 50;
+    // this.health = 50; <- this is now tracked using getters and setters.
     this.maxHealth = 50;
     this.velocity = 0;
 
     this.moveTarget = {};
 
-    this.color = '#3aadd1'; // TODO: Do we want to keep this property?
+    this.setTexture('./images/PlayerOverhead.png');
+
   }
+
+  get health() { return this.stats.hp; }
+  set health(value) { this.stats.hp = value; }
 
   setPosition(position) {
     super.setPosition(position);
@@ -93,6 +97,25 @@ class PlayerCharacter extends Character {
       if(this.hasMoveTarget) this.clearMoveTarget();
       this.velocity = 0;
     }
+    // console.log("updated player. calling super.");
+    super.update(delta);
+  }
+
+  toJSON() {
+    const out = Object.assign({}, this);
+    if(out.children) {
+      out.children = out.children.map(c => {
+        const newChild = Object.assign({}, c);
+        c.parentGO = undefined;
+        c.parentId = this.instanceId;
+        return newChild;
+      });
+    }
+    if(out.collider && out.collider.ownerGO) {
+      out.collider = Object.assign({}, out.collider);
+      out.collider.ownerGO = undefined;
+    }
+    return out;
   }
 
 }

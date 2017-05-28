@@ -6,11 +6,16 @@ export const SpriteTypes = {
   CHEST: 'SpriteTypes.CHEST',
   FIREBALL: 'SpriteTypes.FIREBALL',
   EXPLOSION: 'SpriteTypes.EXPLOSION',
+  BLOODSTAIN: 'SpriteTypes.BLOODSTAIN',
 };
-
 
 export const ClientSpriteClassMap = new Map();
 ClientSpriteClassMap.set(SpriteTypes.PLAYER, PlayerCharacter);
+
+export const SpriteTextureMap = new Map();
+SpriteTextureMap.set(SpriteTypes.CHEST, './images/ChestClosed.png');
+SpriteTextureMap.set(SpriteTypes.FIREBALL, './images/FireballStatic.png');
+SpriteTextureMap.set(SpriteTypes.PLAYER, './images/PlayerOverhead.png');
 
 export function GetSpriteTypeName(obj) {
   var iterator = ClientSpriteClassMap.entries();

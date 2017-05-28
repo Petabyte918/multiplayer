@@ -15,7 +15,7 @@ export default class CombatText extends GameObject {
     super();
     
     this.deleteCallback = deleteCallback || (() => { throw new Error("Please provide a callback for combat text deleteCallback."); });
-    
+
     this.fillStyle = params.fillStyle || defaults.fillStyle;
     this.setFont(params.font || defaults.font);
     this.setPosition(params.position || defaults.position);
@@ -23,12 +23,14 @@ export default class CombatText extends GameObject {
     this.lifeTime = params.lifeTime || defaults.lifeTime;
     this.livesUntil = +Date.now() + this.lifeTime;
 
-    console.log("TTL: " + (params.lifeTime || defaults.lifeTime));
+    this.xShift = params.xShift || (Math.random() * 48) - 24;
+
+    // console.log("TTL: " + (params.lifeTime || defaults.lifeTime));
     this.cancelTimeout = setTimeout(() => {
       this.delete();
     }, params.lifeTime || defaults.lifeTime);
 
-    console.log("Created combat text: ", this);
+    // console.log("Created combat text: ", this);
   }
 
   draw(ctx) {
@@ -45,6 +47,7 @@ export default class CombatText extends GameObject {
 
   update(delta) {
     this.position.y -= 48 * delta / 1000;
+    this.position.x += this.xShift * delta / 1000;
   }
 
   delete() {

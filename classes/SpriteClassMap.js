@@ -2,6 +2,7 @@
 import PlayerCharacter from './shared/PlayerCharacter';
 import FireBall from './shared/FireBall';
 import Explosion from './shared/Explosion';
+import Bloodstain from './shared/Bloodstain';
 import Chest from './shared/Chest';
 import { SpriteTypes } from './SpriteTypes';
 
@@ -9,6 +10,7 @@ export const SpriteClassMap = new Map();
 SpriteClassMap.set(SpriteTypes.PLAYER, PlayerCharacter);
 SpriteClassMap.set(SpriteTypes.FIREBALL, FireBall);
 SpriteClassMap.set(SpriteTypes.EXPLOSION, Explosion);
+SpriteClassMap.set(SpriteTypes.BLOODSTAIN, Bloodstain);
 SpriteClassMap.set(SpriteTypes.CHEST, Chest);
 
 export function GetSpriteTypeName(obj) {

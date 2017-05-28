@@ -1,17 +1,20 @@
 // Game Objects
 // import FireBall from '../../classes/shared/FireBall';
 import PlayerCharacter from '../../classes/shared/PlayerCharacter';
+import Character from '../../classes/shared/Character';
 import Sprite from '../../classes/shared/Sprite';
 import CombatText from '../../classes/client/CombatText';
 
 // Constants & Enumerations
 import MessageTypes from '../../classes/MessageTypes';
 import TileTypes from '../../classes/TileTypes';
-import { SpriteTypes, ClientSpriteClassMap } from '../../classes/SpriteTypes';
+import { SpriteTypes, SpriteTextureMap, ClientSpriteClassMap } from '../../classes/SpriteTypes';
 import PlayerActions from '../../classes/PlayerActions';
 
 // Game Managers
 import { GameSettings } from '../../classes/GameSettings';
+import ClientGlobals from '../../classes/client/ClientGlobals';
+import MediaManager from '../../classes/client/MediaManager';
 
 // Helpers
 import { angle2d } from '../../classes/Helpers/gx2D';
@@ -49,10 +52,10 @@ TileColorMap.set(TileTypes.WATER, 'blue');
 TileColorMap.set(TileTypes.PIT, 'black');
 TileColorMap.set(TileTypes.BRIDGE, '#7c4b2e');
 
-const SpriteTextureMap = new Map();
-SpriteTextureMap.set(SpriteTypes.CHEST, './images/ChestClosed.png');
-SpriteTextureMap.set(SpriteTypes.FIREBALL, './images/FireballStatic.png');
-SpriteTextureMap.set(SpriteTypes.PLAYER, './images/PlayerOverhead.png');
+// const SpriteTextureMap = new Map();
+// SpriteTextureMap.set(SpriteTypes.CHEST, './images/ChestClosed.png');
+// SpriteTextureMap.set(SpriteTypes.FIREBALL, './images/FireballStatic.png');
+// SpriteTextureMap.set(SpriteTypes.PLAYER, './images/PlayerOverhead.png');
 
 const ImageLoader = new Map();
 
@@ -60,7 +63,7 @@ let playerCharacter = null;
 
 // level tiles / objects for map the player is currently on.
 let tileMap = [];
-let sprites = []; // SPRITE
+let sprites = ClientGlobals.sprites; // []; // SPRITE
 let ui = {
   textSprites: [],
   addCombatText(text) {
@@ -147,17 +150,18 @@ function startSocketClient() {
         drawSprites();
         break;
       case MessageTypes.Spawn:
-        console.log('Spawn info: ', message);
         if(!message.spawnClass) {
           console.error("No spawn class provided.");
           return;
         }
         if(message.spawnClass === SpriteTypes.PLAYER) {
           console.log("Player spawned: ", message.spawn.instanceId);
+          console.log('Spawn info: ', message);
         }
         // const spawnClass = SpriteClassMap.get(message.spawnClass);
         if(message.spawn.instanceId === playerCharacter.instanceId) return;
-        const newSpawn = Object.assign(new Sprite(), message.spawn, { type: message.spawnClass });
+        // const newSpawn = Object.assign(new Sprite(), message.spawn, { type: message.spawnClass });
+        const newSpawn = classifySprite(message.spawn, message.spawnClass);
         sprites.push(newSpawn);
         sprites[newSpawn.instanceId] = newSpawn;
         break;
@@ -179,7 +183,7 @@ function startSocketClient() {
             if(spriteToUpdate) {
               Object.assign(spriteToUpdate, spriteUpdateInfo);
             } else {
-              console.log("couldn't find sprite.", spriteUpdateInfo);
+              // console.log("couldn't find sprite.", spriteUpdateInfo);
             }
           } else {
             console.log("Invalid frame action");
@@ -190,6 +194,13 @@ function startSocketClient() {
         break;
       case MessageTypes.TakeDamage:
         handleTakeDamage(message);
+        break;
+      case MessageTypes.PlayerDeath:
+        handlePlayerDeath(message);
+        break;
+      case MessageTypes.PlayerRespawn:
+        // console.log('Respawn info: ', message);
+        handlePlayerRespawn(message);
         break;
       case MessageTypes.DEBUG:
         console.log('Debug package received. Message: ' + message.message);
@@ -211,19 +222,38 @@ function startSocketClient() {
 }
 
 const handleTakeDamage = function handleTakeDamage(message) {
-  const target = message.target;
+  const target = sprites[message.target];
   const damage = message.damage;
   const text = new CombatText(
     { 
       text: '-' + damage, 
       lifeTime: 1000,
-      position: target.position
+      position: {
+        x: target.position.x - 16,
+        y: target.position.y - 16,
+      }
     }, 
     function() {
       ui.removeCombatText(text);
     }
   );
   ui.addCombatText(text);
+  target.stats.hp = message.remainingHp;
+  target.stats.maxHp = message.maxHp;
+}
+
+const handlePlayerDeath = function handlePlayerDeath(message) {
+  const target = sprites.find(s => s.instanceId === message.target);
+  target.isDead = true;
+  
+}
+const handlePlayerRespawn = function handlePlayerRespawn(message) {
+  const target = sprites.find(s => s.instanceId === message.target);
+  target.isDead = false;
+  target.stats.hp = target.stats.maxHp;
+  // console.log("Found: ", target);
+  // console.log("ID: ", message.target);
+  target.setPosition(message.position);
 }
 
 const sendLogin = (username, password) => {
@@ -233,7 +263,7 @@ const sendLogin = (username, password) => {
 const classifySprite = function classifySprite(sprite, spriteClassTag) {
   if(!spriteClassTag) return sprite;
   const spriteClass = ClientSpriteClassMap.get(spriteClassTag);
-  if(sprite instanceof spriteClass) return;
+  if(!spriteClass || sprite instanceof spriteClass) return sprite;
   const classifiedSprite = Object.assign(new spriteClass(), sprite);
   return classifiedSprite;
 }
@@ -291,8 +321,8 @@ function initCanvas() {
 }
 
 function handleResize() {
-  spriteCanvas.width = cursorCanvas.width = tileCanvas.width = document.body.offsetWidth;
-  spriteCanvas.height = cursorCanvas.height = tileCanvas.height = document.body.offsetHeight;
+  uiCanvas.width = spriteCanvas.width = cursorCanvas.width = tileCanvas.width = document.body.offsetWidth;
+  uiCanvas.height = spriteCanvas.height = cursorCanvas.height = tileCanvas.height = document.body.offsetHeight;
   drawCanvas();
 }
 
@@ -332,14 +362,16 @@ const drawSprites = function drawSprites() {
 
   sprites.forEach((sprite) => {  // SPRITE
 
-    if (sprite instanceof PlayerCharacter) {
-      drawSprite(sprite.position.x, sprite.position.y, SpriteTextureMap.get(SpriteTypes.PLAYER), sprite.angle || 0);
-    } else {
-      // console.log("Other type of sprite: ", sprite.type, sprite.position, typeof sprite, sprite);
-      const imageSource = sprite.texture || SpriteTextureMap.get(sprite.type);
-      if(imageSource === undefined) console.log("undefined darnit.", sprite);
-      drawSprite(sprite.position.x, sprite.position.y, imageSource, sprite.angle || 0);
+    if(sprite.isDead) return;
+    if(sprite.draw) {
+      sprite.draw(spriteContext);
+      return;
     }
+
+    const imageSource = sprite.texture || SpriteTextureMap.get(sprite.type);
+    if(imageSource === undefined) console.log("undefined darnit.", sprite);
+    drawSprite(sprite.position.x, sprite.position.y, imageSource, sprite.angle || 0);
+
   });
 };
 
@@ -351,6 +383,26 @@ const drawHUD = function drawHUD() {
       cbText.draw(uiContext);
     }
   });
+
+  const characters = sprites.filter(s => s instanceof Character);
+  characters.forEach(character => {
+    if(character.instanceId !== playerCharacter.instanceId)
+      console.log("checking visibility.");
+
+    const bounds = {
+      left: 0,
+      right: spriteCanvas.width,
+      top: 0,
+      bottom: spriteCanvas.height
+    };
+
+    if(character.isVisibleTo(bounds)) {
+      character.drawHealthBar(uiContext);
+    } else {
+      // console.log("Player is not visible: ", character.instanceId);
+    }
+  });
+
 }
 
 // Canvas helper functions
@@ -370,7 +422,7 @@ const drawCircle = function drawCircle(x, y, radius = TILE_SCALE, fill = '#FFFFF
 const drawSprite = function drawSprite(x, y, imageSource, angle = null) {
   // const imgElement = document.querySelector('#image-loader');
 
-  let imgElement = ImageLoader.get(imageSource);
+  let imgElement = MediaManager.loadImage(imageSource);
   let rotAngle = 0;
   if (angle) {
     rotAngle = angle;
@@ -397,6 +449,7 @@ const drawSprite = function drawSprite(x, y, imageSource, angle = null) {
     spriteContext.rotate(-rotAngle);
     spriteContext.translate(-x, -y);
   }
+
 };
 
 function keyPressed(keyName, message = {}) {
@@ -654,7 +707,6 @@ function updateLoop(timestamp = performance.now()) { // TODO: Rename. (drawLoop(
   }
 
   let delta = timestamp - loopTime;
-  
   updateHUD(delta);
 
   loopTime = timestamp;
@@ -668,6 +720,15 @@ const updateHUD = function updateHUD(delta) {
   ui.textSprites.forEach((cbText) => {
     if(cbText.update) {
       cbText.update(delta);
+    }
+  });
+
+  const characters = sprites.filter(s => s instanceof Character);
+  characters.forEach(character => {
+    // console.log("setting stats to " + character.health + " " + character.stats.maxHp + " for: ", character);
+    if(character.healthBar) {
+      character.healthBar.stats.current = character.stats.hp;
+      character.healthBar.stats.max = character.stats.maxHp;
     }
   });
 }

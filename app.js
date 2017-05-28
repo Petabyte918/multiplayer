@@ -41,6 +41,7 @@ import { CollisionStatus } from './classes/shared/Collider';
 // Database related
 mongoose.connect(process.env.MONGODB_CONNECTIONSTRING);
 import User from './models/User';
+import Character from './models/Character';
 
 // Application Globals
 // const World = {
@@ -57,12 +58,12 @@ const authenticate = async function authenticate(client, authString) { // TODO: 
 
   if (username && password) {
     try {
-      const user = await User.findOne({ user: username }); // , 'user pass');
-      console.log("User: ", user);
+      const user = await User.findOne({ user: username }).populate('character'); // , 'user pass');
+      // console.log("User: ", user);
       const hashedPass = hashPassword(password, user.pass.salt);
       if(hashedPass.hash === user.pass.hash) {
         // TODO: retrieve character info???
-        client.model = user;
+        client.user = user;
         return true;
       }
       //  else if(username.toLowerCase() === 'james') {
@@ -138,8 +139,8 @@ const clientMessage = async function clientMessage(incoming = '{}') {
       break;
     case MessageTypes.Who:
       if (await authenticate(this, message.who)) {
-        log("Getting player.");
-        this.playerCharacter = DatabaseManager.getPlayer('James');
+        // log("Getting player.");
+        this.playerCharacter = DatabaseManager.getPlayer(this.user.character.name);
         sendPackage(
           this.socket,
           MessageTypes.Authentication,
@@ -180,13 +181,13 @@ const clientMessage = async function clientMessage(incoming = '{}') {
         MessageTypes.Port,
         { success: true, level, playerCharacter: pc }
       );
-      console.log("sent port package");
-      console.log("broadcasting port package");
+      // console.log("sent port package");
+      // console.log("broadcasting port package");
       broadcastPackage(
         MessageTypes.Spawn,
         { spawnClass: SpriteTypes.PLAYER, spawn: pc }
       );
-      console.log("broadcast port package");
+      // console.log("broadcast port package");
       break;
     case MessageTypes.KeyPressed:
       handleKeyPressed(this, message);
@@ -336,7 +337,7 @@ const handlePlayerFireRequest = function handlePlayerFireRequest(client, message
 }
 
 const castSpell = function castSpell(client, message) {
-  if(client.player.canCast(message.spellId)) {
+  if(client.playerCharacter.canCast(message.spellId)) {
     // TODO: Eventually something like this -> client.player.cast(DatabaseManager.getSpell(spellId));
     //const fb = new FireBall();
   }

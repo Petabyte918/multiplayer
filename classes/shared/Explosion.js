@@ -4,7 +4,7 @@ import World from '../GameEngine';
 export default class Explosion extends Sprite {
   constructor(params = {}) {
     super(params);
-    console.log("Creating an explosion!!!!!");
+    // console.log("Creating an explosion!!!!!");
     this.setPosition(params.start || { x: 0, y: 0 });
     this.setTexture('./images/ExplosionExploding.png');
 

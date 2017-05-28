@@ -16,7 +16,9 @@ class LevelManager {
     if(!this.levels[levelId]) {
       
       const level = new Level(levelId);
-      level.populate(this.loadFromJSONFile(`./levels/level_${levelId}.json`));
+      const levelData = this.loadFromJSONFile(`./levels/level_${levelId}.json`);
+      Object.assign(level, levelData);
+      level.populate(levelData);
 
       if(!level)
         throw new Error("Level did not load. This is probably because of an invalid level ID.");
@@ -29,20 +31,23 @@ class LevelManager {
   getLevelBySprite(sprite) {
     let levelFound = null;
     Object.keys(this.levels).forEach(levelId => {
-      console.log("doing get level");
+      // console.log("doing get level");
       const level = this.getLevel(levelId);
-      console.log("got level");
+      // console.log("got level");
       if(level.sprites.indexOf(sprite) !== -1) {
         levelFound = level;
-        console.log("Found from comparison: " + levelFound.id);
+        // console.log("Found from comparison: " + levelFound.id);
       }
     });
-    console.log("return level: ", levelFound);
+    // console.log("return level: ", levelFound);
     return levelFound;
   }
 
   loadFromJSONFile(filename) {
     const level = JSON.parse(fs.readFileSync(filename, 'utf-8'));
+    
+    // console.log("Loaded Level: ", level);
+
     level.sprites = level.sprites.map(s => {
       const spriteClass = SpriteClassMap.get(s.type);
       if(spriteClass) {

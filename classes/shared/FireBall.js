@@ -80,16 +80,12 @@ class FireBall extends Sprite {
     
     if(otherCollider.tags.includes('PLAYER')) {
       const otherPlayer = otherCollider.ownerGO;
-      console.log("Spawning explosion at target player position.");
-      otherPlayer.takeDamage(this.stats.damage, this.ownerGO);
+      World.CharacterManager.applyDamage(otherPlayer, { damage: this.stats.damage, source: this.ownerGO  });
       World.spawnSprite(otherPlayer.levelId, SpriteTypes.EXPLOSION, { start: this.position });
-      broadcastPackage(MessageTypes.TakeDamage, { damage: this.stats.damage, target: otherPlayer });
     } else {
-      console.log("Spawning explosion at fireball position.");
       World.spawnSprite(World.getLevelBySprite(this).id, SpriteTypes.EXPLOSION, { start: this.position });
     }
 
-    console.log("despawning fireball. From level: " + World.getLevelBySprite(this).levelId);
     World.despawnSpriteByLevel(World.getLevelBySprite(this).id, this);
 
   }
