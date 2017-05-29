@@ -7,7 +7,22 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Nodemon",
+      "runtimeExecutable": "nodemon",
+      "runtimeArgs": [
+        "--inspect=5858"
+      ],
+      "program": "${workspaceRoot}/app.bundle.js",
+      "restart": true,
+      "port": 5858,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Node",
       "program": "${workspaceRoot}\\app.bundle.js",
       "protocol": "inspector"
     }

@@ -1,4 +1,6 @@
 
+import AnimatedImage from './AnimatedImage';
+
 const ImageLoader = new Map();
 
 class MediaManager {
@@ -25,6 +27,9 @@ class MediaManager {
     // } else {
     //   return p;
     // }
+  }
+  loadAnimatedImage(imageSource, params) {
+    const animImgElement = new AnimatedImage({ spriteSheetImage: imageSource, fps: 60, frameWidth: 32, frameHeight: 32 }).image;
   }
 }
 

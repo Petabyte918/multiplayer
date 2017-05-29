@@ -63,1056 +63,180 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 38);
+/******/ 	return __webpack_require__(__webpack_require__.s = 39);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/* unknown exports provided */
+/* all exports used */
+/*!**********************************!*\
+  !*** ./classes/shared/Sprite.js ***!
+  \**********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _MediaManager = __webpack_require__(9);
-
-var _MediaManager2 = _interopRequireDefault(_MediaManager);
-
-var _GameObject2 = __webpack_require__(12);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-var _Collider = __webpack_require__(10);
-
-var _Collider2 = _interopRequireDefault(_Collider);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-// import { SpriteTextureMap } from '../SpriteTypes';
-
-var Sprite = function (_GameObject) {
-  _inherits(Sprite, _GameObject);
-
-  function Sprite() {
-    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, Sprite);
-
-    // ensure we don't get undefined errors and then pass params to the Collider constructor
-    var _this = _possibleConstructorReturn(this, (Sprite.__proto__ || Object.getPrototypeOf(Sprite)).call(this, params));
-
-    params.collider = params.collider || {};
-    // TODO: shall we take this one level deeper and put it on GameObject?
-    //        Since base game object technically doesn't move, it should only have collider if it is a wall, trigger or switch.
-    _this.collider = new _Collider2.default(params.collider, params.owner || _this);
-
-    _this.moving = params.moving || false;
-    _this.aim = params.aim || { x: -1, y: -1, placeholder: true };
-
-    _this.texture = './images/SpritePlaceholder.png';
-
-    if (!_this.angle) _this.angle = params.angle || 0;
-    // TODO: Add sprite frame dimensions
-    // TODO: Add framerate.
-    // TODO: ANIMATE!!! Yay!
-    return _this;
-  }
-
-  _createClass(Sprite, [{
-    key: 'setTexture',
-    value: function setTexture(imageSource) {
-      this.texture = imageSource;
-    }
-  }, {
-    key: 'checkCollision',
-    value: function checkCollision(target) {
-      if (this.collider) return this.collider.getCollisionStatus(target);
-      return _Collider.CollisionStatus.NONE;
-    }
-  }, {
-    key: 'setPosition',
-    value: function setPosition() {
-      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
-
-      this.position.x = position.x;
-      this.position.y = position.y;
-    }
-  }, {
-    key: 'onCollisionEnter',
-    value: function onCollisionEnter(otherCollider) {
-      // console.log("OTHER Collider is: ", otherCollider.ownerGO);
-
-      // console.log("Collision detected between: ", this.instanceId, otherCollider.ownerGO.instanceId);
-    }
-  }, {
-    key: 'toJSON',
-    value: function toJSON() {
-      var output = Object.assign({}, this);
-      if (output.collider) {
-        output.collider = Object.assign({}, output.collider);
-        output.collider.ownerGO = undefined;
-      }
-      return output;
-    }
-  }, {
-    key: 'update',
-    value: function update(delta) {
-      // console.log("updating sprite");
-      _get(Sprite.prototype.__proto__ || Object.getPrototypeOf(Sprite.prototype), 'update', this).call(this, delta);
-      // if(this.moving) {
-      //   console.log("Updating");
-      //   if(this.aim.placeholder) return;
-      //   // SOH, CAH, TOA
-      //   const deltaY = Math.sin(this.angle) * this.speed * delta / 1000;
-      //   const deltaX = Math.cos(this.angle) * this.speed * delta / 1000;
-      //   this.setPosition({
-      //     x: this.position.x + deltaX,
-      //     y: this.position.y + deltaY
-      //   });
-      // }
-    }
-  }, {
-    key: 'draw',
-    value: function draw(context) {
-      if (!this.texture) return;
-      var imgElement = _MediaManager2.default.loadImage(this.texture);
-
-      var rotAngle = 0;
-      if (this.angle) {
-        rotAngle = this.angle;
-      }
-      context.translate(this.position.x, this.position.y);
-      context.rotate(rotAngle);
-      context.drawImage(imgElement, -16, -16);
-      context.rotate(-rotAngle);
-      context.translate(-this.position.x, -this.position.y);
-
-      if (this.children) {
-        this.children.forEach(function (child) {
-          if (child.draw) {
-            child.draw(context);
-          }
-        });
-      }
-    }
-  }]);
-
-  return Sprite;
-}(_GameObject3.default);
-
-exports.default = Sprite;
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if (\"value\" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };\n\nvar _MediaManager = __webpack_require__(/*! ../client/MediaManager */ 9);\n\nvar _MediaManager2 = _interopRequireDefault(_MediaManager);\n\nvar _GameObject2 = __webpack_require__(/*! ./GameObject */ 13);\n\nvar _GameObject3 = _interopRequireDefault(_GameObject2);\n\nvar _Collider = __webpack_require__(/*! ./Collider */ 11);\n\nvar _Collider2 = _interopRequireDefault(_Collider);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n// import { SpriteTextureMap } from '../SpriteTypes';\n\nvar Sprite = function (_GameObject) {\n  _inherits(Sprite, _GameObject);\n\n  function Sprite() {\n    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n    _classCallCheck(this, Sprite);\n\n    // ensure we don't get undefined errors and then pass params to the Collider constructor\n    var _this = _possibleConstructorReturn(this, (Sprite.__proto__ || Object.getPrototypeOf(Sprite)).call(this, params));\n\n    params.collider = params.collider || {};\n    // TODO: shall we take this one level deeper and put it on GameObject?\n    //        Since base game object technically doesn't move, it should only have collider if it is a wall, trigger or switch.\n    _this.collider = new _Collider2.default(params.collider, params.owner || _this);\n\n    _this.moving = params.moving || false;\n    _this.aim = params.aim || { x: -1, y: -1, placeholder: true };\n\n    _this.texture = './images/SpritePlaceholder.png';\n\n    if (!_this.angle) _this.angle = params.angle || 0;\n    // TODO: Add sprite frame dimensions\n    // TODO: Add framerate.\n    // TODO: ANIMATE!!! Yay!\n    return _this;\n  }\n\n  _createClass(Sprite, [{\n    key: 'setTexture',\n    value: function setTexture(imageSource) {\n      this.texture = imageSource;\n    }\n  }, {\n    key: 'checkCollision',\n    value: function checkCollision(target) {\n      if (this.collider) return this.collider.getCollisionStatus(target);\n      return _Collider.CollisionStatus.NONE;\n    }\n  }, {\n    key: 'setPosition',\n    value: function setPosition() {\n      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };\n\n      this.position.x = position.x;\n      this.position.y = position.y;\n    }\n  }, {\n    key: 'onCollisionEnter',\n    value: function onCollisionEnter(otherCollider) {\n      // console.log(\"OTHER Collider is: \", otherCollider.ownerGO);\n\n      // console.log(\"Collision detected between: \", this.instanceId, otherCollider.ownerGO.instanceId);\n    }\n  }, {\n    key: 'toJSON',\n    value: function toJSON() {\n      var output = Object.assign({}, this);\n      if (output.collider) {\n        output.collider = Object.assign({}, output.collider);\n        output.collider.ownerGO = undefined;\n      }\n      return output;\n    }\n  }, {\n    key: 'update',\n    value: function update(delta) {\n      // console.log(\"updating sprite\");\n      _get(Sprite.prototype.__proto__ || Object.getPrototypeOf(Sprite.prototype), 'update', this).call(this, delta);\n      // if(this.moving) {\n      //   console.log(\"Updating\");\n      //   if(this.aim.placeholder) return;\n      //   // SOH, CAH, TOA\n      //   const deltaY = Math.sin(this.angle) * this.speed * delta / 1000;\n      //   const deltaX = Math.cos(this.angle) * this.speed * delta / 1000;\n      //   this.setPosition({\n      //     x: this.position.x + deltaX,\n      //     y: this.position.y + deltaY\n      //   });\n      // }\n    }\n  }, {\n    key: 'draw',\n    value: function draw(context) {\n      if (!this.texture) return;\n      var imgElement = _MediaManager2.default.loadImage(this.texture);\n\n      var rotAngle = 0;\n      if (this.angle) {\n        rotAngle = this.angle;\n      }\n      context.translate(this.position.x, this.position.y);\n      context.rotate(rotAngle);\n      context.drawImage(imgElement, -16, -16);\n      context.rotate(-rotAngle);\n      context.translate(-this.position.x, -this.position.y);\n\n      if (this.children) {\n        this.children.forEach(function (child) {\n          if (child.draw) {\n            child.draw(context);\n          }\n        });\n      }\n    }\n  }]);\n\n  return Sprite;\n}(_GameObject3.default);\n\nexports.default = Sprite;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMC5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL3NoYXJlZC9TcHJpdGUuanM/OTliZiJdLCJzb3VyY2VzQ29udGVudCI6WyJcbi8vIGltcG9ydCB7IFNwcml0ZVRleHR1cmVNYXAgfSBmcm9tICcuLi9TcHJpdGVUeXBlcyc7XG5cbmltcG9ydCBNZWRpYU1hbmFnZXIgIGZyb20gJy4uL2NsaWVudC9NZWRpYU1hbmFnZXInO1xuXG5pbXBvcnQgR2FtZU9iamVjdCBmcm9tICcuL0dhbWVPYmplY3QnO1xuaW1wb3J0IENvbGxpZGVyLCB7IENvbGxpc2lvblN0YXR1cyB9IGZyb20gJy4vQ29sbGlkZXInO1xuXG5jbGFzcyBTcHJpdGUgZXh0ZW5kcyBHYW1lT2JqZWN0IHtcbiAgXG4gIGNvbnN0cnVjdG9yKHBhcmFtcyA9IHt9KSB7XG4gICAgc3VwZXIocGFyYW1zKTtcblxuICAgIC8vIGVuc3VyZSB3ZSBkb24ndCBnZXQgdW5kZWZpbmVkIGVycm9ycyBhbmQgdGhlbiBwYXNzIHBhcmFtcyB0byB0aGUgQ29sbGlkZXIgY29uc3RydWN0b3JcbiAgICBwYXJhbXMuY29sbGlkZXIgPSBwYXJhbXMuY29sbGlkZXIgfHwge307XG4gICAgLy8gVE9ETzogc2hhbGwgd2UgdGFrZSB0aGlzIG9uZSBsZXZlbCBkZWVwZXIgYW5kIHB1dCBpdCBvbiBHYW1lT2JqZWN0P1xuICAgIC8vICAgICAgICBTaW5jZSBiYXNlIGdhbWUgb2JqZWN0IHRlY2huaWNhbGx5IGRvZXNuJ3QgbW92ZSwgaXQgc2hvdWxkIG9ubHkgaGF2ZSBjb2xsaWRlciBpZiBpdCBpcyBhIHdhbGwsIHRyaWdnZXIgb3Igc3dpdGNoLlxuICAgIHRoaXMuY29sbGlkZXIgPSBuZXcgQ29sbGlkZXIocGFyYW1zLmNvbGxpZGVyLCBwYXJhbXMub3duZXIgfHwgdGhpcyk7XG5cbiAgICB0aGlzLm1vdmluZyA9IHBhcmFtcy5tb3ZpbmcgfHwgZmFsc2U7XG4gICAgdGhpcy5haW0gPSBwYXJhbXMuYWltIHx8IHsgeDogLTEsIHk6IC0xLCBwbGFjZWhvbGRlcjogdHJ1ZSB9O1xuXG4gICAgdGhpcy50ZXh0dXJlID0gJy4vaW1hZ2VzL1Nwcml0ZVBsYWNlaG9sZGVyLnBuZyc7XG5cbiAgICBpZighdGhpcy5hbmdsZSkgdGhpcy5hbmdsZSA9IHBhcmFtcy5hbmdsZSB8fCAwO1xuICAgIC8vIFRPRE86IEFkZCBzcHJpdGUgZnJhbWUgZGltZW5zaW9uc1xuICAgIC8vIFRPRE86IEFkZCBmcmFtZXJhdGUuXG4gICAgLy8gVE9ETzogQU5JTUFURSEhISBZYXkhXG4gIH1cblxuICBzZXRUZXh0dXJlKGltYWdlU291cmNlKSB7XG4gICAgdGhpcy50ZXh0dXJlID0gaW1hZ2VTb3VyY2U7XG4gIH1cblxuICBjaGVja0NvbGxpc2lvbih0YXJnZXQpIHtcbiAgICBpZih0aGlzLmNvbGxpZGVyKSByZXR1cm4gdGhpcy5jb2xsaWRlci5nZXRDb2xsaXNpb25TdGF0dXModGFyZ2V0KTtcbiAgICByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG4gIH1cblxuICBzZXRQb3NpdGlvbihwb3NpdGlvbiA9IHsgeDogMCwgeTogMCB9KSB7XG4gICAgdGhpcy5wb3NpdGlvbi54ID0gcG9zaXRpb24ueDtcbiAgICB0aGlzLnBvc2l0aW9uLnkgPSBwb3NpdGlvbi55O1xuICB9XG5cbiAgb25Db2xsaXNpb25FbnRlcihvdGhlckNvbGxpZGVyKSB7XG4gICAgLy8gY29uc29sZS5sb2coXCJPVEhFUiBDb2xsaWRlciBpczogXCIsIG90aGVyQ29sbGlkZXIub3duZXJHTyk7XG5cbiAgICAvLyBjb25zb2xlLmxvZyhcIkNvbGxpc2lvbiBkZXRlY3RlZCBiZXR3ZWVuOiBcIiwgdGhpcy5pbnN0YW5jZUlkLCBvdGhlckNvbGxpZGVyLm93bmVyR08uaW5zdGFuY2VJZCk7XG4gIH1cblxuICB0b0pTT04oKSB7XG4gICAgY29uc3Qgb3V0cHV0ID0gT2JqZWN0LmFzc2lnbih7fSwgdGhpcyk7XG4gICAgaWYob3V0cHV0LmNvbGxpZGVyKSB7XG4gICAgICBvdXRwdXQuY29sbGlkZXIgPSBPYmplY3QuYXNzaWduKHt9LCBvdXRwdXQuY29sbGlkZXIpO1xuICAgICAgb3V0cHV0LmNvbGxpZGVyLm93bmVyR08gPSB1bmRlZmluZWQ7XG4gICAgfSBcbiAgICByZXR1cm4gb3V0cHV0O1xuICB9XG5cblxuICB1cGRhdGUoZGVsdGEpIHtcbiAgICAvLyBjb25zb2xlLmxvZyhcInVwZGF0aW5nIHNwcml0ZVwiKTtcbiAgICBzdXBlci51cGRhdGUoZGVsdGEpO1xuICAgIC8vIGlmKHRoaXMubW92aW5nKSB7XG4gICAgLy8gICBjb25zb2xlLmxvZyhcIlVwZGF0aW5nXCIpO1xuICAgIC8vICAgaWYodGhpcy5haW0ucGxhY2Vob2xkZXIpIHJldHVybjtcbiAgICAvLyAgIC8vIFNPSCwgQ0FILCBUT0FcbiAgICAvLyAgIGNvbnN0IGRlbHRhWSA9IE1hdGguc2luKHRoaXMuYW5nbGUpICogdGhpcy5zcGVlZCAqIGRlbHRhIC8gMTAwMDtcbiAgICAvLyAgIGNvbnN0IGRlbHRhWCA9IE1hdGguY29zKHRoaXMuYW5nbGUpICogdGhpcy5zcGVlZCAqIGRlbHRhIC8gMTAwMDtcbiAgICAvLyAgIHRoaXMuc2V0UG9zaXRpb24oe1xuICAgIC8vICAgICB4OiB0aGlzLnBvc2l0aW9uLnggKyBkZWx0YVgsXG4gICAgLy8gICAgIHk6IHRoaXMucG9zaXRpb24ueSArIGRlbHRhWVxuICAgIC8vICAgfSk7XG4gICAgLy8gfVxuICB9XG5cbiAgZHJhdyhjb250ZXh0KSB7XG4gICAgaWYoIXRoaXMudGV4dHVyZSkgcmV0dXJuO1xuICAgIGxldCBpbWdFbGVtZW50ID0gTWVkaWFNYW5hZ2VyLmxvYWRJbWFnZSh0aGlzLnRleHR1cmUpO1xuXG4gICAgbGV0IHJvdEFuZ2xlID0gMDtcbiAgICBpZiAodGhpcy5hbmdsZSkge1xuICAgICAgcm90QW5nbGUgPSB0aGlzLmFuZ2xlO1xuICAgIH1cbiAgICBjb250ZXh0LnRyYW5zbGF0ZSh0aGlzLnBvc2l0aW9uLngsIHRoaXMucG9zaXRpb24ueSk7XG4gICAgY29udGV4dC5yb3RhdGUocm90QW5nbGUpO1xuICAgIGNvbnRleHQuZHJhd0ltYWdlKGltZ0VsZW1lbnQsIC0xNiwgLTE2KTtcbiAgICBjb250ZXh0LnJvdGF0ZSgtcm90QW5nbGUpO1xuICAgIGNvbnRleHQudHJhbnNsYXRlKC10aGlzLnBvc2l0aW9uLngsIC10aGlzLnBvc2l0aW9uLnkpO1xuXG4gICAgaWYodGhpcy5jaGlsZHJlbikge1xuICAgICAgdGhpcy5jaGlsZHJlbi5mb3JFYWNoKGNoaWxkID0+IHtcbiAgICAgICAgaWYoY2hpbGQuZHJhdykge1xuICAgICAgICAgIGNoaWxkLmRyYXcoY29udGV4dCk7XG4gICAgICAgIH1cbiAgICAgIH0pXG4gICAgfVxuXG4gIH1cbn1cblxuZXhwb3J0IGRlZmF1bHQgU3ByaXRlO1xuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL3NoYXJlZC9TcHJpdGUuanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFHQTtBQUNBOzs7QUFDQTtBQUNBOzs7QUFBQTtBQUNBOzs7Ozs7Ozs7O0FBTkE7QUFDQTtBQU1BOzs7QUFFQTtBQUFBO0FBQ0E7QUFEQTtBQUNBO0FBRUE7QUFIQTtBQUNBO0FBR0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQWpCQTtBQWtCQTtBQUNBOzs7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBOzs7QUFFQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUdBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUE7Ozs7OztBQUdBIiwic291cmNlUm9vdCI6IiJ9");
 
 /***/ }),
 /* 1 */
+/* unknown exports provided */
+/* all exports used */
+/*!*********************************!*\
+  !*** ./classes/GameSettings.js ***!
+  \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-// GameSettings is a shared settings file that will share info to both the server and the client.
-var GameSettings = exports.GameSettings = {
-  TILE_SCALE: 32
-};
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n// GameSettings is a shared settings file that will share info to both the server and the client.\nvar GameSettings = exports.GameSettings = {\n  TILE_SCALE: 32\n};//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMS5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL0dhbWVTZXR0aW5ncy5qcz9kYzhkIl0sInNvdXJjZXNDb250ZW50IjpbIi8vIEdhbWVTZXR0aW5ncyBpcyBhIHNoYXJlZCBzZXR0aW5ncyBmaWxlIHRoYXQgd2lsbCBzaGFyZSBpbmZvIHRvIGJvdGggdGhlIHNlcnZlciBhbmQgdGhlIGNsaWVudC5cbmV4cG9ydCBjb25zdCBHYW1lU2V0dGluZ3MgPSB7XG4gIFRJTEVfU0NBTEU6IDMyLFxuICAvL01PTkdPREJfQ09OTkVDVElPTlNUUklORzogc2VydmVyQ29uZmlnLk1PTkdPREJfQ09OTkVDVElPTlNUUklOR1xufVxuXG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvR2FtZVNldHRpbmdzLmpzIl0sIm1hcHBpbmdzIjoiOzs7OztBQUFBO0FBQ0E7QUFDQTtBQURBIiwic291cmNlUm9vdCI6IiJ9");
 
 /***/ }),
 /* 2 */
+/* unknown exports provided */
+/* all exports used */
+/*!*********************************!*\
+  !*** ./classes/Helpers/guid.js ***!
+  \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.guid = guid;
-function guid() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-  }
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-}
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.guid = guid;\nfunction guid() {\n  function s4() {\n    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);\n  }\n  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();\n}//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMi5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL0hlbHBlcnMvZ3VpZC5qcz81NmRmIl0sInNvdXJjZXNDb250ZW50IjpbIlxuZXhwb3J0IGZ1bmN0aW9uIGd1aWQoKSB7XG4gIGZ1bmN0aW9uIHM0KCkge1xuICAgIHJldHVybiBNYXRoLmZsb29yKCgxICsgTWF0aC5yYW5kb20oKSkgKiAweDEwMDAwKVxuICAgICAgLnRvU3RyaW5nKDE2KVxuICAgICAgLnN1YnN0cmluZygxKTtcbiAgfVxuICByZXR1cm4gczQoKSArIHM0KCkgKyAnLScgKyBzNCgpICsgJy0nICsgczQoKSArICctJyArXG4gICAgczQoKSArICctJyArIHM0KCkgKyBzNCgpICsgczQoKTtcbn1cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9IZWxwZXJzL2d1aWQuanMiXSwibWFwcGluZ3MiOiI7Ozs7O0FBQ0E7QUFBQTtBQUNBO0FBQ0E7QUFHQTtBQUNBO0FBRUEiLCJzb3VyY2VSb290IjoiIn0=");
 
 /***/ }),
 /* 3 */
+/* unknown exports provided */
+/* all exports used */
+/*!*********************************!*\
+  !*** ./classes/MessageTypes.js ***!
+  \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var MessageTypes = {
-  Who: 'WHO',
-  Authentication: 'AUTHENTICATION',
-  Port: 'PORT',
-  KeyPressed: 'KEY_PRESSED',
-  KeyReleased: 'KEY_RELEASED',
-  MouseDown: 'MOUSE_DOWN',
-  MouseUp: 'MOUSE_UP',
-  MouseClick: 'MOUSE_CLICK',
-  MouseMove: 'MOUSE_MOVE',
-  MoveTo: 'MOVE_TO',
-  Cast: 'CAST',
-  Spawn: 'SPAWN',
-  Despawn: 'DESPAWN',
-  DEBUG: 'DEBUG',
-  UpdateSprite: 'UPDATE_SPRITE',
-  FrameQueue: 'FRAME_QUEUE',
-  TakeDamage: 'TAKE_DAMAGE',
-  PlayerDeath: 'PLAYER_DEATH',
-  PlayerRespawn: 'PLAYER_RESPAWN',
-  PING: 'PING',
-  PONG: 'PONG'
-};
-exports.default = MessageTypes;
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nvar MessageTypes = {\n  Who: 'WHO',\n  Authentication: 'AUTHENTICATION',\n  Port: 'PORT',\n  KeyPressed: 'KEY_PRESSED',\n  KeyReleased: 'KEY_RELEASED',\n  MouseDown: 'MOUSE_DOWN',\n  MouseUp: 'MOUSE_UP',\n  MouseClick: 'MOUSE_CLICK',\n  MouseMove: 'MOUSE_MOVE',\n  MoveTo: 'MOVE_TO',\n  Cast: 'CAST',\n  Spawn: 'SPAWN',\n  Despawn: 'DESPAWN',\n  DEBUG: 'DEBUG',\n  UpdateSprite: 'UPDATE_SPRITE',\n  FrameQueue: 'FRAME_QUEUE',\n  TakeDamage: 'TAKE_DAMAGE',\n  PlayerDeath: 'PLAYER_DEATH',\n  PlayerRespawn: 'PLAYER_RESPAWN',\n  PING: 'PING',\n  PONG: 'PONG'\n};\nexports.default = MessageTypes;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMy5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL01lc3NhZ2VUeXBlcy5qcz83ZDI5Il0sInNvdXJjZXNDb250ZW50IjpbImNvbnN0IE1lc3NhZ2VUeXBlcyA9IHtcbiAgV2hvOiAnV0hPJyxcbiAgQXV0aGVudGljYXRpb246ICdBVVRIRU5USUNBVElPTicsXG4gIFBvcnQ6ICdQT1JUJyxcbiAgS2V5UHJlc3NlZDogJ0tFWV9QUkVTU0VEJyxcbiAgS2V5UmVsZWFzZWQ6ICdLRVlfUkVMRUFTRUQnLFxuICBNb3VzZURvd246ICdNT1VTRV9ET1dOJyxcbiAgTW91c2VVcDogJ01PVVNFX1VQJyxcbiAgTW91c2VDbGljazogJ01PVVNFX0NMSUNLJyxcbiAgTW91c2VNb3ZlOiAnTU9VU0VfTU9WRScsXG4gIE1vdmVUbzogJ01PVkVfVE8nLFxuICBDYXN0OiAnQ0FTVCcsXG4gIFNwYXduOiAnU1BBV04nLFxuICBEZXNwYXduOiAnREVTUEFXTicsXG4gIERFQlVHOiAnREVCVUcnLFxuICBVcGRhdGVTcHJpdGU6ICdVUERBVEVfU1BSSVRFJyxcbiAgRnJhbWVRdWV1ZTogJ0ZSQU1FX1FVRVVFJyxcbiAgVGFrZURhbWFnZTogJ1RBS0VfREFNQUdFJyxcbiAgUGxheWVyRGVhdGg6ICdQTEFZRVJfREVBVEgnLFxuICBQbGF5ZXJSZXNwYXduOiAnUExBWUVSX1JFU1BBV04nLFxuICBQSU5HOiAnUElORycsXG4gIFBPTkc6ICdQT05HJyxcbn07XG5leHBvcnQgZGVmYXVsdCBNZXNzYWdlVHlwZXM7XG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvTWVzc2FnZVR5cGVzLmpzIl0sIm1hcHBpbmdzIjoiOzs7OztBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBckJBO0FBdUJBIiwic291cmNlUm9vdCI6IiJ9");
 
 /***/ }),
 /* 4 */
+/* unknown exports provided */
+/* all exports used */
+/*!*******************************************!*\
+  !*** ./classes/shared/PlayerCharacter.js ***!
+  \*******************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _Character2 = __webpack_require__(17);
-
-var _Character3 = _interopRequireDefault(_Character2);
-
-var _GameSettings = __webpack_require__(1);
-
-var _ColliderTypes = __webpack_require__(5);
-
-var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
-
-var _gx2D = __webpack_require__(8);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-//import World, { MessageTypes, sendPackage, broadcastPackage  } from '../GameEngine';
-
-var PlayerCharacter = function (_Character) {
-  _inherits(PlayerCharacter, _Character);
-
-  function PlayerCharacter() {
-    var characterName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Frank';
-
-    _classCallCheck(this, PlayerCharacter);
-
-    var _this = _possibleConstructorReturn(this, (PlayerCharacter.__proto__ || Object.getPrototypeOf(PlayerCharacter)).call(this, {
-      collider: {
-        type: _ColliderTypes2.default.RADIUS,
-        tags: ['PLAYER'],
-        radius: 5
-      }
-    }));
-
-    _this.id = -1;
-
-    _this.name = characterName;
-    _this.stats = {
-      level: 1,
-      strength: 1,
-      hp: 50,
-      maxHp: 50,
-      maxVelocity: 8 * _GameSettings.GameSettings.TILE_SCALE,
-      acceleration: 16 * _GameSettings.GameSettings.TILE_SCALE
-    };
-    _this.levelId = 1;
-    _this.strength = 1;
-    // this.health = 50; <- this is now tracked using getters and setters.
-    _this.maxHealth = 50;
-    _this.velocity = 0;
-
-    _this.moveTarget = {};
-
-    _this.setTexture('./images/PlayerOverhead.png');
-
-    return _this;
-  }
-
-  _createClass(PlayerCharacter, [{
-    key: 'setPosition',
-    value: function setPosition(position) {
-      _get(PlayerCharacter.prototype.__proto__ || Object.getPrototypeOf(PlayerCharacter.prototype), 'setPosition', this).call(this, position);
-      this.tx = Math.round(this.position.x / _GameSettings.GameSettings.TILE_SCALE);
-      this.ty = Math.round(this.position.y / _GameSettings.GameSettings.TILE_SCALE);
-      if (this.tx < 0) this.tx = 0;
-      if (this.ty < 0) this.ty = 0;
-    }
-  }, {
-    key: 'setMoveTarget',
-    value: function setMoveTarget(x, y) {
-      this.moveTarget = { x: x, y: y };
-    }
-  }, {
-    key: 'clearMoveTarget',
-    value: function clearMoveTarget() {
-      this.moveTarget = undefined;
-      this.moveAngle = undefined;
-    }
-  }, {
-    key: 'update',
-    value: function update(delta) {
-      if (this.hasMoveTarget) {
-        this.isWalking = true;
-
-        // TODO: make 8 = some STOPPING_DISTANCE constant ... GameSettings?
-        if ((0, _gx2D.distance2d)(this.position, this.moveTarget) < 8) {
-          this.clearMoveTarget();
-          return;
-        }
-
-        this.moveAngle = (0, _gx2D.angle2d)(this.position.x, this.position.y, this.moveTarget.x, this.moveTarget.y);
-        this.angle = this.moveAngle + Math.PI / 2;
-
-        if (this.velocity < this.stats.maxVelocity) {
-          // console.log('accelerating from: ' + this.velocity, "DELTA: " + delta, "ANGLE: " + this.angle);
-          this.velocity += this.stats.acceleration * delta / 1000;
-          if (this.velocity > this.stats.maxVelocity) this.velocity = this.stats.maxVelocity;
-          // console.log('New velocity: ' + this.velocity + '/' + this.stats.maxVelocity);
-        }
-
-        var deltaY = Math.sin(this.moveAngle) * this.velocity * (delta / 1000);
-        var deltaX = Math.cos(this.moveAngle) * this.velocity * (delta / 1000);
-
-        var newPosition = {
-          x: this.position.x + deltaX,
-          y: this.position.y + deltaY
-        };
-        //console.log(this.position, newPosition);
-        this.setPosition(newPosition);
-      } else {
-        this.isWalking = false;
-        if (this.hasMoveTarget) this.clearMoveTarget();
-        this.velocity = 0;
-      }
-      // console.log("updated player. calling super.");
-      _get(PlayerCharacter.prototype.__proto__ || Object.getPrototypeOf(PlayerCharacter.prototype), 'update', this).call(this, delta);
-    }
-  }, {
-    key: 'toJSON',
-    value: function toJSON() {
-      var _this2 = this;
-
-      var out = Object.assign({}, this);
-      if (out.children) {
-        out.children = out.children.map(function (c) {
-          var newChild = Object.assign({}, c);
-          c.parentGO = undefined;
-          c.parentId = _this2.instanceId;
-          return newChild;
-        });
-      }
-      if (out.collider && out.collider.ownerGO) {
-        out.collider = Object.assign({}, out.collider);
-        out.collider.ownerGO = undefined;
-      }
-      return out;
-    }
-  }, {
-    key: 'health',
-    get: function get() {
-      return this.stats.hp;
-    },
-    set: function set(value) {
-      this.stats.hp = value;
-    }
-  }, {
-    key: 'hasMoveTarget',
-    get: function get() {
-      return this.moveTarget && this.moveTarget.x && this.moveTarget.y;
-    }
-  }]);
-
-  return PlayerCharacter;
-}(_Character3.default);
-
-exports.default = PlayerCharacter;
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if (\"value\" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };\n\nvar _Character2 = __webpack_require__(/*! ./Character */ 10);\n\nvar _Character3 = _interopRequireDefault(_Character2);\n\nvar _GameSettings = __webpack_require__(/*! ../GameSettings */ 1);\n\nvar _ColliderTypes = __webpack_require__(/*! ../ColliderTypes */ 5);\n\nvar _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);\n\nvar _gx2D = __webpack_require__(/*! ../Helpers/gx2D */ 8);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\n//import World, { MessageTypes, sendPackage, broadcastPackage  } from '../GameEngine';\n\nvar PlayerCharacter = function (_Character) {\n  _inherits(PlayerCharacter, _Character);\n\n  function PlayerCharacter() {\n    var characterName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Frank';\n\n    _classCallCheck(this, PlayerCharacter);\n\n    var _this = _possibleConstructorReturn(this, (PlayerCharacter.__proto__ || Object.getPrototypeOf(PlayerCharacter)).call(this, {\n      collider: {\n        type: _ColliderTypes2.default.RADIUS,\n        tags: ['PLAYER'],\n        radius: 5\n      }\n    }));\n\n    _this.id = -1;\n\n    _this.name = characterName;\n    _this.stats = {\n      level: 1,\n      strength: 1,\n      hp: 50,\n      maxHp: 50,\n      maxVelocity: 8 * _GameSettings.GameSettings.TILE_SCALE,\n      acceleration: 16 * _GameSettings.GameSettings.TILE_SCALE\n    };\n    _this.levelId = 1;\n    _this.strength = 1;\n    // this.health = 50; <- this is now tracked using getters and setters.\n    _this.maxHealth = 50;\n    _this.velocity = 0;\n\n    _this.moveTarget = {};\n\n    _this.setTexture('./images/PlayerOverhead.png');\n\n    return _this;\n  }\n\n  _createClass(PlayerCharacter, [{\n    key: 'setPosition',\n    value: function setPosition(position) {\n      _get(PlayerCharacter.prototype.__proto__ || Object.getPrototypeOf(PlayerCharacter.prototype), 'setPosition', this).call(this, position);\n      this.tx = Math.round(this.position.x / _GameSettings.GameSettings.TILE_SCALE);\n      this.ty = Math.round(this.position.y / _GameSettings.GameSettings.TILE_SCALE);\n      if (this.tx < 0) this.tx = 0;\n      if (this.ty < 0) this.ty = 0;\n    }\n  }, {\n    key: 'setMoveTarget',\n    value: function setMoveTarget(x, y) {\n      this.moveTarget = { x: x, y: y };\n    }\n  }, {\n    key: 'clearMoveTarget',\n    value: function clearMoveTarget() {\n      this.moveTarget = undefined;\n      this.moveAngle = undefined;\n    }\n  }, {\n    key: 'update',\n    value: function update(delta) {\n      if (this.hasMoveTarget) {\n        this.isWalking = true;\n\n        // TODO: make 8 = some STOPPING_DISTANCE constant ... GameSettings?\n        if ((0, _gx2D.distance2d)(this.position, this.moveTarget) < 8) {\n          this.clearMoveTarget();\n          return;\n        }\n\n        this.moveAngle = (0, _gx2D.angle2d)(this.position.x, this.position.y, this.moveTarget.x, this.moveTarget.y);\n        this.angle = this.moveAngle + Math.PI / 2;\n\n        if (this.velocity < this.stats.maxVelocity) {\n          // console.log('accelerating from: ' + this.velocity, \"DELTA: \" + delta, \"ANGLE: \" + this.angle);\n          this.velocity += this.stats.acceleration * delta / 1000;\n          if (this.velocity > this.stats.maxVelocity) this.velocity = this.stats.maxVelocity;\n          // console.log('New velocity: ' + this.velocity + '/' + this.stats.maxVelocity);\n        }\n\n        var deltaY = Math.sin(this.moveAngle) * this.velocity * (delta / 1000);\n        var deltaX = Math.cos(this.moveAngle) * this.velocity * (delta / 1000);\n\n        var newPosition = {\n          x: this.position.x + deltaX,\n          y: this.position.y + deltaY\n        };\n        //console.log(this.position, newPosition);\n        this.setPosition(newPosition);\n      } else {\n        this.isWalking = false;\n        if (this.hasMoveTarget) this.clearMoveTarget();\n        this.velocity = 0;\n      }\n      // console.log(\"updated player. calling super.\");\n      _get(PlayerCharacter.prototype.__proto__ || Object.getPrototypeOf(PlayerCharacter.prototype), 'update', this).call(this, delta);\n    }\n  }, {\n    key: 'toJSON',\n    value: function toJSON() {\n      var _this2 = this;\n\n      var out = Object.assign({}, this);\n      if (out.children) {\n        out.children = out.children.map(function (c) {\n          var newChild = Object.assign({}, c);\n          c.parentGO = undefined;\n          c.parentId = _this2.instanceId;\n          return newChild;\n        });\n      }\n      if (out.collider && out.collider.ownerGO) {\n        out.collider = Object.assign({}, out.collider);\n        out.collider.ownerGO = undefined;\n      }\n      return out;\n    }\n  }, {\n    key: 'health',\n    get: function get() {\n      return this.stats.hp;\n    },\n    set: function set(value) {\n      this.stats.hp = value;\n    }\n  }, {\n    key: 'hasMoveTarget',\n    get: function get() {\n      return this.moveTarget && this.moveTarget.x && this.moveTarget.y;\n    }\n  }]);\n\n  return PlayerCharacter;\n}(_Character3.default);\n\nexports.default = PlayerCharacter;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiNC5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL3NoYXJlZC9QbGF5ZXJDaGFyYWN0ZXIuanM/YTQyMSJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmltcG9ydCBDaGFyYWN0ZXIgZnJvbSAnLi9DaGFyYWN0ZXInO1xuaW1wb3J0IHsgR2FtZVNldHRpbmdzIH0gZnJvbSAnLi4vR2FtZVNldHRpbmdzJztcbmltcG9ydCBDb2xsaWRlclR5cGVzIGZyb20gJy4uL0NvbGxpZGVyVHlwZXMnO1xuXG5pbXBvcnQgeyBkaXN0YW5jZTJkLCBhbmdsZTJkIH0gZnJvbSAnLi4vSGVscGVycy9neDJEJztcblxuLy9pbXBvcnQgV29ybGQsIHsgTWVzc2FnZVR5cGVzLCBzZW5kUGFja2FnZSwgYnJvYWRjYXN0UGFja2FnZSAgfSBmcm9tICcuLi9HYW1lRW5naW5lJztcblxuY2xhc3MgUGxheWVyQ2hhcmFjdGVyIGV4dGVuZHMgQ2hhcmFjdGVyIHtcbiAgY29uc3RydWN0b3IoY2hhcmFjdGVyTmFtZSA9ICdGcmFuaycpIHtcbiAgICBzdXBlcih7XG4gICAgICBjb2xsaWRlcjoge1xuICAgICAgICB0eXBlOiBDb2xsaWRlclR5cGVzLlJBRElVUyxcbiAgICAgICAgdGFnczogWydQTEFZRVInXSxcbiAgICAgICAgcmFkaXVzOiA1XG4gICAgICB9XG4gICAgfSk7XG5cbiAgICB0aGlzLmlkID0gLTE7XG4gICAgXG4gICAgdGhpcy5uYW1lID0gY2hhcmFjdGVyTmFtZTtcbiAgICB0aGlzLnN0YXRzID0ge1xuICAgICAgbGV2ZWw6IDEsXG4gICAgICBzdHJlbmd0aDogMSxcbiAgICAgIGhwOiA1MCxcbiAgICAgIG1heEhwOiA1MCxcbiAgICAgIG1heFZlbG9jaXR5OiA4ICogR2FtZVNldHRpbmdzLlRJTEVfU0NBTEUsXG4gICAgICBhY2NlbGVyYXRpb246IDE2ICogR2FtZVNldHRpbmdzLlRJTEVfU0NBTEUsXG4gICAgfTtcbiAgICB0aGlzLmxldmVsSWQgPSAxO1xuICAgIHRoaXMuc3RyZW5ndGggPSAxO1xuICAgIC8vIHRoaXMuaGVhbHRoID0gNTA7IDwtIHRoaXMgaXMgbm93IHRyYWNrZWQgdXNpbmcgZ2V0dGVycyBhbmQgc2V0dGVycy5cbiAgICB0aGlzLm1heEhlYWx0aCA9IDUwO1xuICAgIHRoaXMudmVsb2NpdHkgPSAwO1xuXG4gICAgdGhpcy5tb3ZlVGFyZ2V0ID0ge307XG5cbiAgICB0aGlzLnNldFRleHR1cmUoJy4vaW1hZ2VzL1BsYXllck92ZXJoZWFkLnBuZycpO1xuXG4gIH1cblxuICBnZXQgaGVhbHRoKCkgeyByZXR1cm4gdGhpcy5zdGF0cy5ocDsgfVxuICBzZXQgaGVhbHRoKHZhbHVlKSB7IHRoaXMuc3RhdHMuaHAgPSB2YWx1ZTsgfVxuXG4gIHNldFBvc2l0aW9uKHBvc2l0aW9uKSB7XG4gICAgc3VwZXIuc2V0UG9zaXRpb24ocG9zaXRpb24pO1xuICAgIHRoaXMudHggPSBNYXRoLnJvdW5kKHRoaXMucG9zaXRpb24ueCAvIEdhbWVTZXR0aW5ncy5USUxFX1NDQUxFKTtcbiAgICB0aGlzLnR5ID0gTWF0aC5yb3VuZCh0aGlzLnBvc2l0aW9uLnkgLyBHYW1lU2V0dGluZ3MuVElMRV9TQ0FMRSk7XG4gICAgaWYodGhpcy50eCA8IDApIHRoaXMudHggPSAwO1xuICAgIGlmKHRoaXMudHkgPCAwKSB0aGlzLnR5ID0gMDtcbiAgfVxuXG4gIGdldCBoYXNNb3ZlVGFyZ2V0KCkge1xuICAgIHJldHVybiB0aGlzLm1vdmVUYXJnZXQgJiYgdGhpcy5tb3ZlVGFyZ2V0LnggJiYgdGhpcy5tb3ZlVGFyZ2V0Lnk7XG4gIH1cbiAgc2V0TW92ZVRhcmdldCh4LCB5KSB7XG4gICAgdGhpcy5tb3ZlVGFyZ2V0ID0geyB4LCB5IH07XG4gIH1cbiAgY2xlYXJNb3ZlVGFyZ2V0KCkge1xuICAgIHRoaXMubW92ZVRhcmdldCA9IHVuZGVmaW5lZDtcbiAgICB0aGlzLm1vdmVBbmdsZSA9IHVuZGVmaW5lZDtcbiAgfVxuXG4gIHVwZGF0ZShkZWx0YSkge1xuICAgIGlmKHRoaXMuaGFzTW92ZVRhcmdldCkge1xuICAgICAgdGhpcy5pc1dhbGtpbmcgPSB0cnVlO1xuXG4gICAgICAvLyBUT0RPOiBtYWtlIDggPSBzb21lIFNUT1BQSU5HX0RJU1RBTkNFIGNvbnN0YW50IC4uLiBHYW1lU2V0dGluZ3M/XG4gICAgICBpZihkaXN0YW5jZTJkKHRoaXMucG9zaXRpb24sIHRoaXMubW92ZVRhcmdldCkgPCA4KSB7XG4gICAgICAgIHRoaXMuY2xlYXJNb3ZlVGFyZ2V0KCk7XG4gICAgICAgIHJldHVybjtcbiAgICAgIH1cblxuICAgICAgdGhpcy5tb3ZlQW5nbGUgPSBhbmdsZTJkKHRoaXMucG9zaXRpb24ueCwgdGhpcy5wb3NpdGlvbi55LCB0aGlzLm1vdmVUYXJnZXQueCwgdGhpcy5tb3ZlVGFyZ2V0LnkpO1xuICAgICAgdGhpcy5hbmdsZSA9IHRoaXMubW92ZUFuZ2xlICsgTWF0aC5QSSAvIDI7XG5cbiAgICAgIFxuICAgICAgaWYgKHRoaXMudmVsb2NpdHkgPCB0aGlzLnN0YXRzLm1heFZlbG9jaXR5KSB7XG4gICAgICAgIC8vIGNvbnNvbGUubG9nKCdhY2NlbGVyYXRpbmcgZnJvbTogJyArIHRoaXMudmVsb2NpdHksIFwiREVMVEE6IFwiICsgZGVsdGEsIFwiQU5HTEU6IFwiICsgdGhpcy5hbmdsZSk7XG4gICAgICAgIHRoaXMudmVsb2NpdHkgKz0gKHRoaXMuc3RhdHMuYWNjZWxlcmF0aW9uICogZGVsdGEgLyAxMDAwKTtcbiAgICAgICAgaWYodGhpcy52ZWxvY2l0eSA+IHRoaXMuc3RhdHMubWF4VmVsb2NpdHkpIHRoaXMudmVsb2NpdHkgPSB0aGlzLnN0YXRzLm1heFZlbG9jaXR5XG4gICAgICAgIC8vIGNvbnNvbGUubG9nKCdOZXcgdmVsb2NpdHk6ICcgKyB0aGlzLnZlbG9jaXR5ICsgJy8nICsgdGhpcy5zdGF0cy5tYXhWZWxvY2l0eSk7XG4gICAgICB9XG5cbiAgICAgIGNvbnN0IGRlbHRhWSA9IE1hdGguc2luKHRoaXMubW92ZUFuZ2xlKSAqIHRoaXMudmVsb2NpdHkgKiAoZGVsdGEgLyAxMDAwKTtcbiAgICAgIGNvbnN0IGRlbHRhWCA9IE1hdGguY29zKHRoaXMubW92ZUFuZ2xlKSAqIHRoaXMudmVsb2NpdHkgKiAoZGVsdGEgLyAxMDAwKTtcblxuICAgICAgY29uc3QgbmV3UG9zaXRpb24gPSB7XG4gICAgICAgIHg6IHRoaXMucG9zaXRpb24ueCArIGRlbHRhWCxcbiAgICAgICAgeTogdGhpcy5wb3NpdGlvbi55ICsgZGVsdGFZXG4gICAgICB9O1xuICAgICAgLy9jb25zb2xlLmxvZyh0aGlzLnBvc2l0aW9uLCBuZXdQb3NpdGlvbik7XG4gICAgICB0aGlzLnNldFBvc2l0aW9uKG5ld1Bvc2l0aW9uKTtcbiAgICB9IGVsc2Uge1xuICAgICAgdGhpcy5pc1dhbGtpbmcgPSBmYWxzZTtcbiAgICAgIGlmKHRoaXMuaGFzTW92ZVRhcmdldCkgdGhpcy5jbGVhck1vdmVUYXJnZXQoKTtcbiAgICAgIHRoaXMudmVsb2NpdHkgPSAwO1xuICAgIH1cbiAgICAvLyBjb25zb2xlLmxvZyhcInVwZGF0ZWQgcGxheWVyLiBjYWxsaW5nIHN1cGVyLlwiKTtcbiAgICBzdXBlci51cGRhdGUoZGVsdGEpO1xuICB9XG5cbiAgdG9KU09OKCkge1xuICAgIGNvbnN0IG91dCA9IE9iamVjdC5hc3NpZ24oe30sIHRoaXMpO1xuICAgIGlmKG91dC5jaGlsZHJlbikge1xuICAgICAgb3V0LmNoaWxkcmVuID0gb3V0LmNoaWxkcmVuLm1hcChjID0+IHtcbiAgICAgICAgY29uc3QgbmV3Q2hpbGQgPSBPYmplY3QuYXNzaWduKHt9LCBjKTtcbiAgICAgICAgYy5wYXJlbnRHTyA9IHVuZGVmaW5lZDtcbiAgICAgICAgYy5wYXJlbnRJZCA9IHRoaXMuaW5zdGFuY2VJZDtcbiAgICAgICAgcmV0dXJuIG5ld0NoaWxkO1xuICAgICAgfSk7XG4gICAgfVxuICAgIGlmKG91dC5jb2xsaWRlciAmJiBvdXQuY29sbGlkZXIub3duZXJHTykge1xuICAgICAgb3V0LmNvbGxpZGVyID0gT2JqZWN0LmFzc2lnbih7fSwgb3V0LmNvbGxpZGVyKTtcbiAgICAgIG91dC5jb2xsaWRlci5vd25lckdPID0gdW5kZWZpbmVkO1xuICAgIH1cbiAgICByZXR1cm4gb3V0O1xuICB9XG5cbn1cblxuZXhwb3J0IGRlZmF1bHQgUGxheWVyQ2hhcmFjdGVyO1xuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL3NoYXJlZC9QbGF5ZXJDaGFyYWN0ZXIuanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFDQTtBQUNBOzs7QUFBQTtBQUNBO0FBQUE7QUFDQTs7O0FBQ0E7QUFDQTs7Ozs7Ozs7O0FBQ0E7QUFDQTtBQUNBOzs7QUFDQTtBQUFBO0FBQ0E7QUFEQTtBQUNBO0FBREE7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUhBO0FBREE7QUFDQTtBQU9BO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBTkE7QUFRQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQTdCQTtBQThCQTtBQUNBOzs7QUFJQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBS0E7QUFDQTtBQUNBOzs7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUZBO0FBSUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQUE7QUFDQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBNUVBO0FBQUE7QUFBQTtBQUNBO0FBQUE7QUFBQTs7O0FBVUE7QUFDQTtBQUNBOzs7Ozs7QUFtRUEiLCJzb3VyY2VSb290IjoiIn0=");
 
 /***/ }),
 /* 5 */
+/* unknown exports provided */
+/* all exports used */
+/*!**********************************!*\
+  !*** ./classes/ColliderTypes.js ***!
+  \**********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var ColliderTypes = {
-  NONE: 'NONE',
-  RADIUS: 'RADIUS',
-  RECTANGLE: 'RECTANGLE'
-};
-
-exports.default = ColliderTypes;
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar ColliderTypes = {\n  NONE: 'NONE',\n  RADIUS: 'RADIUS',\n  RECTANGLE: 'RECTANGLE'\n};\n\nexports.default = ColliderTypes;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiNS5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL0NvbGxpZGVyVHlwZXMuanM/MzVlNyJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmNvbnN0IENvbGxpZGVyVHlwZXMgPSB7XG4gIE5PTkU6ICdOT05FJyxcbiAgUkFESVVTOiAnUkFESVVTJyxcbiAgUkVDVEFOR0xFOiAnUkVDVEFOR0xFJyxcbn07XG5cbmV4cG9ydCBkZWZhdWx0IENvbGxpZGVyVHlwZXM7XG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvQ29sbGlkZXJUeXBlcy5qcyJdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFIQTtBQUNBO0FBS0EiLCJzb3VyY2VSb290IjoiIn0=");
 
 /***/ }),
 /* 6 */,
 /* 7 */
+/* unknown exports provided */
+/* all exports used */
+/*!********************************!*\
+  !*** ./classes/SpriteTypes.js ***!
+  \********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.SpriteTextureMap = exports.ClientSpriteClassMap = exports.SpriteTypes = undefined;
-exports.GetSpriteTypeName = GetSpriteTypeName;
-
-var _PlayerCharacter = __webpack_require__(4);
-
-var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var SpriteTypes = exports.SpriteTypes = {
-  PLAYER: 'SpriteTypes.PLAYER',
-  CHEST: 'SpriteTypes.CHEST',
-  FIREBALL: 'SpriteTypes.FIREBALL',
-  EXPLOSION: 'SpriteTypes.EXPLOSION',
-  BLOODSTAIN: 'SpriteTypes.BLOODSTAIN'
-};
-
-var ClientSpriteClassMap = exports.ClientSpriteClassMap = new Map();
-ClientSpriteClassMap.set(SpriteTypes.PLAYER, _PlayerCharacter2.default);
-
-var SpriteTextureMap = exports.SpriteTextureMap = new Map();
-SpriteTextureMap.set(SpriteTypes.CHEST, './images/ChestClosed.png');
-SpriteTextureMap.set(SpriteTypes.FIREBALL, './images/FireballStatic.png');
-SpriteTextureMap.set(SpriteTypes.PLAYER, './images/PlayerOverhead.png');
-
-function GetSpriteTypeName(obj) {
-  var iterator = ClientSpriteClassMap.entries();
-  var mapCursor = {};
-
-  do {
-
-    mapCursor = iterator.next();
-    if (mapCursor.done) break;
-
-    if (obj instanceof mapCursor.value[1]) {
-      return mapCursor.value[0];
-    }
-  } while (!mapCursor.done);
-
-  console.warn("didn't find it.");
-  return undefined;
-}
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.SpriteTextureMap = exports.ClientSpriteClassMap = exports.SpriteTypes = undefined;\nexports.GetSpriteTypeName = GetSpriteTypeName;\n\nvar _PlayerCharacter = __webpack_require__(/*! ./shared/PlayerCharacter */ 4);\n\nvar _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nvar SpriteTypes = exports.SpriteTypes = {\n  PLAYER: 'SpriteTypes.PLAYER',\n  CHEST: 'SpriteTypes.CHEST',\n  FIREBALL: 'SpriteTypes.FIREBALL',\n  EXPLOSION: 'SpriteTypes.EXPLOSION',\n  BLOODSTAIN: 'SpriteTypes.BLOODSTAIN'\n};\n\nvar ClientSpriteClassMap = exports.ClientSpriteClassMap = new Map();\nClientSpriteClassMap.set(SpriteTypes.PLAYER, _PlayerCharacter2.default);\n\nvar SpriteTextureMap = exports.SpriteTextureMap = new Map();\nSpriteTextureMap.set(SpriteTypes.CHEST, './images/ChestClosed.png');\nSpriteTextureMap.set(SpriteTypes.FIREBALL, './images/FireballStatic.png');\nSpriteTextureMap.set(SpriteTypes.PLAYER, './images/PlayerOverhead.png');\n\nfunction GetSpriteTypeName(obj) {\n  var iterator = ClientSpriteClassMap.entries();\n  var mapCursor = {};\n\n  do {\n\n    mapCursor = iterator.next();\n    if (mapCursor.done) break;\n\n    if (obj instanceof mapCursor.value[1]) {\n      return mapCursor.value[0];\n    }\n  } while (!mapCursor.done);\n\n  console.warn(\"didn't find it.\");\n  return undefined;\n}//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiNy5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL1Nwcml0ZVR5cGVzLmpzP2RlZjQiXSwic291cmNlc0NvbnRlbnQiOlsiXG5pbXBvcnQgUGxheWVyQ2hhcmFjdGVyIGZyb20gJy4vc2hhcmVkL1BsYXllckNoYXJhY3Rlcic7XG5cbmV4cG9ydCBjb25zdCBTcHJpdGVUeXBlcyA9IHtcbiAgUExBWUVSOiAnU3ByaXRlVHlwZXMuUExBWUVSJyxcbiAgQ0hFU1Q6ICdTcHJpdGVUeXBlcy5DSEVTVCcsXG4gIEZJUkVCQUxMOiAnU3ByaXRlVHlwZXMuRklSRUJBTEwnLFxuICBFWFBMT1NJT046ICdTcHJpdGVUeXBlcy5FWFBMT1NJT04nLFxuICBCTE9PRFNUQUlOOiAnU3ByaXRlVHlwZXMuQkxPT0RTVEFJTicsXG59O1xuXG5leHBvcnQgY29uc3QgQ2xpZW50U3ByaXRlQ2xhc3NNYXAgPSBuZXcgTWFwKCk7XG5DbGllbnRTcHJpdGVDbGFzc01hcC5zZXQoU3ByaXRlVHlwZXMuUExBWUVSLCBQbGF5ZXJDaGFyYWN0ZXIpO1xuXG5leHBvcnQgY29uc3QgU3ByaXRlVGV4dHVyZU1hcCA9IG5ldyBNYXAoKTtcblNwcml0ZVRleHR1cmVNYXAuc2V0KFNwcml0ZVR5cGVzLkNIRVNULCAnLi9pbWFnZXMvQ2hlc3RDbG9zZWQucG5nJyk7XG5TcHJpdGVUZXh0dXJlTWFwLnNldChTcHJpdGVUeXBlcy5GSVJFQkFMTCwgJy4vaW1hZ2VzL0ZpcmViYWxsU3RhdGljLnBuZycpO1xuU3ByaXRlVGV4dHVyZU1hcC5zZXQoU3ByaXRlVHlwZXMuUExBWUVSLCAnLi9pbWFnZXMvUGxheWVyT3ZlcmhlYWQucG5nJyk7XG5cbmV4cG9ydCBmdW5jdGlvbiBHZXRTcHJpdGVUeXBlTmFtZShvYmopIHtcbiAgdmFyIGl0ZXJhdG9yID0gQ2xpZW50U3ByaXRlQ2xhc3NNYXAuZW50cmllcygpO1xuICBsZXQgbWFwQ3Vyc29yID0ge307XG5cbiAgZG8ge1xuICAgIFxuICAgIG1hcEN1cnNvciA9IGl0ZXJhdG9yLm5leHQoKTtcbiAgICBpZihtYXBDdXJzb3IuZG9uZSkgYnJlYWs7XG5cbiAgICBpZihvYmogaW5zdGFuY2VvZiBtYXBDdXJzb3IudmFsdWVbMV0pIHtcbiAgICAgIHJldHVybiBtYXBDdXJzb3IudmFsdWVbMF07XG4gICAgfVxuICB9IHdoaWxlKCFtYXBDdXJzb3IuZG9uZSk7XG5cbiAgY29uc29sZS53YXJuKFwiZGlkbid0IGZpbmQgaXQuXCIpO1xuICByZXR1cm4gdW5kZWZpbmVkO1xufVxuXG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvU3ByaXRlVHlwZXMuanMiXSwibWFwcGluZ3MiOiI7Ozs7OztBQW1CQTtBQUNBO0FBbkJBO0FBQ0E7Ozs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBTEE7QUFDQTtBQU9BO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBIiwic291cmNlUm9vdCI6IiJ9");
 
 /***/ }),
 /* 8 */
+/* unknown exports provided */
+/* all exports used */
+/*!*********************************!*\
+  !*** ./classes/Helpers/gx2D.js ***!
+  \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.angle2d = angle2d;
-exports.distance2d = distance2d;
-function angle2d(ax, ay, bx, by) {
-  return Math.atan2(by - ay, bx - ax);
-}
-
-// These are terrible.
-// see: https://en.wikipedia.org/wiki/Linear_interpolation
-// export function lerp1d(start, end, delta) {
-//   return ( start.y * (end.x - delta) + end.y * (delta - start.x) ) / (end.x - start.x);
-// }
-
-// export function lerp2d(startPosition, endPosition, delta) {
-//   return { 
-//     x: lerp1d(startPosition.x, endPosition.x, delta),
-//     y: lerp1d(startPosition.y, endPosition.y, delta),
-//   }
-// }
-
-function distance2d(startPosition, endPosition) {
-  var aSquared = Math.pow(startPosition.x - endPosition.x, 2);
-  var bSquared = Math.pow(startPosition.y - endPosition.y, 2);
-  return Math.sqrt(aSquared + bSquared);
-}
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.angle2d = angle2d;\nexports.distance2d = distance2d;\nfunction angle2d(ax, ay, bx, by) {\n  return Math.atan2(by - ay, bx - ax);\n}\n\n// These are terrible.\n// see: https://en.wikipedia.org/wiki/Linear_interpolation\n// export function lerp1d(start, end, delta) {\n//   return ( start.y * (end.x - delta) + end.y * (delta - start.x) ) / (end.x - start.x);\n// }\n\n// export function lerp2d(startPosition, endPosition, delta) {\n//   return { \n//     x: lerp1d(startPosition.x, endPosition.x, delta),\n//     y: lerp1d(startPosition.y, endPosition.y, delta),\n//   }\n// }\n\nfunction distance2d(startPosition, endPosition) {\n  var aSquared = Math.pow(startPosition.x - endPosition.x, 2);\n  var bSquared = Math.pow(startPosition.y - endPosition.y, 2);\n  return Math.sqrt(aSquared + bSquared);\n}//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiOC5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL0hlbHBlcnMvZ3gyRC5qcz8yZmU5Il0sInNvdXJjZXNDb250ZW50IjpbIlxuZXhwb3J0IGZ1bmN0aW9uICBhbmdsZTJkKGF4LCBheSwgYngsIGJ5KSB7XG4gICAgcmV0dXJuIE1hdGguYXRhbjIoYnkgLSBheSwgYnggLSBheCk7XG59XG5cbi8vIFRoZXNlIGFyZSB0ZXJyaWJsZS5cbi8vIHNlZTogaHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvTGluZWFyX2ludGVycG9sYXRpb25cbi8vIGV4cG9ydCBmdW5jdGlvbiBsZXJwMWQoc3RhcnQsIGVuZCwgZGVsdGEpIHtcbi8vICAgcmV0dXJuICggc3RhcnQueSAqIChlbmQueCAtIGRlbHRhKSArIGVuZC55ICogKGRlbHRhIC0gc3RhcnQueCkgKSAvIChlbmQueCAtIHN0YXJ0LngpO1xuLy8gfVxuXG4vLyBleHBvcnQgZnVuY3Rpb24gbGVycDJkKHN0YXJ0UG9zaXRpb24sIGVuZFBvc2l0aW9uLCBkZWx0YSkge1xuLy8gICByZXR1cm4geyBcbi8vICAgICB4OiBsZXJwMWQoc3RhcnRQb3NpdGlvbi54LCBlbmRQb3NpdGlvbi54LCBkZWx0YSksXG4vLyAgICAgeTogbGVycDFkKHN0YXJ0UG9zaXRpb24ueSwgZW5kUG9zaXRpb24ueSwgZGVsdGEpLFxuLy8gICB9XG4vLyB9XG5cbmV4cG9ydCBmdW5jdGlvbiBkaXN0YW5jZTJkKHN0YXJ0UG9zaXRpb24sIGVuZFBvc2l0aW9uKSB7XG4gIGNvbnN0IGFTcXVhcmVkID0gTWF0aC5wb3coc3RhcnRQb3NpdGlvbi54IC0gZW5kUG9zaXRpb24ueCwgMik7XG4gIGNvbnN0IGJTcXVhcmVkID0gTWF0aC5wb3coc3RhcnRQb3NpdGlvbi55IC0gZW5kUG9zaXRpb24ueSwgMik7XG4gIHJldHVybiBNYXRoLnNxcnQoYVNxdWFyZWQgKyBiU3F1YXJlZCk7XG59XG5cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9IZWxwZXJzL2d4MkQuanMiXSwibWFwcGluZ3MiOiI7Ozs7O0FBQ0E7QUFpQkE7QUFqQkE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EiLCJzb3VyY2VSb290IjoiIn0=");
 
 /***/ }),
 /* 9 */
+/* unknown exports provided */
+/* all exports used */
+/*!****************************************!*\
+  !*** ./classes/client/MediaManager.js ***!
+  \****************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ImageLoader = new Map();
-
-var MediaManager = function () {
-  function MediaManager() {
-    _classCallCheck(this, MediaManager);
-  }
-
-  _createClass(MediaManager, [{
-    key: "loadImage",
-    value: function loadImage(imageSource, loadComplete) {
-      // var p = new Promise(function(res, rej) {
-      var imgElement = ImageLoader.get(imageSource);
-      if (!imgElement) {
-        imgElement = new Image();
-        imgElement.src = imageSource;
-        // TODO: handle errors where images are not found.
-        imgElement.addEventListener('load', function (e) {
-          console.log("Image loaded.");
-        });
-        ImageLoader.set(imageSource, imgElement);
-        // imgElement.addEventListener('load', (e) => { res(imgElement); });
-        // imgElement.addEventListener('error', (e) => { rej(e); });
-      }
-      // res(imgElement);
-      return imgElement;
-
-      // });
-      // if(typeof loadComplete === "function") {
-      //   p.then((image) => loadComplete(undefined, image)).catch((err) => loadComplete(err, undefined));
-      // } else {
-      //   return p;
-      // }
-    }
-  }]);
-
-  return MediaManager;
-}();
-
-exports.default = new MediaManager();
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar ImageLoader = new Map();\n\nvar MediaManager = function () {\n  function MediaManager() {\n    _classCallCheck(this, MediaManager);\n  }\n\n  _createClass(MediaManager, [{\n    key: \"loadImage\",\n    value: function loadImage(imageSource, loadComplete) {\n      // var p = new Promise(function(res, rej) {\n      var imgElement = ImageLoader.get(imageSource);\n      if (!imgElement) {\n        imgElement = new Image();\n        imgElement.src = imageSource;\n        // TODO: handle errors where images are not found.\n        imgElement.addEventListener('load', function (e) {\n          console.log(\"Image loaded.\");\n        });\n        ImageLoader.set(imageSource, imgElement);\n        // imgElement.addEventListener('load', (e) => { res(imgElement); });\n        // imgElement.addEventListener('error', (e) => { rej(e); });\n      }\n      // res(imgElement);\n      return imgElement;\n\n      // });\n      // if(typeof loadComplete === \"function\") {\n      //   p.then((image) => loadComplete(undefined, image)).catch((err) => loadComplete(err, undefined));\n      // } else {\n      //   return p;\n      // }\n    }\n  }]);\n\n  return MediaManager;\n}();\n\nexports.default = new MediaManager();//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiOS5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL2NsaWVudC9NZWRpYU1hbmFnZXIuanM/MzA2ZSJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmNvbnN0IEltYWdlTG9hZGVyID0gbmV3IE1hcCgpO1xuXG5jbGFzcyBNZWRpYU1hbmFnZXIge1xuICBsb2FkSW1hZ2UoaW1hZ2VTb3VyY2UsIGxvYWRDb21wbGV0ZSkge1xuICAgIC8vIHZhciBwID0gbmV3IFByb21pc2UoZnVuY3Rpb24ocmVzLCByZWopIHtcbiAgICAgIGxldCBpbWdFbGVtZW50ID0gSW1hZ2VMb2FkZXIuZ2V0KGltYWdlU291cmNlKTtcbiAgICAgIGlmICghaW1nRWxlbWVudCkge1xuICAgICAgICBpbWdFbGVtZW50ID0gbmV3IEltYWdlKCk7XG4gICAgICAgIGltZ0VsZW1lbnQuc3JjID0gaW1hZ2VTb3VyY2U7XG4gICAgICAgIC8vIFRPRE86IGhhbmRsZSBlcnJvcnMgd2hlcmUgaW1hZ2VzIGFyZSBub3QgZm91bmQuXG4gICAgICAgIGltZ0VsZW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignbG9hZCcsIChlKSA9PiB7IFxuICAgICAgICAgIGNvbnNvbGUubG9nKFwiSW1hZ2UgbG9hZGVkLlwiKTsgXG4gICAgICAgIH0pO1xuICAgICAgICBJbWFnZUxvYWRlci5zZXQoaW1hZ2VTb3VyY2UsIGltZ0VsZW1lbnQpO1xuICAgICAgICAvLyBpbWdFbGVtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ2xvYWQnLCAoZSkgPT4geyByZXMoaW1nRWxlbWVudCk7IH0pO1xuICAgICAgICAvLyBpbWdFbGVtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ2Vycm9yJywgKGUpID0+IHsgcmVqKGUpOyB9KTtcbiAgICAgIH1cbiAgICAgICAgLy8gcmVzKGltZ0VsZW1lbnQpO1xuICAgICAgICByZXR1cm4gaW1nRWxlbWVudDtcblxuICAgIC8vIH0pO1xuICAgIC8vIGlmKHR5cGVvZiBsb2FkQ29tcGxldGUgPT09IFwiZnVuY3Rpb25cIikge1xuICAgIC8vICAgcC50aGVuKChpbWFnZSkgPT4gbG9hZENvbXBsZXRlKHVuZGVmaW5lZCwgaW1hZ2UpKS5jYXRjaCgoZXJyKSA9PiBsb2FkQ29tcGxldGUoZXJyLCB1bmRlZmluZWQpKTtcbiAgICAvLyB9IGVsc2Uge1xuICAgIC8vICAgcmV0dXJuIHA7XG4gICAgLy8gfVxuICB9XG59XG5cbmV4cG9ydCBkZWZhdWx0IG5ldyBNZWRpYU1hbmFnZXIoKTtcblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9jbGllbnQvTWVkaWFNYW5hZ2VyLmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7O0FBQ0E7QUFDQTtBQUNBOzs7Ozs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7Ozs7QUFHQSIsInNvdXJjZVJvb3QiOiIifQ==");
 
 /***/ }),
 /* 10 */
+/* unknown exports provided */
+/* all exports used */
+/*!*************************************!*\
+  !*** ./classes/shared/Character.js ***!
+  \*************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.CollisionStatus = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _guid = __webpack_require__(2);
-
-var _ColliderTypes = __webpack_require__(5);
-
-var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Collider = function () {
-  function Collider() {
-    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var ownerGO = arguments[1];
-
-    _classCallCheck(this, Collider);
-
-    //console.log("constructing collider for owner: " + ownerGO.instanceId, ownerGO);
-    //console.log("Tags: ", params.tags);
-    this.ownerGO = ownerGO;
-
-    this.type = params.type || _ColliderTypes2.default.NONE;
-    this.radius = params.radius || 16;
-    this.rect = params.rect || { left: 0, top: 0, right: 32, bottom: 32 };
-    // Tags that this object has.
-    this.tags = params.tags || ['ALL'];
-    // Tags that this object reacts to.
-    this.collidesWith = params.collidesWith || ['ALL'];
-
-    this.ignoresIds = params.ignoresIds || [];
-
-    //TODO: temporary, remove
-    this.instanceId = (0, _guid.guid)();
-
-    this.currentCollisions = [];
-  }
-
-  _createClass(Collider, [{
-    key: 'getCollisionStatus',
-    value: function getCollisionStatus(otherCollider) {
-      // If I have the sprite and not the collider, try to get the collider
-      if (!(otherCollider instanceof Collider)) otherCollider = otherCollider.collider;
-      if (!(otherCollider instanceof Collider)) return CollisionStatus.NONE;
-      // If the other collider's game object is not active.
-      if (!otherCollider.ownerGO.isActive()) return CollisionStatus.NONE;
-
-      // If I'm colliding with myself return CollisionStatus.NONE;
-      if (otherCollider === this) return CollisionStatus.NONE;
-      // Excludes should be provided via ignoresIds
-      if (this.ignoresIds.includes(otherCollider.ownerGO.instanceId)) return CollisionStatus.NONE;
-      // If no collision tracking return CollisionStatus.NONE
-      if (this.type === _ColliderTypes2.default.NONE || otherCollider.type === _ColliderTypes2.default.NONE) return CollisionStatus.NONE;
-
-      // Check types
-      var collidedTags = this.collidesWith.filter(function (tag) {
-        if (otherCollider.tags.includes(tag)) {
-          return true;
-        }
-        return false;
-      });
-      // No collisions on expected tag types.
-      if (collidedTags.length === 0) return CollisionStatus.NONE;
-
-      if (this.type === _ColliderTypes2.default.RADIUS && otherCollider.type === _ColliderTypes2.default.RADIUS) {
-        // two radius colliders
-        var thisCenter = this.getColliderPoint(PointEnum.CENTER);
-        var otherCenter = otherCollider.getColliderPoint(PointEnum.CENTER);
-        var distance = this.getDistanceBetween(thisCenter, otherCenter);
-        var isOverlapping = false;
-        if (distance < this.radius + otherCollider.radius) {
-          // console.log("Collision at distance: " + distance, thisCenter, otherCenter);
-          isOverlapping = true;
-        }
-        if (isOverlapping && !this.currentCollisions.includes(otherCollider.instanceId)) {
-          // console.log("collision enter");
-          // console.log("Collided with tags: ", collidedTags);
-          this.currentCollisions.push(otherCollider.instanceId);
-          return CollisionStatus.ENTER;
-        } else if (isOverlapping) {
-          return CollisionStatus.COLLIDING;
-        }
-        if (!isOverlapping && this.currentCollisions.includes(otherCollider.instanceId)) {
-          // console.log("collision leave\n\n\n");
-          this.currentCollisions.splice(this.currentCollisions.indexOf(otherCollider.instanceId), 1);
-          return CollisionStatus.EXIT;
-        }
-        return CollisionStatus.NONE;
-      } else if (this.type === _ColliderTypes2.default.RECTANGLE && otherCollider.type === _ColliderTypes2.default.RECTANGLE) {
-        // two square colliders
-
-      } else if (this.type === _ColliderTypes2.default.RADIUS) {
-        // one of each: this is radius, other is rectangle
-      } else if (this.type === _ColliderTypes2.default.RECTANGLE) {
-        // one of each: this is rectangle, other is radius
-      } else {
-        console.error("Unknown collider type: " + this.type + " - " + otherCollider.type);
-      }
-      return false;
-    }
-  }, {
-    key: 'getAbsoluteRect',
-    value: function getAbsoluteRect() {
-      return {
-        left: this.rect.left + this.ownerGO.position.x,
-        right: this.rect.right + this.ownerGO.position.x,
-        top: this.rect.top + this.ownerGO.position.y,
-        bottom: this.rect.bottom + this.ownerGO.position.y
-      };
-    }
-  }, {
-    key: 'getColliderPoint',
-    value: function getColliderPoint(pointType) {
-      var absRect = this.getAbsoluteRect();
-      switch (pointType) {
-        case PointEnum.CENTER:
-          return {
-            x: absRect.left + (absRect.right - absRect.left) / 2,
-            y: absRect.top + (absRect.bottom - absRect.top) / 2
-          };
-        case PointEnum.TOPLEFT:
-          return { x: absRect.left, y: absRect.top };
-        case PointEnum.TOPRIGHT:
-          return { x: absRect.right, y: absRect.top };
-        case PointEnum.BOTTOMLEFT:
-          return { x: absRect.left, y: absRect.bottom };
-        case PointEnum.BOTTOMRIGHT:
-          return { x: absRect.right, y: absRect.bottom };
-        default:
-          return undefined;
-      }
-    }
-
-    // TODO: this probably belongs in some central place ("engine?") so the app can access it to.
-
-  }, {
-    key: 'getDistanceBetween',
-    value: function getDistanceBetween(pointA, pointB) {
-      var aSquared = Math.pow(pointA.x - pointB.x, 2);
-      var bSquared = Math.pow(pointA.y - pointB.y, 2);
-      return Math.sqrt(aSquared + bSquared);
-    }
-  }]);
-
-  return Collider;
-}();
-
-var PointEnum = {
-  CENTER: 'CENTER',
-  TOPLEFT: 'TOPLEFT',
-  TOPRIGHT: 'TOPRIGHT',
-  BOTTOMLEFT: 'BOTTOMLEFT',
-  BOTTOMRIGHT: 'BOTTOMRIGHT'
-};
-
-var CollisionStatus = exports.CollisionStatus = {
-  ENTER: 'ENTER',
-  COLLIDING: 'COLLIDING',
-  EXIT: 'EXIT',
-  NONE: 'NONE'
-};
-
-exports.default = Collider;
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _Sprite2 = __webpack_require__(/*! ./Sprite */ 0);\n\nvar _Sprite3 = _interopRequireDefault(_Sprite2);\n\nvar _ColliderTypes = __webpack_require__(/*! ../ColliderTypes */ 5);\n\nvar _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);\n\nvar _ProgressBar = __webpack_require__(/*! ../client/ProgressBar */ 17);\n\nvar _ProgressBar2 = _interopRequireDefault(_ProgressBar);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar Character = function (_Sprite) {\n  _inherits(Character, _Sprite);\n\n  function Character() {\n    var paramObject = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n    _classCallCheck(this, Character);\n\n    if (!paramObject.collider) paramObject.collider = { type: _ColliderTypes2.default.RADIUS };\n    return _possibleConstructorReturn(this, (Character.__proto__ || Object.getPrototypeOf(Character)).call(this, paramObject));\n  }\n\n  _createClass(Character, [{\n    key: 'canCast',\n    value: function canCast(spellId) {\n      // TODO: Check if the character has the spell in their spellbook and if it's not on cooldown.\n      return true;\n    }\n  }, {\n    key: 'isVisibleTo',\n    value: function isVisibleTo(bounds) {\n      var right = this.position.x + (this.width || 32);\n      var bottom = this.position.y + (this.width || 32);\n\n      var isGood = this.position.x < bounds.right && this.position.y < bounds.bottom && right > bounds.left && bottom > bounds.top;\n      return isGood;\n    }\n  }, {\n    key: 'drawHealthBar',\n    value: function drawHealthBar(context) {\n      if (this.isActive() && !this.isDead) {\n        if (!this.healthBar) {\n          console.log(\"creating a healthbar\");\n          this.healthBar = new _ProgressBar2.default({\n            x: 0,\n            y: 0,\n            width: 32, // TODO: Use game settings\n            height: 5,\n            current: this.stats.hp,\n            max: this.stats.maxHp,\n            // bgColor: \n            // fgColor:\n            parentGO: this\n          });\n          this.healthBar.setBounds(this.position.x - 16, this.position.y - 16);\n          this.healthBar.draw(context);\n        } else {\n          // console.log(\"Setting healthbar bounds to: \", this.position, this.instanceId);\n          this.healthBar.setBounds(this.position.x - 16, this.position.y - 16);\n          this.healthBar.draw(context);\n        }\n      }\n    }\n  }, {\n    key: 'tookDamage',\n    value: function tookDamage() {\n      var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;\n      var damageSource = arguments[1];\n\n      // TODO: modifiers.\n      this.health -= amount;\n      var overkill = 0;\n      if (this.health < 0) {\n        overkill = -this.health;\n        // console.log(\"Overkill!!!! -> \" + overkill  + \" HP\");\n        this.health = 0;\n      }\n      console.log(\"taking damage!\");\n    }\n  }]);\n\n  return Character;\n}(_Sprite3.default);\n\nexports.default = Character;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTAuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvQ2hhcmFjdGVyLmpzPzJiZTkiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFNwcml0ZSBmcm9tICcuL1Nwcml0ZSc7XG5pbXBvcnQgQ29sbGlkZXJUeXBlcyBmcm9tICcuLi9Db2xsaWRlclR5cGVzJztcblxuaW1wb3J0IFByb2dyZXNzQmFyIGZyb20gJy4uL2NsaWVudC9Qcm9ncmVzc0Jhcic7XG5cbmNsYXNzIENoYXJhY3RlciBleHRlbmRzIFNwcml0ZSB7XG4gIGNvbnN0cnVjdG9yKHBhcmFtT2JqZWN0ID0ge30pIHtcbiAgICBpZighcGFyYW1PYmplY3QuY29sbGlkZXIpIHBhcmFtT2JqZWN0LmNvbGxpZGVyID0geyB0eXBlOiBDb2xsaWRlclR5cGVzLlJBRElVUyB9XG4gICAgc3VwZXIocGFyYW1PYmplY3QpO1xuICB9XG5cbiAgY2FuQ2FzdChzcGVsbElkKSB7XG4gICAgLy8gVE9ETzogQ2hlY2sgaWYgdGhlIGNoYXJhY3RlciBoYXMgdGhlIHNwZWxsIGluIHRoZWlyIHNwZWxsYm9vayBhbmQgaWYgaXQncyBub3Qgb24gY29vbGRvd24uXG4gICAgcmV0dXJuIHRydWU7XG4gIH1cblxuICBpc1Zpc2libGVUbyhib3VuZHMpIHtcbiAgICBjb25zdCByaWdodCA9IHRoaXMucG9zaXRpb24ueCArICh0aGlzLndpZHRoIHx8IDMyKTtcbiAgICBjb25zdCBib3R0b20gPSB0aGlzLnBvc2l0aW9uLnkgKyAodGhpcy53aWR0aCB8fCAzMik7XG5cbiAgICBjb25zdCBpc0dvb2QgPSB0aGlzLnBvc2l0aW9uLnggPCBib3VuZHMucmlnaHRcbiAgICAgICAgICAgJiYgdGhpcy5wb3NpdGlvbi55IDwgYm91bmRzLmJvdHRvbVxuICAgICAgICAgICAmJiByaWdodCA+IGJvdW5kcy5sZWZ0XG4gICAgICAgICAgICYmIGJvdHRvbSA+IGJvdW5kcy50b3A7XG4gICAgcmV0dXJuIGlzR29vZDtcbiAgfVxuXG4gIGRyYXdIZWFsdGhCYXIoY29udGV4dCkge1xuICAgIGlmKHRoaXMuaXNBY3RpdmUoKSAmJiAhdGhpcy5pc0RlYWQpIHtcbiAgICAgIGlmKCF0aGlzLmhlYWx0aEJhcikge1xuICAgICAgICBjb25zb2xlLmxvZyhcImNyZWF0aW5nIGEgaGVhbHRoYmFyXCIpO1xuICAgICAgICB0aGlzLmhlYWx0aEJhciA9IG5ldyBQcm9ncmVzc0Jhcih7XG4gICAgICAgICAgeDogMCxcbiAgICAgICAgICB5OiAwLFxuICAgICAgICAgIHdpZHRoOiAzMiwgLy8gVE9ETzogVXNlIGdhbWUgc2V0dGluZ3NcbiAgICAgICAgICBoZWlnaHQ6IDUsIFxuICAgICAgICAgIGN1cnJlbnQ6IHRoaXMuc3RhdHMuaHAsXG4gICAgICAgICAgbWF4OiB0aGlzLnN0YXRzLm1heEhwLFxuICAgICAgICAgIC8vIGJnQ29sb3I6IFxuICAgICAgICAgIC8vIGZnQ29sb3I6XG4gICAgICAgICAgcGFyZW50R086IHRoaXNcbiAgICAgICAgfSk7XG4gICAgICAgIHRoaXMuaGVhbHRoQmFyLnNldEJvdW5kcyh0aGlzLnBvc2l0aW9uLnggLSAxNiwgdGhpcy5wb3NpdGlvbi55IC0gMTYpO1xuICAgICAgICB0aGlzLmhlYWx0aEJhci5kcmF3KGNvbnRleHQpO1xuICAgICAgfSBlbHNlIHtcbiAgICAgICAgLy8gY29uc29sZS5sb2coXCJTZXR0aW5nIGhlYWx0aGJhciBib3VuZHMgdG86IFwiLCB0aGlzLnBvc2l0aW9uLCB0aGlzLmluc3RhbmNlSWQpO1xuICAgICAgICB0aGlzLmhlYWx0aEJhci5zZXRCb3VuZHModGhpcy5wb3NpdGlvbi54IC0gMTYsIHRoaXMucG9zaXRpb24ueSAtIDE2KTtcbiAgICAgICAgdGhpcy5oZWFsdGhCYXIuZHJhdyhjb250ZXh0KTtcbiAgICAgIH1cbiAgICB9XG4gIH1cblxuICB0b29rRGFtYWdlKGFtb3VudCA9IDAsIGRhbWFnZVNvdXJjZSkge1xuICAgIC8vIFRPRE86IG1vZGlmaWVycy5cbiAgICB0aGlzLmhlYWx0aCAtPSBhbW91bnQ7XG4gICAgbGV0IG92ZXJraWxsID0gMDtcbiAgICBpZiAodGhpcy5oZWFsdGggPCAwKSB7XG4gICAgICBvdmVya2lsbCA9IC10aGlzLmhlYWx0aDtcbiAgICAgIC8vIGNvbnNvbGUubG9nKFwiT3ZlcmtpbGwhISEhIC0+IFwiICsgb3ZlcmtpbGwgICsgXCIgSFBcIik7XG4gICAgICB0aGlzLmhlYWx0aCA9IDA7XG4gICAgfVxuICAgIGNvbnNvbGUubG9nKFwidGFraW5nIGRhbWFnZSFcIik7XG5cbiAgfVxuXG59XG5cbmV4cG9ydCBkZWZhdWx0IENoYXJhY3RlcjtcblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9zaGFyZWQvQ2hhcmFjdGVyLmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7OztBQUFBO0FBQ0E7OztBQUFBO0FBQ0E7OztBQUNBO0FBQ0E7Ozs7Ozs7Ozs7O0FBQ0E7OztBQUNBO0FBQUE7QUFDQTtBQURBO0FBQ0E7QUFBQTtBQURBO0FBR0E7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFJQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBVEE7QUFXQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQUE7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUE7Ozs7OztBQUlBIiwic291cmNlUm9vdCI6IiJ9");
 
 /***/ }),
 /* 11 */
+/* unknown exports provided */
+/* all exports used */
+/*!************************************!*\
+  !*** ./classes/shared/Collider.js ***!
+  \************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var PlayerActions = {
-  UNMAPPED: 'UNMAPPED',
-  LEFT: 'LEFT',
-  RIGHT: 'RIGHT',
-  UP: 'UP',
-  DOWN: 'DOWN',
-  SHIFT: 'SHIFT',
-  MOUSE_ACTION_1: 'MOUSE_ACTION_1',
-  MOUSE_ACTION_2: 'MOUSE_ACTION_2',
-  SHOOT_PROJECTILE: 'SHOOT_PROJECTILE'
-};
-exports.default = PlayerActions;
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.CollisionStatus = undefined;\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _guid = __webpack_require__(/*! ../Helpers/guid */ 2);\n\nvar _ColliderTypes = __webpack_require__(/*! ../ColliderTypes */ 5);\n\nvar _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar Collider = function () {\n  function Collider() {\n    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n    var ownerGO = arguments[1];\n\n    _classCallCheck(this, Collider);\n\n    //console.log(\"constructing collider for owner: \" + ownerGO.instanceId, ownerGO);\n    //console.log(\"Tags: \", params.tags);\n    this.ownerGO = ownerGO;\n\n    this.type = params.type || _ColliderTypes2.default.NONE;\n    this.radius = params.radius || 16;\n    this.rect = params.rect || { left: 0, top: 0, right: 32, bottom: 32 };\n    // Tags that this object has.\n    this.tags = params.tags || ['ALL'];\n    // Tags that this object reacts to.\n    this.collidesWith = params.collidesWith || ['ALL'];\n\n    this.ignoresIds = params.ignoresIds || [];\n\n    //TODO: temporary, remove\n    this.instanceId = (0, _guid.guid)();\n\n    this.currentCollisions = [];\n  }\n\n  _createClass(Collider, [{\n    key: 'getCollisionStatus',\n    value: function getCollisionStatus(otherCollider) {\n      // If I have the sprite and not the collider, try to get the collider\n      if (!(otherCollider instanceof Collider)) otherCollider = otherCollider.collider;\n      if (!(otherCollider instanceof Collider)) return CollisionStatus.NONE;\n      // If the other collider's game object is not active.\n      if (!otherCollider.ownerGO.isActive()) return CollisionStatus.NONE;\n\n      // If I'm colliding with myself return CollisionStatus.NONE;\n      if (otherCollider === this) return CollisionStatus.NONE;\n      // Excludes should be provided via ignoresIds\n      if (this.ignoresIds.includes(otherCollider.ownerGO.instanceId)) return CollisionStatus.NONE;\n      // If no collision tracking return CollisionStatus.NONE\n      if (this.type === _ColliderTypes2.default.NONE || otherCollider.type === _ColliderTypes2.default.NONE) return CollisionStatus.NONE;\n\n      // Check types\n      var collidedTags = this.collidesWith.filter(function (tag) {\n        if (otherCollider.tags.includes(tag)) {\n          return true;\n        }\n        return false;\n      });\n      // No collisions on expected tag types.\n      if (collidedTags.length === 0) return CollisionStatus.NONE;\n\n      if (this.type === _ColliderTypes2.default.RADIUS && otherCollider.type === _ColliderTypes2.default.RADIUS) {\n        // two radius colliders\n        var thisCenter = this.getColliderPoint(PointEnum.CENTER);\n        var otherCenter = otherCollider.getColliderPoint(PointEnum.CENTER);\n        var distance = this.getDistanceBetween(thisCenter, otherCenter);\n        var isOverlapping = false;\n        if (distance < this.radius + otherCollider.radius) {\n          // console.log(\"Collision at distance: \" + distance, thisCenter, otherCenter);\n          isOverlapping = true;\n        }\n        if (isOverlapping && !this.currentCollisions.includes(otherCollider.instanceId)) {\n          // console.log(\"collision enter\");\n          // console.log(\"Collided with tags: \", collidedTags);\n          this.currentCollisions.push(otherCollider.instanceId);\n          return CollisionStatus.ENTER;\n        } else if (isOverlapping) {\n          return CollisionStatus.COLLIDING;\n        }\n        if (!isOverlapping && this.currentCollisions.includes(otherCollider.instanceId)) {\n          // console.log(\"collision leave\\n\\n\\n\");\n          this.currentCollisions.splice(this.currentCollisions.indexOf(otherCollider.instanceId), 1);\n          return CollisionStatus.EXIT;\n        }\n        return CollisionStatus.NONE;\n      } else if (this.type === _ColliderTypes2.default.RECTANGLE && otherCollider.type === _ColliderTypes2.default.RECTANGLE) {\n        // two square colliders\n\n      } else if (this.type === _ColliderTypes2.default.RADIUS) {\n        // one of each: this is radius, other is rectangle\n      } else if (this.type === _ColliderTypes2.default.RECTANGLE) {\n        // one of each: this is rectangle, other is radius\n      } else {\n        console.error(\"Unknown collider type: \" + this.type + \" - \" + otherCollider.type);\n      }\n      return false;\n    }\n  }, {\n    key: 'getAbsoluteRect',\n    value: function getAbsoluteRect() {\n      return {\n        left: this.rect.left + this.ownerGO.position.x,\n        right: this.rect.right + this.ownerGO.position.x,\n        top: this.rect.top + this.ownerGO.position.y,\n        bottom: this.rect.bottom + this.ownerGO.position.y\n      };\n    }\n  }, {\n    key: 'getColliderPoint',\n    value: function getColliderPoint(pointType) {\n      var absRect = this.getAbsoluteRect();\n      switch (pointType) {\n        case PointEnum.CENTER:\n          return {\n            x: absRect.left + (absRect.right - absRect.left) / 2,\n            y: absRect.top + (absRect.bottom - absRect.top) / 2\n          };\n        case PointEnum.TOPLEFT:\n          return { x: absRect.left, y: absRect.top };\n        case PointEnum.TOPRIGHT:\n          return { x: absRect.right, y: absRect.top };\n        case PointEnum.BOTTOMLEFT:\n          return { x: absRect.left, y: absRect.bottom };\n        case PointEnum.BOTTOMRIGHT:\n          return { x: absRect.right, y: absRect.bottom };\n        default:\n          return undefined;\n      }\n    }\n\n    // TODO: this probably belongs in some central place (\"engine?\") so the app can access it to.\n\n  }, {\n    key: 'getDistanceBetween',\n    value: function getDistanceBetween(pointA, pointB) {\n      var aSquared = Math.pow(pointA.x - pointB.x, 2);\n      var bSquared = Math.pow(pointA.y - pointB.y, 2);\n      return Math.sqrt(aSquared + bSquared);\n    }\n  }]);\n\n  return Collider;\n}();\n\nvar PointEnum = {\n  CENTER: 'CENTER',\n  TOPLEFT: 'TOPLEFT',\n  TOPRIGHT: 'TOPRIGHT',\n  BOTTOMLEFT: 'BOTTOMLEFT',\n  BOTTOMRIGHT: 'BOTTOMRIGHT'\n};\n\nvar CollisionStatus = exports.CollisionStatus = {\n  ENTER: 'ENTER',\n  COLLIDING: 'COLLIDING',\n  EXIT: 'EXIT',\n  NONE: 'NONE'\n};\n\nexports.default = Collider;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTEuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvQ29sbGlkZXIuanM/YjQzYiJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmltcG9ydCB7IGd1aWQgfSBmcm9tICcuLi9IZWxwZXJzL2d1aWQnO1xuaW1wb3J0IENvbGxpZGVyVHlwZXMgZnJvbSAnLi4vQ29sbGlkZXJUeXBlcyc7XG5cbmNsYXNzIENvbGxpZGVyIHtcbiAgY29uc3RydWN0b3IocGFyYW1zID0ge30sIG93bmVyR08pIHtcblxuICAgIC8vY29uc29sZS5sb2coXCJjb25zdHJ1Y3RpbmcgY29sbGlkZXIgZm9yIG93bmVyOiBcIiArIG93bmVyR08uaW5zdGFuY2VJZCwgb3duZXJHTyk7XG4gICAgLy9jb25zb2xlLmxvZyhcIlRhZ3M6IFwiLCBwYXJhbXMudGFncyk7XG4gICAgdGhpcy5vd25lckdPID0gb3duZXJHTztcblxuICAgIHRoaXMudHlwZSA9IHBhcmFtcy50eXBlIHx8IENvbGxpZGVyVHlwZXMuTk9ORTtcbiAgICB0aGlzLnJhZGl1cyA9IHBhcmFtcy5yYWRpdXMgfHwgMTY7XG4gICAgdGhpcy5yZWN0ID0gcGFyYW1zLnJlY3QgfHwgeyBsZWZ0OiAwLCB0b3A6IDAsIHJpZ2h0OiAzMiwgYm90dG9tOiAzMiB9O1xuICAgIC8vIFRhZ3MgdGhhdCB0aGlzIG9iamVjdCBoYXMuXG4gICAgdGhpcy50YWdzID0gcGFyYW1zLnRhZ3MgfHwgWydBTEwnXTtcbiAgICAvLyBUYWdzIHRoYXQgdGhpcyBvYmplY3QgcmVhY3RzIHRvLlxuICAgIHRoaXMuY29sbGlkZXNXaXRoID0gcGFyYW1zLmNvbGxpZGVzV2l0aCB8fCBbJ0FMTCddO1xuXG4gICAgdGhpcy5pZ25vcmVzSWRzID0gcGFyYW1zLmlnbm9yZXNJZHMgfHwgW107XG5cbiAgICAvL1RPRE86IHRlbXBvcmFyeSwgcmVtb3ZlXG4gICAgdGhpcy5pbnN0YW5jZUlkID0gZ3VpZCgpO1xuXG4gICAgdGhpcy5jdXJyZW50Q29sbGlzaW9ucyA9IFtdO1xuXG4gIH1cblxuICBnZXRDb2xsaXNpb25TdGF0dXMob3RoZXJDb2xsaWRlcikge1xuICAgIC8vIElmIEkgaGF2ZSB0aGUgc3ByaXRlIGFuZCBub3QgdGhlIGNvbGxpZGVyLCB0cnkgdG8gZ2V0IHRoZSBjb2xsaWRlclxuICAgIGlmKCEob3RoZXJDb2xsaWRlciBpbnN0YW5jZW9mIENvbGxpZGVyKSkgb3RoZXJDb2xsaWRlciA9IG90aGVyQ29sbGlkZXIuY29sbGlkZXI7XG4gICAgaWYoIShvdGhlckNvbGxpZGVyIGluc3RhbmNlb2YgQ29sbGlkZXIpKSByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG4gICAgLy8gSWYgdGhlIG90aGVyIGNvbGxpZGVyJ3MgZ2FtZSBvYmplY3QgaXMgbm90IGFjdGl2ZS5cbiAgICBpZighb3RoZXJDb2xsaWRlci5vd25lckdPLmlzQWN0aXZlKCkpIHJldHVybiBDb2xsaXNpb25TdGF0dXMuTk9ORTtcblxuICAgIC8vIElmIEknbSBjb2xsaWRpbmcgd2l0aCBteXNlbGYgcmV0dXJuIENvbGxpc2lvblN0YXR1cy5OT05FO1xuICAgIGlmKG90aGVyQ29sbGlkZXIgPT09IHRoaXMpIHJldHVybiBDb2xsaXNpb25TdGF0dXMuTk9ORTtcbiAgICAvLyBFeGNsdWRlcyBzaG91bGQgYmUgcHJvdmlkZWQgdmlhIGlnbm9yZXNJZHNcbiAgICBpZih0aGlzLmlnbm9yZXNJZHMuaW5jbHVkZXMob3RoZXJDb2xsaWRlci5vd25lckdPLmluc3RhbmNlSWQpKSByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG4gICAgLy8gSWYgbm8gY29sbGlzaW9uIHRyYWNraW5nIHJldHVybiBDb2xsaXNpb25TdGF0dXMuTk9ORVxuICAgIGlmKHRoaXMudHlwZSA9PT0gQ29sbGlkZXJUeXBlcy5OT05FIHx8IG90aGVyQ29sbGlkZXIudHlwZSA9PT0gQ29sbGlkZXJUeXBlcy5OT05FKSByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG4gICAgXG4gICAgLy8gQ2hlY2sgdHlwZXNcbiAgICBjb25zdCBjb2xsaWRlZFRhZ3MgPSB0aGlzLmNvbGxpZGVzV2l0aC5maWx0ZXIoZnVuY3Rpb24odGFnKSB7XG4gICAgICBpZihvdGhlckNvbGxpZGVyLnRhZ3MuaW5jbHVkZXModGFnKSkge1xuICAgICAgICByZXR1cm4gdHJ1ZTtcbiAgICAgIH1cbiAgICAgIHJldHVybiBmYWxzZTtcbiAgICB9KTtcbiAgICAvLyBObyBjb2xsaXNpb25zIG9uIGV4cGVjdGVkIHRhZyB0eXBlcy5cbiAgICBpZihjb2xsaWRlZFRhZ3MubGVuZ3RoID09PSAwKSByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG5cbiAgICBpZih0aGlzLnR5cGUgPT09IENvbGxpZGVyVHlwZXMuUkFESVVTICYmIG90aGVyQ29sbGlkZXIudHlwZSA9PT0gQ29sbGlkZXJUeXBlcy5SQURJVVMpIHtcbiAgICAgIC8vIHR3byByYWRpdXMgY29sbGlkZXJzXG4gICAgICBjb25zdCB0aGlzQ2VudGVyID0gdGhpcy5nZXRDb2xsaWRlclBvaW50KFBvaW50RW51bS5DRU5URVIpO1xuICAgICAgY29uc3Qgb3RoZXJDZW50ZXIgPSBvdGhlckNvbGxpZGVyLmdldENvbGxpZGVyUG9pbnQoUG9pbnRFbnVtLkNFTlRFUik7XG4gICAgICBjb25zdCBkaXN0YW5jZSA9IHRoaXMuZ2V0RGlzdGFuY2VCZXR3ZWVuKHRoaXNDZW50ZXIsIG90aGVyQ2VudGVyKTtcbiAgICAgIGxldCBpc092ZXJsYXBwaW5nID0gZmFsc2U7XG4gICAgICBpZihkaXN0YW5jZSA8IHRoaXMucmFkaXVzICsgb3RoZXJDb2xsaWRlci5yYWRpdXMpIHtcbiAgICAgICAgLy8gY29uc29sZS5sb2coXCJDb2xsaXNpb24gYXQgZGlzdGFuY2U6IFwiICsgZGlzdGFuY2UsIHRoaXNDZW50ZXIsIG90aGVyQ2VudGVyKTtcbiAgICAgICAgaXNPdmVybGFwcGluZyA9IHRydWU7XG4gICAgICB9XG4gICAgICBpZihpc092ZXJsYXBwaW5nICYmICF0aGlzLmN1cnJlbnRDb2xsaXNpb25zLmluY2x1ZGVzKG90aGVyQ29sbGlkZXIuaW5zdGFuY2VJZCkpIHtcbiAgICAgICAgLy8gY29uc29sZS5sb2coXCJjb2xsaXNpb24gZW50ZXJcIik7XG4gICAgICAgIC8vIGNvbnNvbGUubG9nKFwiQ29sbGlkZWQgd2l0aCB0YWdzOiBcIiwgY29sbGlkZWRUYWdzKTtcbiAgICAgICAgdGhpcy5jdXJyZW50Q29sbGlzaW9ucy5wdXNoKG90aGVyQ29sbGlkZXIuaW5zdGFuY2VJZCk7XG4gICAgICAgIHJldHVybiBDb2xsaXNpb25TdGF0dXMuRU5URVI7XG4gICAgICB9IGVsc2UgaWYoaXNPdmVybGFwcGluZykge1xuICAgICAgICByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLkNPTExJRElORztcbiAgICAgIH1cbiAgICAgIGlmKCFpc092ZXJsYXBwaW5nICYmIHRoaXMuY3VycmVudENvbGxpc2lvbnMuaW5jbHVkZXMob3RoZXJDb2xsaWRlci5pbnN0YW5jZUlkKSkge1xuICAgICAgICAvLyBjb25zb2xlLmxvZyhcImNvbGxpc2lvbiBsZWF2ZVxcblxcblxcblwiKTtcbiAgICAgICAgdGhpcy5jdXJyZW50Q29sbGlzaW9ucy5zcGxpY2UodGhpcy5jdXJyZW50Q29sbGlzaW9ucy5pbmRleE9mKG90aGVyQ29sbGlkZXIuaW5zdGFuY2VJZCksIDEpO1xuICAgICAgICByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLkVYSVQ7XG4gICAgICB9XG4gICAgICByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG4gICAgfSBlbHNlIGlmKHRoaXMudHlwZSA9PT0gQ29sbGlkZXJUeXBlcy5SRUNUQU5HTEUgJiYgb3RoZXJDb2xsaWRlci50eXBlID09PSBDb2xsaWRlclR5cGVzLlJFQ1RBTkdMRSkge1xuICAgICAgLy8gdHdvIHNxdWFyZSBjb2xsaWRlcnNcbiAgICAgIFxuICAgIH0gZWxzZSBpZih0aGlzLnR5cGUgPT09IENvbGxpZGVyVHlwZXMuUkFESVVTKSB7XG4gICAgICAvLyBvbmUgb2YgZWFjaDogdGhpcyBpcyByYWRpdXMsIG90aGVyIGlzIHJlY3RhbmdsZVxuICAgIH0gZWxzZSBpZih0aGlzLnR5cGUgPT09IENvbGxpZGVyVHlwZXMuUkVDVEFOR0xFKSB7XG4gICAgICAvLyBvbmUgb2YgZWFjaDogdGhpcyBpcyByZWN0YW5nbGUsIG90aGVyIGlzIHJhZGl1c1xuICAgIH0gZWxzZSB7XG4gICAgICBjb25zb2xlLmVycm9yKFwiVW5rbm93biBjb2xsaWRlciB0eXBlOiBcIiArIHRoaXMudHlwZSArIFwiIC0gXCIgKyBvdGhlckNvbGxpZGVyLnR5cGUpO1xuICAgIH1cbiAgICByZXR1cm4gZmFsc2U7XG4gIH1cblxuICBnZXRBYnNvbHV0ZVJlY3QoKSB7XG4gICAgcmV0dXJuIHtcbiAgICAgIGxlZnQ6IHRoaXMucmVjdC5sZWZ0ICsgdGhpcy5vd25lckdPLnBvc2l0aW9uLngsXG4gICAgICByaWdodDogdGhpcy5yZWN0LnJpZ2h0ICsgdGhpcy5vd25lckdPLnBvc2l0aW9uLngsXG4gICAgICB0b3A6IHRoaXMucmVjdC50b3AgKyB0aGlzLm93bmVyR08ucG9zaXRpb24ueSxcbiAgICAgIGJvdHRvbTogdGhpcy5yZWN0LmJvdHRvbSArIHRoaXMub3duZXJHTy5wb3NpdGlvbi55LFxuICAgIH1cbiAgfVxuXG4gIGdldENvbGxpZGVyUG9pbnQocG9pbnRUeXBlKSB7XG4gICAgY29uc3QgYWJzUmVjdCA9IHRoaXMuZ2V0QWJzb2x1dGVSZWN0KCk7XG4gICAgc3dpdGNoKHBvaW50VHlwZSkge1xuICAgICAgY2FzZSBQb2ludEVudW0uQ0VOVEVSOlxuICAgICAgICByZXR1cm4ge1xuICAgICAgICAgIHg6IGFic1JlY3QubGVmdCArICggKGFic1JlY3QucmlnaHQgLSBhYnNSZWN0LmxlZnQpIC8gMiApLFxuICAgICAgICAgIHk6IGFic1JlY3QudG9wICsgKCAoYWJzUmVjdC5ib3R0b20gLSBhYnNSZWN0LnRvcCkgLyAyICksXG4gICAgICAgIH1cbiAgICAgIGNhc2UgUG9pbnRFbnVtLlRPUExFRlQ6XG4gICAgICAgIHJldHVybiB7IHg6IGFic1JlY3QubGVmdCwgeTogYWJzUmVjdC50b3AgfVxuICAgICAgY2FzZSBQb2ludEVudW0uVE9QUklHSFQ6XG4gICAgICAgIHJldHVybiB7IHg6IGFic1JlY3QucmlnaHQsIHk6IGFic1JlY3QudG9wIH1cbiAgICAgIGNhc2UgUG9pbnRFbnVtLkJPVFRPTUxFRlQ6XG4gICAgICAgIHJldHVybiB7IHg6IGFic1JlY3QubGVmdCwgeTogYWJzUmVjdC5ib3R0b20gfVxuICAgICAgY2FzZSBQb2ludEVudW0uQk9UVE9NUklHSFQ6XG4gICAgICAgIHJldHVybiB7IHg6IGFic1JlY3QucmlnaHQsIHk6IGFic1JlY3QuYm90dG9tIH1cbiAgICAgIGRlZmF1bHQ6XG4gICAgICAgIHJldHVybiB1bmRlZmluZWQ7XG4gICAgfVxuICB9XG5cbiAgLy8gVE9ETzogdGhpcyBwcm9iYWJseSBiZWxvbmdzIGluIHNvbWUgY2VudHJhbCBwbGFjZSAoXCJlbmdpbmU/XCIpIHNvIHRoZSBhcHAgY2FuIGFjY2VzcyBpdCB0by5cbiAgZ2V0RGlzdGFuY2VCZXR3ZWVuKHBvaW50QSwgcG9pbnRCKSB7XG4gICAgY29uc3QgYVNxdWFyZWQgPSBNYXRoLnBvdyhwb2ludEEueCAtIHBvaW50Qi54LCAyKTtcbiAgICBjb25zdCBiU3F1YXJlZCA9IE1hdGgucG93KHBvaW50QS55IC0gcG9pbnRCLnksIDIpO1xuICAgIHJldHVybiBNYXRoLnNxcnQoYVNxdWFyZWQgKyBiU3F1YXJlZCk7XG4gIH1cbn1cblxuY29uc3QgUG9pbnRFbnVtID0ge1xuICBDRU5URVI6ICdDRU5URVInLFxuICBUT1BMRUZUOiAnVE9QTEVGVCcsXG4gIFRPUFJJR0hUOiAnVE9QUklHSFQnLFxuICBCT1RUT01MRUZUOiAnQk9UVE9NTEVGVCcsXG4gIEJPVFRPTVJJR0hUOiAnQk9UVE9NUklHSFQnXG59XG5cbmV4cG9ydCBjb25zdCBDb2xsaXNpb25TdGF0dXMgPSB7XG4gIEVOVEVSOiAnRU5URVInLFxuICBDT0xMSURJTkc6ICdDT0xMSURJTkcnLFxuICBFWElUOiAnRVhJVCcsXG4gIE5PTkU6ICdOT05FJyxcbn1cblxuZXhwb3J0IGRlZmF1bHQgQ29sbGlkZXI7XG5cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9zaGFyZWQvQ29sbGlkZXIuanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7OztBQUNBO0FBQ0E7QUFBQTtBQUNBOzs7Ozs7O0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFDQTtBQURBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBOzs7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUpBO0FBTUE7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRkE7QUFJQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQWZBO0FBaUJBO0FBQ0E7QUFDQTtBQUNBOzs7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7Ozs7QUFHQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFMQTtBQUNBO0FBT0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUpBO0FBQ0E7QUFNQSIsInNvdXJjZVJvb3QiOiIifQ==");
 
 /***/ }),
 /* 12 */
+/* unknown exports provided */
+/* all exports used */
+/*!**********************************!*\
+  !*** ./classes/PlayerActions.js ***!
+  \**********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _guid = __webpack_require__(2);
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var GameObject = function () {
-  function GameObject() {
-    _classCallCheck(this, GameObject);
-
-    // (paramObject = {}) {
-    this.position = { x: 0, y: 0 };
-    this._relativePosition = { x: 0, y: 0 };
-    this.instanceId = (0, _guid.guid)();
-    this.active = true;
-    this.levelId = undefined;
-    this.children = [];
-  }
-
-  // Relative to current level map
-
-
-  _createClass(GameObject, [{
-    key: "setPosition",
-    value: function setPosition() {
-      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
-
-      // TODO: Integrate legal level position checks.
-      this.position.x = position.x;
-      this.position.y = position.y;
-    }
-
-    // Relative to parent object
-
-  }, {
-    key: "setRelativePosition",
-    value: function setRelativePosition() {
-      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
-
-      this._relativePosition = position;
-      if (!this.parentGO) throw new Error("This GameObject does not have a parent GameObject.");else console.log(position, this.parentGO);
-      var parentX = this.parentGO && this.parentGO.position ? this.parentGO.position.x : 0;
-      var parentY = this.parentGO && this.parentGO.position ? this.parentGO.position.y : 0;
-      this.setPosition({
-        x: parentX + position.x,
-        y: parentY + position.y
-      });
-      console.log("set progressbar position?", this.position);
-    }
-  }, {
-    key: "deactivate",
-    value: function deactivate() {
-      this.active = false;
-    }
-  }, {
-    key: "activate",
-    value: function activate() {
-      this.active = true;
-    }
-  }, {
-    key: "isActive",
-    value: function isActive() {
-      return this.active;
-    }
-  }, {
-    key: "update",
-    value: function update(delta) {
-      if (this.isActive()) {
-        if (this.children) {
-          this.children.forEach(function (child) {
-            if (child.update) {
-              child.update(delta);
-            }
-          });
-        }
-      }
-    }
-  }]);
-
-  return GameObject;
-}();
-
-exports.default = GameObject;
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nvar PlayerActions = {\n  UNMAPPED: 'UNMAPPED',\n  LEFT: 'LEFT',\n  RIGHT: 'RIGHT',\n  UP: 'UP',\n  DOWN: 'DOWN',\n  SHIFT: 'SHIFT',\n  MOUSE_ACTION_1: 'MOUSE_ACTION_1',\n  MOUSE_ACTION_2: 'MOUSE_ACTION_2',\n  SHOOT_PROJECTILE: 'SHOOT_PROJECTILE'\n};\nexports.default = PlayerActions;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTIuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9QbGF5ZXJBY3Rpb25zLmpzPzFkNzUiXSwic291cmNlc0NvbnRlbnQiOlsiY29uc3QgUGxheWVyQWN0aW9ucyA9IHtcbiAgVU5NQVBQRUQ6ICdVTk1BUFBFRCcsXG4gIExFRlQ6ICdMRUZUJyxcbiAgUklHSFQ6ICdSSUdIVCcsXG4gIFVQOiAnVVAnLFxuICBET1dOOiAnRE9XTicsXG4gIFNISUZUOiAnU0hJRlQnLFxuICBNT1VTRV9BQ1RJT05fMTogJ01PVVNFX0FDVElPTl8xJyxcbiAgTU9VU0VfQUNUSU9OXzI6ICdNT1VTRV9BQ1RJT05fMicsXG4gIFNIT09UX1BST0pFQ1RJTEU6ICdTSE9PVF9QUk9KRUNUSUxFJyxcbn07XG5leHBvcnQgZGVmYXVsdCBQbGF5ZXJBY3Rpb25zO1xuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL1BsYXllckFjdGlvbnMuanMiXSwibWFwcGluZ3MiOiI7Ozs7O0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFUQTtBQVdBIiwic291cmNlUm9vdCI6IiJ9");
 
 /***/ }),
-/* 13 */,
+/* 13 */
+/* unknown exports provided */
+/* all exports used */
+/*!**************************************!*\
+  !*** ./classes/shared/GameObject.js ***!
+  \**************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _guid = __webpack_require__(/*! ../Helpers/guid */ 2);\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar GameObject = function () {\n  function GameObject() {\n    _classCallCheck(this, GameObject);\n\n    // (paramObject = {}) {\n    this.position = { x: 0, y: 0 };\n    this._relativePosition = { x: 0, y: 0 };\n    this.instanceId = (0, _guid.guid)();\n    this.active = true;\n    this.levelId = undefined;\n    this.children = [];\n  }\n\n  // Relative to current level map\n\n\n  _createClass(GameObject, [{\n    key: \"setPosition\",\n    value: function setPosition() {\n      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };\n\n      // TODO: Integrate legal level position checks.\n      this.position.x = position.x;\n      this.position.y = position.y;\n    }\n\n    // Relative to parent object\n\n  }, {\n    key: \"setRelativePosition\",\n    value: function setRelativePosition() {\n      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };\n\n      this._relativePosition = position;\n      if (!this.parentGO) throw new Error(\"This GameObject does not have a parent GameObject.\");else console.log(position, this.parentGO);\n      var parentX = this.parentGO && this.parentGO.position ? this.parentGO.position.x : 0;\n      var parentY = this.parentGO && this.parentGO.position ? this.parentGO.position.y : 0;\n      this.setPosition({\n        x: parentX + position.x,\n        y: parentY + position.y\n      });\n      console.log(\"set progressbar position?\", this.position);\n    }\n  }, {\n    key: \"deactivate\",\n    value: function deactivate() {\n      this.active = false;\n    }\n  }, {\n    key: \"activate\",\n    value: function activate() {\n      this.active = true;\n    }\n  }, {\n    key: \"isActive\",\n    value: function isActive() {\n      return this.active;\n    }\n  }, {\n    key: \"update\",\n    value: function update(delta) {\n      if (this.isActive()) {\n        if (this.children) {\n          this.children.forEach(function (child) {\n            if (child.update) {\n              child.update(delta);\n            }\n          });\n        }\n      }\n    }\n  }]);\n\n  return GameObject;\n}();\n\nexports.default = GameObject;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvR2FtZU9iamVjdC5qcz85ZGEzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGd1aWQgfSBmcm9tICcuLi9IZWxwZXJzL2d1aWQnXG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIEdhbWVPYmplY3Qge1xuICBjb25zdHJ1Y3RvcigpIHsgLy8gKHBhcmFtT2JqZWN0ID0ge30pIHtcbiAgICB0aGlzLnBvc2l0aW9uID0geyB4OiAwLCB5OiAwIH1cbiAgICB0aGlzLl9yZWxhdGl2ZVBvc2l0aW9uID0geyB4OiAwLCB5OiAwIH1cbiAgICB0aGlzLmluc3RhbmNlSWQgPSBndWlkKCk7XG4gICAgdGhpcy5hY3RpdmUgPSB0cnVlO1xuICAgIHRoaXMubGV2ZWxJZCA9IHVuZGVmaW5lZDtcbiAgICB0aGlzLmNoaWxkcmVuID0gW107XG4gIH1cblxuICAvLyBSZWxhdGl2ZSB0byBjdXJyZW50IGxldmVsIG1hcFxuICBzZXRQb3NpdGlvbihwb3NpdGlvbiA9IHsgeDogMCwgeTogMCB9KSB7XG4gICAgLy8gVE9ETzogSW50ZWdyYXRlIGxlZ2FsIGxldmVsIHBvc2l0aW9uIGNoZWNrcy5cbiAgICB0aGlzLnBvc2l0aW9uLnggPSBwb3NpdGlvbi54O1xuICAgIHRoaXMucG9zaXRpb24ueSA9IHBvc2l0aW9uLnk7XG4gIH1cblxuICAvLyBSZWxhdGl2ZSB0byBwYXJlbnQgb2JqZWN0XG4gIHNldFJlbGF0aXZlUG9zaXRpb24ocG9zaXRpb24gPSB7IHg6IDAsIHk6IDAgfSkge1xuICAgIHRoaXMuX3JlbGF0aXZlUG9zaXRpb24gPSBwb3NpdGlvbjtcbiAgICBpZighdGhpcy5wYXJlbnRHTykgdGhyb3cgbmV3IEVycm9yKFwiVGhpcyBHYW1lT2JqZWN0IGRvZXMgbm90IGhhdmUgYSBwYXJlbnQgR2FtZU9iamVjdC5cIik7XG4gICAgZWxzZSBjb25zb2xlLmxvZyhwb3NpdGlvbiwgdGhpcy5wYXJlbnRHTyk7XG4gICAgY29uc3QgcGFyZW50WCA9IHRoaXMucGFyZW50R08gJiYgdGhpcy5wYXJlbnRHTy5wb3NpdGlvbiA/IHRoaXMucGFyZW50R08ucG9zaXRpb24ueCA6IDA7XG4gICAgY29uc3QgcGFyZW50WSA9IHRoaXMucGFyZW50R08gJiYgdGhpcy5wYXJlbnRHTy5wb3NpdGlvbiA/IHRoaXMucGFyZW50R08ucG9zaXRpb24ueSA6IDA7XG4gICAgdGhpcy5zZXRQb3NpdGlvbih7XG4gICAgICB4OiBwYXJlbnRYICsgcG9zaXRpb24ueCxcbiAgICAgIHk6IHBhcmVudFkgKyBwb3NpdGlvbi55LFxuICAgIH0pO1xuICAgIGNvbnNvbGUubG9nKFwic2V0IHByb2dyZXNzYmFyIHBvc2l0aW9uP1wiLCB0aGlzLnBvc2l0aW9uKTtcbiAgfVxuXG4gIGRlYWN0aXZhdGUoKSB7XG4gICAgdGhpcy5hY3RpdmUgPSBmYWxzZTtcbiAgfVxuXG4gIGFjdGl2YXRlKCkge1xuICAgIHRoaXMuYWN0aXZlID0gdHJ1ZTtcbiAgfVxuXG4gIGlzQWN0aXZlKCkge1xuICAgIHJldHVybiB0aGlzLmFjdGl2ZTtcbiAgfVxuXG4gIHVwZGF0ZShkZWx0YSkge1xuICAgIGlmKHRoaXMuaXNBY3RpdmUoKSkge1xuICAgICAgaWYodGhpcy5jaGlsZHJlbikge1xuICAgICAgICB0aGlzLmNoaWxkcmVuLmZvckVhY2goY2hpbGQgPT4ge1xuICAgICAgICAgIGlmKGNoaWxkLnVwZGF0ZSkge1xuICAgICAgICAgICAgY2hpbGQudXBkYXRlKGRlbHRhKTtcbiAgICAgICAgICB9XG4gICAgICAgIH0pO1xuICAgICAgfSBcbiAgICB9XG4gIH1cbn1cblxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL3NoYXJlZC9HYW1lT2JqZWN0LmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7OztBQUFBO0FBQ0E7OztBQUNBO0FBQ0E7QUFBQTtBQUNBO0FBREE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7QUFEQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBQUE7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFGQTtBQUlBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7Ozs7OztBQXJEQSIsInNvdXJjZVJvb3QiOiIifQ==");
+
+/***/ }),
 /* 14 */,
 /* 15 */,
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _Sprite2 = __webpack_require__(0);
-
-var _Sprite3 = _interopRequireDefault(_Sprite2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ProgressBar = function (_Sprite) {
-  _inherits(ProgressBar, _Sprite);
-
-  function ProgressBar() {
-    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, ProgressBar);
-
-    var _this = _possibleConstructorReturn(this, (ProgressBar.__proto__ || Object.getPrototypeOf(ProgressBar)).call(this)); // x, y, width, height, current, max, fgColor, bgColor, parentSprite) {
-
-
-    _this.stats = { current: params.current, max: params.max };
-    _this.bgColor = params.bgColor || "#FFFFFF";
-    _this.fgColor = params.fgColor || "#FF0000";
-    _this.parentGO = params.parentGO || { position: { x: 0, y: 0 } };
-    _this.setBounds(params.x || -1, params.y || -1, params.width || -1, params.height || -1);
-    _this.setRelativePosition({ x: params.x || 0, y: params.y || 0 });
-    return _this;
-  }
-
-  _createClass(ProgressBar, [{
-    key: "setBounds",
-    value: function setBounds(x, y, width, height) {
-      this.bounds = this.bounds || {};
-      this.bounds.x = x || this.bounds.x;
-      this.bounds.y = y || this.bounds.y;
-      this.bounds.width = width || this.bounds.width, this.bounds.height = height || this.bounds.height, this.bounds.left = this.bounds.x;
-      this.bounds.right = x && width ? x + width : this.bounds.x + this.bounds.width;
-      this.bounds.top = this.bounds.y;
-      this.bounds.bottom = y && height ? y + height : this.bounds.y + this.bounds.height;
-
-      this.setPosition(this.bounds);
-    }
-  }, {
-    key: "draw",
-    value: function draw(ctx) {
-      // Draw background
-      var x = this.position.x;
-      var y = this.position.y;
-      var width = this.bounds.width;
-      var height = this.bounds.height;
-      ctx.fillStyle = this.bgColor;
-      ctx.fillRect(x, y, width, height);
-
-      // Draw foreground
-      width = this.bounds.width * (this.stats.current / this.stats.max);
-      ctx.fillStyle = this.fgColor;
-      ctx.fillRect(x, y, width, height);
-    }
-  }, {
-    key: "update",
-    value: function update(delta) {
-      console.log("updating progressbar for: ", this.parentId);
-    }
-  }]);
-
-  return ProgressBar;
-}(_Sprite3.default);
-
-exports.default = ProgressBar;
-
-/***/ }),
+/* 16 */,
 /* 17 */
+/* unknown exports provided */
+/* all exports used */
+/*!***************************************!*\
+  !*** ./classes/client/ProgressBar.js ***!
+  \***************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _Sprite2 = __webpack_require__(0);
-
-var _Sprite3 = _interopRequireDefault(_Sprite2);
-
-var _ColliderTypes = __webpack_require__(5);
-
-var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
-
-var _ProgressBar = __webpack_require__(16);
-
-var _ProgressBar2 = _interopRequireDefault(_ProgressBar);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Character = function (_Sprite) {
-  _inherits(Character, _Sprite);
-
-  function Character() {
-    var paramObject = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, Character);
-
-    if (!paramObject.collider) paramObject.collider = { type: _ColliderTypes2.default.RADIUS };
-    return _possibleConstructorReturn(this, (Character.__proto__ || Object.getPrototypeOf(Character)).call(this, paramObject));
-  }
-
-  _createClass(Character, [{
-    key: 'canCast',
-    value: function canCast(spellId) {
-      // TODO: Check if the character has the spell in their spellbook and if it's not on cooldown.
-      return true;
-    }
-  }, {
-    key: 'isVisibleTo',
-    value: function isVisibleTo(bounds) {
-      var right = this.position.x + (this.width || 32);
-      var bottom = this.position.y + (this.width || 32);
-
-      var isGood = this.position.x < bounds.right && this.position.y < bounds.bottom && right > bounds.left && bottom > bounds.top;
-      return isGood;
-    }
-  }, {
-    key: 'drawHealthBar',
-    value: function drawHealthBar(context) {
-      if (this.isActive() && !this.isDead) {
-        if (!this.healthBar) {
-          console.log("creating a healthbar");
-          this.healthBar = new _ProgressBar2.default({
-            x: 0,
-            y: 0,
-            width: 32, // TODO: Use game settings
-            height: 5,
-            current: this.stats.hp,
-            max: this.stats.maxHp,
-            // bgColor: 
-            // fgColor:
-            parentGO: this
-          });
-          this.healthBar.setBounds(this.position.x - 16, this.position.y - 16);
-          this.healthBar.draw(context);
-        } else {
-          // console.log("Setting healthbar bounds to: ", this.position, this.instanceId);
-          this.healthBar.setBounds(this.position.x - 16, this.position.y - 16);
-          this.healthBar.draw(context);
-        }
-      }
-    }
-  }, {
-    key: 'tookDamage',
-    value: function tookDamage() {
-      var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-      var damageSource = arguments[1];
-
-      // TODO: modifiers.
-      this.health -= amount;
-      var overkill = 0;
-      if (this.health < 0) {
-        overkill = -this.health;
-        // console.log("Overkill!!!! -> " + overkill  + " HP");
-        this.health = 0;
-      }
-      console.log("taking damage!");
-    }
-  }]);
-
-  return Character;
-}(_Sprite3.default);
-
-exports.default = Character;
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _Sprite2 = __webpack_require__(/*! ../shared/Sprite */ 0);\n\nvar _Sprite3 = _interopRequireDefault(_Sprite2);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar ProgressBar = function (_Sprite) {\n  _inherits(ProgressBar, _Sprite);\n\n  function ProgressBar() {\n    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n    _classCallCheck(this, ProgressBar);\n\n    var _this = _possibleConstructorReturn(this, (ProgressBar.__proto__ || Object.getPrototypeOf(ProgressBar)).call(this)); // x, y, width, height, current, max, fgColor, bgColor, parentSprite) {\n\n\n    _this.stats = { current: params.current, max: params.max };\n    _this.bgColor = params.bgColor || \"#FFFFFF\";\n    _this.fgColor = params.fgColor || \"#FF0000\";\n    _this.parentGO = params.parentGO || { position: { x: 0, y: 0 } };\n    _this.setBounds(params.x || -1, params.y || -1, params.width || -1, params.height || -1);\n    _this.setRelativePosition({ x: params.x || 0, y: params.y || 0 });\n    return _this;\n  }\n\n  _createClass(ProgressBar, [{\n    key: \"setBounds\",\n    value: function setBounds(x, y, width, height) {\n      this.bounds = this.bounds || {};\n      this.bounds.x = x || this.bounds.x;\n      this.bounds.y = y || this.bounds.y;\n      this.bounds.width = width || this.bounds.width, this.bounds.height = height || this.bounds.height, this.bounds.left = this.bounds.x;\n      this.bounds.right = x && width ? x + width : this.bounds.x + this.bounds.width;\n      this.bounds.top = this.bounds.y;\n      this.bounds.bottom = y && height ? y + height : this.bounds.y + this.bounds.height;\n\n      this.setPosition(this.bounds);\n    }\n  }, {\n    key: \"draw\",\n    value: function draw(ctx) {\n      // Draw background\n      var x = this.position.x;\n      var y = this.position.y;\n      var width = this.bounds.width;\n      var height = this.bounds.height;\n      ctx.fillStyle = this.bgColor;\n      ctx.fillRect(x, y, width, height);\n\n      // Draw foreground\n      width = this.bounds.width * (this.stats.current / this.stats.max);\n      ctx.fillStyle = this.fgColor;\n      ctx.fillRect(x, y, width, height);\n    }\n  }, {\n    key: \"update\",\n    value: function update(delta) {\n      console.log(\"updating progressbar for: \", this.parentId);\n    }\n  }]);\n\n  return ProgressBar;\n}(_Sprite3.default);\n\nexports.default = ProgressBar;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTcuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9jbGllbnQvUHJvZ3Jlc3NCYXIuanM/ZDU3YiJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmltcG9ydCBTcHJpdGUgZnJvbSAnLi4vc2hhcmVkL1Nwcml0ZSc7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIFByb2dyZXNzQmFyIGV4dGVuZHMgU3ByaXRlIHtcbiAgY29uc3RydWN0b3IocGFyYW1zID0ge30pIHsgLy8geCwgeSwgd2lkdGgsIGhlaWdodCwgY3VycmVudCwgbWF4LCBmZ0NvbG9yLCBiZ0NvbG9yLCBwYXJlbnRTcHJpdGUpIHtcbiAgICBzdXBlcigpO1xuICAgIHRoaXMuc3RhdHMgPSB7IGN1cnJlbnQ6IHBhcmFtcy5jdXJyZW50LCBtYXg6IHBhcmFtcy5tYXggfVxuICAgIHRoaXMuYmdDb2xvciA9IHBhcmFtcy5iZ0NvbG9yIHx8IFwiI0ZGRkZGRlwiO1xuICAgIHRoaXMuZmdDb2xvciA9IHBhcmFtcy5mZ0NvbG9yIHx8IFwiI0ZGMDAwMFwiO1xuICAgIHRoaXMucGFyZW50R08gPSBwYXJhbXMucGFyZW50R08gfHwgeyBwb3NpdGlvbjogeyB4OiAwLCB5OiAwIH19O1xuICAgIHRoaXMuc2V0Qm91bmRzKHBhcmFtcy54IHx8IC0xLCBwYXJhbXMueSB8fCAtMSwgcGFyYW1zLndpZHRoIHx8IC0xLCBwYXJhbXMuaGVpZ2h0IHx8IC0xKTtcbiAgICB0aGlzLnNldFJlbGF0aXZlUG9zaXRpb24oeyB4OiBwYXJhbXMueCB8fCAwLCB5OiBwYXJhbXMueSB8fCAwIH0pO1xuICB9XG5cbiAgc2V0Qm91bmRzKHgsIHksIHdpZHRoLCBoZWlnaHQpIHtcbiAgICB0aGlzLmJvdW5kcyA9IHRoaXMuYm91bmRzIHx8IHt9O1xuICAgIHRoaXMuYm91bmRzLnggPSB4IHx8IHRoaXMuYm91bmRzLng7XG4gICAgdGhpcy5ib3VuZHMueSA9IHkgfHwgdGhpcy5ib3VuZHMueTtcbiAgICB0aGlzLmJvdW5kcy53aWR0aCA9IHdpZHRoIHx8IHRoaXMuYm91bmRzLndpZHRoLCBcbiAgICB0aGlzLmJvdW5kcy5oZWlnaHQgPSBoZWlnaHQgfHwgdGhpcy5ib3VuZHMuaGVpZ2h0LCBcbiAgICB0aGlzLmJvdW5kcy5sZWZ0ID0gdGhpcy5ib3VuZHMueDtcbiAgICB0aGlzLmJvdW5kcy5yaWdodCA9IHggJiYgd2lkdGggPyB4ICsgd2lkdGggOiB0aGlzLmJvdW5kcy54ICsgdGhpcy5ib3VuZHMud2lkdGg7XG4gICAgdGhpcy5ib3VuZHMudG9wID0gdGhpcy5ib3VuZHMueTtcbiAgICB0aGlzLmJvdW5kcy5ib3R0b20gPSB5ICYmIGhlaWdodCA/IHkgKyBoZWlnaHQgOiB0aGlzLmJvdW5kcy55ICsgdGhpcy5ib3VuZHMuaGVpZ2h0O1xuXG4gICAgdGhpcy5zZXRQb3NpdGlvbih0aGlzLmJvdW5kcyk7XG4gIH1cblxuICBkcmF3KGN0eCkge1xuICAgIC8vIERyYXcgYmFja2dyb3VuZFxuICAgIGxldCB4ID0gdGhpcy5wb3NpdGlvbi54O1xuICAgIGxldCB5ID0gdGhpcy5wb3NpdGlvbi55O1xuICAgIGxldCB3aWR0aCA9IHRoaXMuYm91bmRzLndpZHRoO1xuICAgIGxldCBoZWlnaHQgPSB0aGlzLmJvdW5kcy5oZWlnaHQ7XG4gICAgY3R4LmZpbGxTdHlsZT10aGlzLmJnQ29sb3I7XG4gICAgY3R4LmZpbGxSZWN0KHgsIHksIHdpZHRoLCBoZWlnaHQpO1xuXG4gICAgLy8gRHJhdyBmb3JlZ3JvdW5kXG4gICAgd2lkdGggPSB0aGlzLmJvdW5kcy53aWR0aCAqICh0aGlzLnN0YXRzLmN1cnJlbnQgLyB0aGlzLnN0YXRzLm1heCk7XG4gICAgY3R4LmZpbGxTdHlsZT10aGlzLmZnQ29sb3I7XG4gICAgY3R4LmZpbGxSZWN0KHgsIHksIHdpZHRoLCBoZWlnaHQpO1xuICB9XG4gIHVwZGF0ZShkZWx0YSkge1xuICAgIGNvbnNvbGUubG9nKFwidXBkYXRpbmcgcHJvZ3Jlc3NiYXIgZm9yOiBcIiwgdGhpcy5wYXJlbnRJZCk7XG4gIH1cbn1cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9jbGllbnQvUHJvZ3Jlc3NCYXIuanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7O0FBQ0E7QUFDQTs7Ozs7Ozs7Ozs7QUFDQTs7O0FBQ0E7QUFBQTtBQUNBO0FBREE7QUFDQTtBQURBO0FBQ0E7QUFDQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQVBBO0FBUUE7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUdBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBOzs7Ozs7QUF6Q0EiLCJzb3VyY2VSb290IjoiIn0=");
 
 /***/ }),
 /* 18 */,
@@ -1121,175 +245,53 @@ exports.default = Character;
 /* 21 */,
 /* 22 */,
 /* 23 */
+/* unknown exports provided */
+/* all exports used */
+/*!***************************************!*\
+  !*** ./classes/Helpers/throttling.js ***!
+  \***************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.throttle = throttle;
-exports.debounce = debounce;
-function throttle(fn, threshhold, scope) {
-  threshhold || (threshhold = 250);
-  var last, deferTimer;
-  return function () {
-
-    var context = scope || this;
-
-    var now = +new Date(),
-        args = arguments;
-    if (last && now < last + threshhold) {
-      // hold on to it
-      clearTimeout(deferTimer);
-      deferTimer = setTimeout(function () {
-        last = now;
-        fn.apply(context, args);
-      }, threshhold);
-    } else {
-      last = now;
-      fn.apply(context, args);
-    }
-  };
-}
-
-function debounce(func, wait, immediate) {
-  var timeout;
-  return function () {
-    var context = this,
-        args = arguments;
-    var later = function later() {
-      timeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    var callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait || 250);
-    if (callNow) func.apply(context, args);
-  };
-}
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.throttle = throttle;\nexports.debounce = debounce;\nfunction throttle(fn, threshhold, scope) {\n  threshhold || (threshhold = 250);\n  var last, deferTimer;\n  return function () {\n\n    var context = scope || this;\n\n    var now = +new Date(),\n        args = arguments;\n    if (last && now < last + threshhold) {\n      // hold on to it\n      clearTimeout(deferTimer);\n      deferTimer = setTimeout(function () {\n        last = now;\n        fn.apply(context, args);\n      }, threshhold);\n    } else {\n      last = now;\n      fn.apply(context, args);\n    }\n  };\n}\n\nfunction debounce(func, wait, immediate) {\n  var timeout;\n  return function () {\n    var context = this,\n        args = arguments;\n    var later = function later() {\n      timeout = null;\n      if (!immediate) func.apply(context, args);\n    };\n    var callNow = immediate && !timeout;\n    clearTimeout(timeout);\n    timeout = setTimeout(later, wait || 250);\n    if (callNow) func.apply(context, args);\n  };\n}//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMjMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9IZWxwZXJzL3Rocm90dGxpbmcuanM/MTUxNCJdLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgZnVuY3Rpb24gdGhyb3R0bGUoZm4sIHRocmVzaGhvbGQsIHNjb3BlKSB7XG4gIHRocmVzaGhvbGQgfHwgKHRocmVzaGhvbGQgPSAyNTApO1xuICB2YXIgbGFzdCwgZGVmZXJUaW1lcjtcbiAgcmV0dXJuIGZ1bmN0aW9uICgpIHtcbiAgICBcbiAgICB2YXIgY29udGV4dCA9IHNjb3BlIHx8IHRoaXM7XG5cbiAgICB2YXIgbm93ID0gK25ldyBEYXRlLCBhcmdzID0gYXJndW1lbnRzO1xuICAgIGlmIChsYXN0ICYmIG5vdyA8IGxhc3QgKyB0aHJlc2hob2xkKSB7XG4gICAgICAvLyBob2xkIG9uIHRvIGl0XG4gICAgICBjbGVhclRpbWVvdXQoZGVmZXJUaW1lcik7XG4gICAgICBkZWZlclRpbWVyID0gc2V0VGltZW91dChmdW5jdGlvbiAoKSB7XG4gICAgICAgIGxhc3QgPSBub3c7XG4gICAgICAgIGZuLmFwcGx5KGNvbnRleHQsIGFyZ3MpO1xuICAgICAgfSwgdGhyZXNoaG9sZCk7XG4gICAgfSBlbHNlIHtcbiAgICAgIGxhc3QgPSBub3c7XG4gICAgICBmbi5hcHBseShjb250ZXh0LCBhcmdzKTtcbiAgICB9XG4gIH07XG59XG5cblxuZXhwb3J0IGZ1bmN0aW9uIGRlYm91bmNlKGZ1bmMsIHdhaXQsIGltbWVkaWF0ZSkge1xuXHR2YXIgdGltZW91dDtcblx0cmV0dXJuIGZ1bmN0aW9uKCkge1xuXHRcdHZhciBjb250ZXh0ID0gdGhpcywgYXJncyA9IGFyZ3VtZW50cztcblx0XHR2YXIgbGF0ZXIgPSBmdW5jdGlvbigpIHtcblx0XHRcdHRpbWVvdXQgPSBudWxsO1xuXHRcdFx0aWYgKCFpbW1lZGlhdGUpIGZ1bmMuYXBwbHkoY29udGV4dCwgYXJncyk7XG5cdFx0fTtcblx0XHR2YXIgY2FsbE5vdyA9IGltbWVkaWF0ZSAmJiAhdGltZW91dDtcblx0XHRjbGVhclRpbWVvdXQodGltZW91dCk7XG5cdFx0dGltZW91dCA9IHNldFRpbWVvdXQobGF0ZXIsIHdhaXQgfHwgMjUwKTtcblx0XHRpZiAoY2FsbE5vdykgZnVuYy5hcHBseShjb250ZXh0LCBhcmdzKTtcblx0fTtcbn1cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9IZWxwZXJzL3Rocm90dGxpbmcuanMiXSwibWFwcGluZ3MiOiI7Ozs7O0FBQUE7QUF1QkE7QUF2QkE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSIsInNvdXJjZVJvb3QiOiIifQ==");
 
 /***/ }),
 /* 24 */
+/* unknown exports provided */
+/* all exports used */
+/*!******************************!*\
+  !*** ./classes/TileTypes.js ***!
+  \******************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var TileTypes = {
-  DIRT: 0,
-  GRASS: 1,
-  ROCK: 2,
-  WATER: 3,
-  PIT: 4,
-  BRIDGE: 5
-};
-
-exports.default = TileTypes;
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nvar TileTypes = {\n  DIRT: 0,\n  GRASS: 1,\n  ROCK: 2,\n  WATER: 3,\n  PIT: 4,\n  BRIDGE: 5\n};\n\nexports.default = TileTypes;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMjQuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9UaWxlVHlwZXMuanM/OWYxYSJdLCJzb3VyY2VzQ29udGVudCI6WyJjb25zdCBUaWxlVHlwZXMgPSB7XG4gIERJUlQ6IDAsXG4gIEdSQVNTOiAxLFxuICBST0NLOiAyLFxuICBXQVRFUjogMyxcbiAgUElUOiA0LFxuICBCUklER0U6IDUsXG59O1xuXG5leHBvcnQgZGVmYXVsdCBUaWxlVHlwZXM7XG5cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9UaWxlVHlwZXMuanMiXSwibWFwcGluZ3MiOiI7Ozs7O0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFOQTtBQUNBO0FBUUEiLCJzb3VyY2VSb290IjoiIn0=");
 
 /***/ }),
 /* 25 */
+/* unknown exports provided */
+/* all exports used */
+/*!*****************************************!*\
+  !*** ./classes/client/ClientGlobals.js ***!
+  \*****************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _GameObject2 = __webpack_require__(12);
-
-var _GameObject3 = _interopRequireDefault(_GameObject2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var defaults = {
-  fillStyle: "red",
-  font: "14px Arial",
-  lifeTime: 5 * 1000,
-  position: { x: 0, y: 0 },
-  text: "Hello World"
-};
-
-var CombatText = function (_GameObject) {
-  _inherits(CombatText, _GameObject);
-
-  function CombatText(params, deleteCallback) {
-    _classCallCheck(this, CombatText);
-
-    if (!deleteCallback) throw new Error("Please provide a callback for combat text deleteCallback.");
-
-    var _this = _possibleConstructorReturn(this, (CombatText.__proto__ || Object.getPrototypeOf(CombatText)).call(this));
-
-    _this.deleteCallback = deleteCallback || function () {
-      throw new Error("Please provide a callback for combat text deleteCallback.");
-    };
-
-    _this.fillStyle = params.fillStyle || defaults.fillStyle;
-    _this.setFont(params.font || defaults.font);
-    _this.setPosition(params.position || defaults.position);
-    _this.text = params.text || defaults.text;
-    _this.lifeTime = params.lifeTime || defaults.lifeTime;
-    _this.livesUntil = +Date.now() + _this.lifeTime;
-
-    _this.xShift = params.xShift || Math.random() * 48 - 24;
-
-    // console.log("TTL: " + (params.lifeTime || defaults.lifeTime));
-    _this.cancelTimeout = setTimeout(function () {
-      _this.delete();
-    }, params.lifeTime || defaults.lifeTime);
-
-    // console.log("Created combat text: ", this);
-    return _this;
-  }
-
-  _createClass(CombatText, [{
-    key: "draw",
-    value: function draw(ctx) {
-      ctx.globalAlpha = (this.livesUntil - Date.now()) / this.lifeTime;
-      ctx.font = this.font;
-      ctx.fillStyle = this.fillStyle;
-      ctx.fillText(this.text, this.position.x, this.position.y);
-      ctx.globalAlpha = 1;
-    }
-  }, {
-    key: "setFont",
-    value: function setFont(font) {
-      this.font = font || defaults.font;
-    }
-  }, {
-    key: "update",
-    value: function update(delta) {
-      this.position.y -= 48 * delta / 1000;
-      this.position.x += this.xShift * delta / 1000;
-    }
-  }, {
-    key: "delete",
-    value: function _delete() {
-      this.deleteCallback();
-    }
-  }]);
-
-  return CombatText;
-}(_GameObject3.default);
-
-exports.default = CombatText;
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar sprites = [];\n\nvar ClientGlobals = function () {\n  function ClientGlobals() {\n    _classCallCheck(this, ClientGlobals);\n  }\n\n  _createClass(ClientGlobals, [{\n    key: \"getSpriteById\",\n    value: function getSpriteById(instanceId) {\n      return sprites.find(function (s) {\n        return s.instanceId === instanceId;\n      });\n    }\n  }, {\n    key: \"addSprite\",\n    value: function addSprite(sprite) {\n      return sprites.push(sprite);\n    }\n  }, {\n    key: \"removeSprite\",\n    value: function removeSprite(sprite) {\n      return sprites.splice(sprites.indexOf(sprite), 1);\n    }\n  }, {\n    key: \"sprites\",\n    get: function get() {\n      return sprites;\n    },\n    set: function set(value) {\n      sprites = value;\n    }\n  }]);\n\n  return ClientGlobals;\n}();\n\nexports.default = new ClientGlobals();//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMjUuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9jbGllbnQvQ2xpZW50R2xvYmFscy5qcz9jNGUzIl0sInNvdXJjZXNDb250ZW50IjpbIlxubGV0IHNwcml0ZXMgPSBbXTtcblxuY2xhc3MgQ2xpZW50R2xvYmFscyB7XG5cbiAgZ2V0IHNwcml0ZXMoKSB7IHJldHVybiBzcHJpdGVzOyB9XG4gIHNldCBzcHJpdGVzKHZhbHVlKSB7IHNwcml0ZXMgPSB2YWx1ZTsgfSBcblxuICBnZXRTcHJpdGVCeUlkKGluc3RhbmNlSWQpIHtcbiAgICByZXR1cm4gc3ByaXRlcy5maW5kKHMgPT4gcy5pbnN0YW5jZUlkID09PSBpbnN0YW5jZUlkKTtcbiAgfVxuICBhZGRTcHJpdGUoc3ByaXRlKSB7XG4gICAgcmV0dXJuIHNwcml0ZXMucHVzaChzcHJpdGUpO1xuICB9XG4gIHJlbW92ZVNwcml0ZShzcHJpdGUpIHtcbiAgICByZXR1cm4gc3ByaXRlcy5zcGxpY2Uoc3ByaXRlcy5pbmRleE9mKHNwcml0ZSksIDEpO1xuICB9XG59XG5cbmV4cG9ydCBkZWZhdWx0IG5ldyBDbGllbnRHbG9iYWxzKCk7XG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvY2xpZW50L0NsaWVudEdsb2JhbHMuanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFDQTtBQUNBO0FBQ0E7Ozs7Ozs7QUFLQTtBQUNBO0FBQUE7QUFBQTtBQUNBOzs7QUFDQTtBQUNBO0FBQ0E7OztBQUNBO0FBQ0E7QUFDQTs7O0FBWEE7QUFBQTtBQUFBO0FBQ0E7QUFBQTtBQUFBOzs7Ozs7QUFhQSIsInNvdXJjZVJvb3QiOiIifQ==");
 
 /***/ }),
-/* 26 */,
+/* 26 */
+/* unknown exports provided */
+/* all exports used */
+/*!**************************************!*\
+  !*** ./classes/client/CombatText.js ***!
+  \**************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _GameObject2 = __webpack_require__(/*! ../shared/GameObject */ 13);\n\nvar _GameObject3 = _interopRequireDefault(_GameObject2);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar defaults = {\n  fillStyle: \"red\",\n  font: \"14px Arial\",\n  lifeTime: 5 * 1000,\n  position: { x: 0, y: 0 },\n  text: \"Hello World\"\n};\n\nvar CombatText = function (_GameObject) {\n  _inherits(CombatText, _GameObject);\n\n  function CombatText(params, deleteCallback) {\n    _classCallCheck(this, CombatText);\n\n    if (!deleteCallback) throw new Error(\"Please provide a callback for combat text deleteCallback.\");\n\n    var _this = _possibleConstructorReturn(this, (CombatText.__proto__ || Object.getPrototypeOf(CombatText)).call(this));\n\n    _this.deleteCallback = deleteCallback || function () {\n      throw new Error(\"Please provide a callback for combat text deleteCallback.\");\n    };\n\n    _this.fillStyle = params.fillStyle || defaults.fillStyle;\n    _this.setFont(params.font || defaults.font);\n    _this.setPosition(params.position || defaults.position);\n    _this.text = params.text || defaults.text;\n    _this.lifeTime = params.lifeTime || defaults.lifeTime;\n    _this.livesUntil = +Date.now() + _this.lifeTime;\n\n    _this.xShift = params.xShift || Math.random() * 48 - 24;\n\n    // console.log(\"TTL: \" + (params.lifeTime || defaults.lifeTime));\n    _this.cancelTimeout = setTimeout(function () {\n      _this.delete();\n    }, params.lifeTime || defaults.lifeTime);\n\n    // console.log(\"Created combat text: \", this);\n    return _this;\n  }\n\n  _createClass(CombatText, [{\n    key: \"draw\",\n    value: function draw(ctx) {\n      ctx.globalAlpha = (this.livesUntil - Date.now()) / this.lifeTime;\n      ctx.font = this.font;\n      ctx.fillStyle = this.fillStyle;\n      ctx.fillText(this.text, this.position.x, this.position.y);\n      ctx.globalAlpha = 1;\n    }\n  }, {\n    key: \"setFont\",\n    value: function setFont(font) {\n      this.font = font || defaults.font;\n    }\n  }, {\n    key: \"update\",\n    value: function update(delta) {\n      this.position.y -= 48 * delta / 1000;\n      this.position.x += this.xShift * delta / 1000;\n    }\n  }, {\n    key: \"delete\",\n    value: function _delete() {\n      this.deleteCallback();\n    }\n  }]);\n\n  return CombatText;\n}(_GameObject3.default);\n\nexports.default = CombatText;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMjYuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9jbGllbnQvQ29tYmF0VGV4dC5qcz9jNWM5Il0sInNvdXJjZXNDb250ZW50IjpbIlxuaW1wb3J0IEdhbWVPYmplY3QgZnJvbSAnLi4vc2hhcmVkL0dhbWVPYmplY3QnO1xuXG5jb25zdCBkZWZhdWx0cyA9IHtcbiAgZmlsbFN0eWxlOiBcInJlZFwiLFxuICBmb250OiBcIjE0cHggQXJpYWxcIixcbiAgbGlmZVRpbWU6IDUgKiAxMDAwLFxuICBwb3NpdGlvbjogeyB4OiAwLCB5OiAwIH0sXG4gIHRleHQ6IFwiSGVsbG8gV29ybGRcIixcbn07XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIENvbWJhdFRleHQgZXh0ZW5kcyBHYW1lT2JqZWN0IHtcbiAgY29uc3RydWN0b3IocGFyYW1zLCBkZWxldGVDYWxsYmFjaykge1xuICAgIGlmKCFkZWxldGVDYWxsYmFjaykgdGhyb3cgbmV3IEVycm9yKFwiUGxlYXNlIHByb3ZpZGUgYSBjYWxsYmFjayBmb3IgY29tYmF0IHRleHQgZGVsZXRlQ2FsbGJhY2suXCIpO1xuICAgIHN1cGVyKCk7XG4gICAgXG4gICAgdGhpcy5kZWxldGVDYWxsYmFjayA9IGRlbGV0ZUNhbGxiYWNrIHx8ICgoKSA9PiB7IHRocm93IG5ldyBFcnJvcihcIlBsZWFzZSBwcm92aWRlIGEgY2FsbGJhY2sgZm9yIGNvbWJhdCB0ZXh0IGRlbGV0ZUNhbGxiYWNrLlwiKTsgfSk7XG5cbiAgICB0aGlzLmZpbGxTdHlsZSA9IHBhcmFtcy5maWxsU3R5bGUgfHwgZGVmYXVsdHMuZmlsbFN0eWxlO1xuICAgIHRoaXMuc2V0Rm9udChwYXJhbXMuZm9udCB8fCBkZWZhdWx0cy5mb250KTtcbiAgICB0aGlzLnNldFBvc2l0aW9uKHBhcmFtcy5wb3NpdGlvbiB8fCBkZWZhdWx0cy5wb3NpdGlvbik7XG4gICAgdGhpcy50ZXh0ID0gcGFyYW1zLnRleHQgfHwgZGVmYXVsdHMudGV4dDtcbiAgICB0aGlzLmxpZmVUaW1lID0gcGFyYW1zLmxpZmVUaW1lIHx8IGRlZmF1bHRzLmxpZmVUaW1lO1xuICAgIHRoaXMubGl2ZXNVbnRpbCA9ICtEYXRlLm5vdygpICsgdGhpcy5saWZlVGltZTtcblxuICAgIHRoaXMueFNoaWZ0ID0gcGFyYW1zLnhTaGlmdCB8fCAoTWF0aC5yYW5kb20oKSAqIDQ4KSAtIDI0O1xuXG4gICAgLy8gY29uc29sZS5sb2coXCJUVEw6IFwiICsgKHBhcmFtcy5saWZlVGltZSB8fCBkZWZhdWx0cy5saWZlVGltZSkpO1xuICAgIHRoaXMuY2FuY2VsVGltZW91dCA9IHNldFRpbWVvdXQoKCkgPT4ge1xuICAgICAgdGhpcy5kZWxldGUoKTtcbiAgICB9LCBwYXJhbXMubGlmZVRpbWUgfHwgZGVmYXVsdHMubGlmZVRpbWUpO1xuXG4gICAgLy8gY29uc29sZS5sb2coXCJDcmVhdGVkIGNvbWJhdCB0ZXh0OiBcIiwgdGhpcyk7XG4gIH1cblxuICBkcmF3KGN0eCkge1xuICAgIGN0eC5nbG9iYWxBbHBoYSA9ICh0aGlzLmxpdmVzVW50aWwgLSBEYXRlLm5vdygpKSAvIHRoaXMubGlmZVRpbWU7XG4gICAgY3R4LmZvbnQgPSB0aGlzLmZvbnQ7XG4gICAgY3R4LmZpbGxTdHlsZSA9IHRoaXMuZmlsbFN0eWxlO1xuICAgIGN0eC5maWxsVGV4dCh0aGlzLnRleHQsIHRoaXMucG9zaXRpb24ueCwgdGhpcy5wb3NpdGlvbi55KTtcbiAgICBjdHguZ2xvYmFsQWxwaGEgPSAxO1xuICB9XG5cbiAgc2V0Rm9udChmb250KSB7XG4gICAgdGhpcy5mb250ID0gZm9udCB8fCBkZWZhdWx0cy5mb250O1xuICB9XG5cbiAgdXBkYXRlKGRlbHRhKSB7XG4gICAgdGhpcy5wb3NpdGlvbi55IC09IDQ4ICogZGVsdGEgLyAxMDAwO1xuICAgIHRoaXMucG9zaXRpb24ueCArPSB0aGlzLnhTaGlmdCAqIGRlbHRhIC8gMTAwMDtcbiAgfVxuXG4gIGRlbGV0ZSgpIHtcbiAgICB0aGlzLmRlbGV0ZUNhbGxiYWNrKCk7XG4gIH1cblxufVxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL2NsaWVudC9Db21iYXRUZXh0LmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7OztBQUNBO0FBQ0E7Ozs7Ozs7Ozs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBTEE7QUFDQTtBQU9BOzs7QUFDQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBRkE7QUFDQTtBQUdBO0FBQUE7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBcEJBO0FBcUJBO0FBQ0E7OztBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7Ozs7OztBQTNDQSIsInNvdXJjZVJvb3QiOiIifQ==");
+
+/***/ }),
 /* 27 */,
 /* 28 */,
 /* 29 */,
@@ -1301,946 +303,17 @@ exports.default = CombatText;
 /* 35 */,
 /* 36 */,
 /* 37 */,
-/* 38 */
+/* 38 */,
+/* 39 */
+/* unknown exports provided */
+/* all exports used */
+/*!************************************!*\
+  !*** ./client/javascript/index.js ***!
+  \************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _PlayerCharacter = __webpack_require__(4);
-
-var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
-
-var _Character = __webpack_require__(17);
-
-var _Character2 = _interopRequireDefault(_Character);
-
-var _Sprite = __webpack_require__(0);
-
-var _Sprite2 = _interopRequireDefault(_Sprite);
-
-var _CombatText = __webpack_require__(25);
-
-var _CombatText2 = _interopRequireDefault(_CombatText);
-
-var _MessageTypes = __webpack_require__(3);
-
-var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
-
-var _TileTypes = __webpack_require__(24);
-
-var _TileTypes2 = _interopRequireDefault(_TileTypes);
-
-var _SpriteTypes = __webpack_require__(7);
-
-var _PlayerActions = __webpack_require__(11);
-
-var _PlayerActions2 = _interopRequireDefault(_PlayerActions);
-
-var _GameSettings = __webpack_require__(1);
-
-var _ClientGlobals = __webpack_require__(40);
-
-var _ClientGlobals2 = _interopRequireDefault(_ClientGlobals);
-
-var _MediaManager = __webpack_require__(9);
-
-var _MediaManager2 = _interopRequireDefault(_MediaManager);
-
-var _gx2D = __webpack_require__(8);
-
-var _throttling = __webpack_require__(23);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } // Game Objects
-// import FireBall from '../../classes/shared/FireBall';
-
-
-// Constants & Enumerations
-
-
-// Game Managers
-
-
-// Helpers
-
-
-// tile canvas
-var tileCanvas = document.querySelector('#tileCanvas');
-var tileContext = tileCanvas.getContext('2d');
-// sprite canvas
-var spriteCanvas = document.querySelector('#spriteCanvas');
-var spriteContext = spriteCanvas.getContext('2d');
-// UI canvas 
-var uiCanvas = document.querySelector('#uiCanvas');
-var uiContext = uiCanvas.getContext('2d');
-// Cursor canvas
-var cursorCanvas = document.querySelector('#cursorCanvas');
-var cursorContext = cursorCanvas.getContext('2d');
-
-// Modes
-var MODE_PLAY = 'PLAY';
-var MODE_EDIT = 'EDIT';
-
-// Application globals
-var client = {
-  token: undefined
-};
-var TILE_SCALE = _GameSettings.GameSettings.TILE_SCALE;
-var gameMode = MODE_PLAY;
-
-var TileColorMap = new Map();
-TileColorMap.set(_TileTypes2.default.DIRT, '#5b2607');
-TileColorMap.set(_TileTypes2.default.GRASS, 'green');
-TileColorMap.set(_TileTypes2.default.ROCK, 'grey');
-TileColorMap.set(_TileTypes2.default.WATER, 'blue');
-TileColorMap.set(_TileTypes2.default.PIT, 'black');
-TileColorMap.set(_TileTypes2.default.BRIDGE, '#7c4b2e');
-
-// const SpriteTextureMap = new Map();
-// SpriteTextureMap.set(SpriteTypes.CHEST, './images/ChestClosed.png');
-// SpriteTextureMap.set(SpriteTypes.FIREBALL, './images/FireballStatic.png');
-// SpriteTextureMap.set(SpriteTypes.PLAYER, './images/PlayerOverhead.png');
-
-var ImageLoader = new Map();
-
-var playerCharacter = null;
-
-// level tiles / objects for map the player is currently on.
-var tileMap = [];
-var sprites = _ClientGlobals2.default.sprites; // []; // SPRITE
-var ui = {
-  textSprites: [],
-  addCombatText: function addCombatText(text) {
-    this.textSprites.push(text);
-  },
-  removeCombatText: function removeCombatText(text) {
-    this.textSprites.splice(this.textSprites.indexOf(text), 1);
-  }
-};
-
-var mousePosition = {};
-
-function openClientSocket() {
-  console.log("Opening socket");
-  var sock = null;
-  try {
-    var protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    sock = client.socket || new WebSocket(protocol + '://' + location.hostname + ':' + location.port + '/');
-    client.socket = sock;
-  } catch (ex) {
-    // Errors will be thrown if not using http, as location object data will not look the same.
-    console.log("Error: ", ex);
-    console.log("If you're testing on the server, did you remember to use localhost?");
-  }
-  console.log("Sending socket back");
-  return sock;
-}
-
-// Start socket
-function startSocketClient() {
-  // TODO: Does this cause conflicts if called more than once?
-  var sock = openClientSocket();
-  // try {
-  //   const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-  //   sock = client.socket || new WebSocket(`${protocol}://${location.hostname}:${location.port}/`);
-  //   client.socket = sock;
-  // } catch(ex) {
-  //   // Errors will be thrown if not using http, as location object data will not look the same.
-  //   console.log("Error: ", ex);
-  //   console.log("If you're testing on the server, did you remember to use localhost?")
-  // }
-
-  sock.onmessage = function onmessage(event) {
-    var message = JSON.parse(event.data);
-
-    switch (message.type) {
-      case _MessageTypes2.default.PONG:
-        // console.log("Pong received.");
-        break;
-      case _MessageTypes2.default.Who:
-        // sendPackage(MessageTypes.Who, { who: 'James:df8c8023ae' });
-        break;
-      case _MessageTypes2.default.Authentication:
-        if (message.success === true) {
-          LoginSucceeded(message);
-        } else {
-          LoginFailed(message.error);
-        }
-        break;
-      case _MessageTypes2.default.Port:
-        console.log('PORTED');
-        if (message.success === true) {
-          message.level = JSON.parse(message.level);
-          // console.log(message);
-          tileMap = message.level.tileMap;
-          var massagedSpriteData = message.level.sprites.map(function (s) {
-            return classifySprite(s.spawn, s.spawnClass);
-          });
-          sprites.push.apply(sprites, _toConsumableArray(massagedSpriteData)); // SPRITE
-          massagedSpriteData.forEach(function (s) {
-            sprites[s.instanceId] = s;
-          });
-
-          playerCharacter = sprites.find(function (s) {
-            return s.instanceId === message.playerCharacter.instanceId;
-          }); // SPRITE
-          playerCharacter.setPosition(message.playerCharacter.position);
-
-          // TODO: Can we determine if this is a first load?
-          drawCanvas();
-        } else {
-          console.log("Message was not successful!!!!", message);
-        }
-        break;
-      case _MessageTypes2.default.MoveTo:
-        // DEBUG: console.log("Attempted to move: ", message);
-        playerCharacter.setPosition(message);
-        drawSprites();
-        break;
-      case _MessageTypes2.default.Spawn:
-        if (!message.spawnClass) {
-          console.error("No spawn class provided.");
-          return;
-        }
-        if (message.spawnClass === _SpriteTypes.SpriteTypes.PLAYER) {
-          console.log("Player spawned: ", message.spawn.instanceId);
-          console.log('Spawn info: ', message);
-        }
-        // const spawnClass = SpriteClassMap.get(message.spawnClass);
-        if (message.spawn.instanceId === playerCharacter.instanceId) return;
-        // const newSpawn = Object.assign(new Sprite(), message.spawn, { type: message.spawnClass });
-        var newSpawn = classifySprite(message.spawn, message.spawnClass);
-        sprites.push(newSpawn);
-        sprites[newSpawn.instanceId] = newSpawn;
-        break;
-      case _MessageTypes2.default.Despawn:
-        // console.log('Despawn Message: ', message); // message.spawnId
-        sprites.splice(sprites.findIndex(function (s) {
-          return s.instanceId === message.spawnId;
-        }), 1);
-        sprites[message.spawnId] = undefined;
-        if (message.spawnId === playerCharacter.instanceId) {
-          // TODO: respawn
-        }
-        delete sprites[message.spawnId];
-        break;
-      case _MessageTypes2.default.FrameQueue:
-        // TODO: finish below
-        message.queue.forEach(function (item) {
-          if (item.type === _MessageTypes2.default.UpdateSprite) {
-            var spriteUpdateInfo = JSON.parse(item.sprite);
-            var spriteToUpdate = sprites[spriteUpdateInfo.instanceId];
-            if (spriteToUpdate) {
-              Object.assign(spriteToUpdate, spriteUpdateInfo);
-            } else {
-              // console.log("couldn't find sprite.", spriteUpdateInfo);
-            }
-          } else {
-            console.log("Invalid frame action");
-          }
-        });
-        drawSprites();
-        // TODO: Draw sprite changes all in one go - DO NOT draw them in each iteration above.
-        break;
-      case _MessageTypes2.default.TakeDamage:
-        handleTakeDamage(message);
-        break;
-      case _MessageTypes2.default.PlayerDeath:
-        handlePlayerDeath(message);
-        break;
-      case _MessageTypes2.default.PlayerRespawn:
-        // console.log('Respawn info: ', message);
-        handlePlayerRespawn(message);
-        break;
-      case _MessageTypes2.default.DEBUG:
-        console.log('Debug package received. Message: ' + message.message);
-        break;
-      default:
-        console.log('Message type not recognized: ', message);
-        break;
-    }
-  };
-
-  sock.onclose = function onclose(something) {
-    console.log('Socket Closed -> ', something);
-    // TODO: If user did not purposely disconnect, attempt to reconnect
-  };
-  sock.onerror = function onerror(something) {
-    console.log('Some Error -> ', something);
-    // TODO: Determine conditions for reconnect and then use them to create reconnect logic.
-  };
-}
-
-var handleTakeDamage = function handleTakeDamage(message) {
-  var target = sprites[message.target];
-  var damage = message.damage;
-  var text = new _CombatText2.default({
-    text: '-' + damage,
-    lifeTime: 1000,
-    position: {
-      x: target.position.x - 16,
-      y: target.position.y - 16
-    }
-  }, function () {
-    ui.removeCombatText(text);
-  });
-  ui.addCombatText(text);
-  target.stats.hp = message.remainingHp;
-  target.stats.maxHp = message.maxHp;
-};
-
-var handlePlayerDeath = function handlePlayerDeath(message) {
-  var target = sprites.find(function (s) {
-    return s.instanceId === message.target;
-  });
-  target.isDead = true;
-};
-var handlePlayerRespawn = function handlePlayerRespawn(message) {
-  var target = sprites.find(function (s) {
-    return s.instanceId === message.target;
-  });
-  target.isDead = false;
-  target.stats.hp = target.stats.maxHp;
-  // console.log("Found: ", target);
-  // console.log("ID: ", message.target);
-  target.setPosition(message.position);
-};
-
-var sendLogin = function sendLogin(username, password) {
-  sendPackage(_MessageTypes2.default.Who, { who: username + ':' + password });
-};
-
-var classifySprite = function classifySprite(sprite, spriteClassTag) {
-  if (!spriteClassTag) return sprite;
-  var spriteClass = _SpriteTypes.ClientSpriteClassMap.get(spriteClassTag);
-  if (!spriteClass || sprite instanceof spriteClass) return sprite;
-  var classifiedSprite = Object.assign(new spriteClass(), sprite);
-  return classifiedSprite;
-};
-
-// Pipeline message handlers
-function LoginSucceeded() {
-  var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-
-  console.log("message: ", message);
-
-  if (!message.instanceId) return;
-  client.instanceId = message.instanceId; // Save to global for later use.
-  toast('Welcome', 'Connected to server.');
-
-  hideUI('UI_Login');
-
-  // TODO: Show loading message / spinner
-  startGame();
-}
-
-function LoginFailed() {
-  var error = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'not defined';
-
-  /* eslint-disable no-alert */
-  toast('YOU FAILED (to log in)!!!');
-  // toast('Oh and the error was: ', error);
-}
-
-function toast() {
-  var title = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Toast';
-  var message = arguments[1];
-
-  // TODO: Develop/borrow toaster alert
-
-  var t = document.querySelector('#toast__template');
-
-  var tToast = t.content.querySelector('.toast');
-  var toastDiv = document.importNode(tToast, true);
-
-  var tClose = toastDiv.querySelector('.toast__close');
-  var tTitle = toastDiv.querySelector('.toast__title');
-  var tMessage = toastDiv.querySelector('.toast__message');
-
-  tTitle.textContent = title;
-  tMessage.textContent = message;
-  tClose.addEventListener('click', function (e) {
-    // Start CSS animation. Takes 2.5 seconds.
-    toastDiv.classList.add('closing');
-    // Remove after completely faded out. (2.5 seconds)
-    setTimeout(function () {
-      toastDiv.parentElement.removeChild(toastDiv);
-    }, 2500);
-    e.stopPropagation();
-  });
-
-  document.querySelector('#toasts').appendChild(toastDiv);
-}
-
-// Set up canvas: (Note: may need to use this later to reinit when screen size changes.)
-function initCanvas() {
-  handleResize();
-  if (tileMap.length > 0) drawCanvas(); // TODO: Put this in a timed loop?
-}
-
-function handleResize() {
-  uiCanvas.width = spriteCanvas.width = cursorCanvas.width = tileCanvas.width = document.body.offsetWidth;
-  uiCanvas.height = spriteCanvas.height = cursorCanvas.height = tileCanvas.height = document.body.offsetHeight;
-  drawCanvas();
-}
-
-// Draw canvas
-function drawCanvas() {
-  // clear bg
-  tileContext.fillStyle = 'cyan'; // clear color
-  tileContext.fillRect(0, 0, tileCanvas.width, tileCanvas.height);
-
-  // draw background tiles
-  drawBackground();
-
-  // draw sprites
-  drawSprites();
-
-  // draw HUD
-  drawHUD();
-}
-
-var drawBackground = function drawBackground() {
-  // TODO: Rewrite using array functions for looping.
-  for (var r = 0; r < tileMap.length; r += 1) {
-    var row = tileMap[r];
-    for (var c = 0; c < row.length; c += 1) {
-      var cell = row[c];
-      tileContext.fillStyle = TileColorMap.get(cell);
-      tileContext.fillRect(c * TILE_SCALE, r * TILE_SCALE, TILE_SCALE, TILE_SCALE);
-    }
-  }
-};
-
-var drawSprites = function drawSprites() {
-  // TODO: Check differences. Only erase previous sprites if they moved and redraw???
-
-  // but for now, lets just clear sprites and redraw
-  spriteContext.clearRect(0, 0, spriteCanvas.width, spriteCanvas.height);
-
-  sprites.forEach(function (sprite) {
-    // SPRITE
-
-    if (sprite.isDead) return;
-    if (sprite.draw) {
-      sprite.draw(spriteContext);
-      return;
-    }
-
-    var imageSource = sprite.texture || _SpriteTypes.SpriteTextureMap.get(sprite.type);
-    if (imageSource === undefined) console.log("undefined darnit.", sprite);
-    drawSprite(sprite.position.x, sprite.position.y, imageSource, sprite.angle || 0);
-  });
-};
-
-var drawHUD = function drawHUD() {
-  // TODO: draw HUD
-  uiContext.clearRect(0, 0, uiCanvas.width, uiCanvas.height);
-  ui.textSprites.forEach(function (cbText) {
-    if (cbText.draw) {
-      cbText.draw(uiContext);
-    }
-  });
-
-  var characters = sprites.filter(function (s) {
-    return s instanceof _Character2.default;
-  });
-  characters.forEach(function (character) {
-    if (character.instanceId !== playerCharacter.instanceId) console.log("checking visibility.");
-
-    var bounds = {
-      left: 0,
-      right: spriteCanvas.width,
-      top: 0,
-      bottom: spriteCanvas.height
-    };
-
-    if (character.isVisibleTo(bounds)) {
-      character.drawHealthBar(uiContext);
-    } else {
-      // console.log("Player is not visible: ", character.instanceId);
-    }
-  });
-};
-
-// Canvas helper functions
-var drawCircle = function drawCircle(x, y) {
-  var radius = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : TILE_SCALE;
-  var fill = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '#FFFFFF';
-  var strokeColor = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '#000000';
-
-  var centerX = x * TILE_SCALE + TILE_SCALE / 2;
-  var centerY = y * TILE_SCALE + TILE_SCALE / 2;
-
-  tileContext.beginPath();
-  tileContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-  tileContext.fillStyle = fill;
-  tileContext.fill();
-  tileContext.lineWidth = 1;
-  tileContext.strokeStyle = strokeColor;
-  tileContext.stroke();
-};
-
-var drawSprite = function drawSprite(x, y, imageSource) {
-  var angle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-
-  // const imgElement = document.querySelector('#image-loader');
-
-  var imgElement = _MediaManager2.default.loadImage(imageSource);
-  var rotAngle = 0;
-  if (angle) {
-    rotAngle = angle;
-  }
-  if (!imgElement) {
-    imgElement = new Image();
-    imgElement.src = imageSource;
-    var onImageLoad = function onImageLoad() {
-      spriteContext.translate(x, y);
-      spriteContext.rotate(rotAngle);
-      spriteContext.drawImage(imgElement, -16, -16);
-      spriteContext.rotate(-rotAngle);
-      spriteContext.translate(-x, -y);
-
-      ImageLoader.set(imageSource, imgElement);
-      imgElement.removeEventListener('load', onImageLoad);
-    };
-    // TODO: handle errors where images are not found.
-    imgElement.addEventListener('load', onImageLoad);
-  } else {
-    spriteContext.translate(x, y);
-    spriteContext.rotate(rotAngle);
-    spriteContext.drawImage(imgElement, -16, -16);
-    spriteContext.rotate(-rotAngle);
-    spriteContext.translate(-x, -y);
-  }
-};
-
-function keyPressed(keyName) {
-  var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-  // If the keyName starts with Unmapped...
-  if (keyName.toUpperCase().indexOf('UNMAPPED') === 0) {
-    var code = parseInt(keyName.split(':')[1], 10);
-    console.log('Unmapped key pressed: ' + code);
-  } else {
-    sendPackage(_MessageTypes2.default.KeyPressed, { action: keyName, message: message });
-  }
-}
-function keyReleased(keyName) {
-  if (keyName.indexOf('UNMAPPED') === 0) {
-    var code = parseInt(keyName.split(':')[1], 10);
-    console.log('Unmapped key released: ' + code);
-  } else {
-    sendPackage(_MessageTypes2.default.KeyReleased, { action: keyName });
-  }
-}
-
-var keyMap = [{ code: 65, action: _PlayerActions2.default.LEFT }, // a
-{ code: 65, action: _PlayerActions2.default.LEFT }, { code: 37, action: _PlayerActions2.default.LEFT }, // left arrow
-{ code: 87, action: _PlayerActions2.default.UP }, // w
-{ code: 38, action: _PlayerActions2.default.UP }, // up arrow
-{ code: 68, action: _PlayerActions2.default.RIGHT }, // d
-{ code: 39, action: _PlayerActions2.default.RIGHT }, // right arrow
-{ code: 83, action: _PlayerActions2.default.DOWN }, // s
-{ code: 40, action: _PlayerActions2.default.DOWN }, // down arrow
-{ code: 16, action: _PlayerActions2.default.SHIFT }, { code: 32, action: _PlayerActions2.default.SHOOT_PROJECTILE }];
-
-// Low Level Event Handlers
-function keyDown(e) {
-  var keyInfo = keyMap.find(function (k) {
-    return k.code === e.keyCode;
-  });
-  if (keyInfo) {
-    var message = {};
-    switch (keyInfo.action) {
-      case _PlayerActions2.default.SHOOT_PROJECTILE:
-        // console.log("trying to shoot fireball");
-        shootFireball(mousePosition);
-        break;
-      default:
-        keyPressed(keyInfo.action, message);
-        break;
-    }
-  } else {
-    keyPressed(_PlayerActions2.default.UNMAPPED + ':' + e.keyCode);
-  }
-}
-function keyUp(e) {
-  var keyInfo = keyMap.find(function (k) {
-    return k.code === e.keyCode;
-  });
-  if (keyInfo) {
-    keyReleased(keyInfo.action);
-  } else {
-    keyReleased(_PlayerActions2.default.UNMAPPED + ':' + e.keyCode);
-  }
-}
-var lastMovePackage = +Date.now();
-var moveInterval = 250;
-function mouseMove(e) {
-
-  var angle = 0;
-  if (!playerCharacter) return;
-
-  if (playerCharacter.position) {
-    angle = (0, _gx2D.angle2d)(playerCharacter.position.x, playerCharacter.position.y, e.clientX, e.clientY);
-  }
-  // Local only
-  if (!playerCharacter.isWalking) {
-    playerCharacter.angle = angle + Math.PI / 2; // Player character starts facing the wrong way. 
-  }
-
-  mousePosition = { x: e.clientX, y: e.clientY };
-
-  if (+Date.now() > lastMovePackage + moveInterval) {
-    // console.log("sending move package");
-    sendPackage(_MessageTypes2.default.MouseMove, { aim: mousePosition });
-    lastMovePackage = +Date.now();
-  }
-
-  // cursorCanvas.focusedTileCoords = {
-  //   tx: Math.floor(e.clientX / TILE_SCALE),
-  //   ty: Math.floor(e.clientY / TILE_SCALE)
-  // };
-
-  // clearCursors();
-  // drawCursors();
-}
-function mouseClick(e) {
-  // sendPackage(MessageTypes.MouseClick, { 
-  //   button: e.button,
-  //   x: e.clientX,
-  //   y: e.clientY
-  // });
-}
-function mouseDown(e) {
-  if (e.button === 2) {
-    console.log("DOWN: " + e.button);
-    e.preventDefault();
-    return;
-  } else {
-    sendPackage(_MessageTypes2.default.MouseDown, {
-      button: e.button,
-      x: e.clientX,
-      y: e.clientY
-    });
-  }
-}
-function mouseUp(e) {
-  if (e.button === 2) {
-    console.log("UP: " + e.button);
-    e.preventDefault();
-    return;
-  } else {
-    sendPackage(_MessageTypes2.default.MouseUp, {
-      button: e.button,
-      x: e.clientX,
-      y: e.clientY
-    });
-  }
-}
-
-function shootFireball(towardPosition) {
-  sendPackage(_MessageTypes2.default.KeyPressed, {
-    action: _PlayerActions2.default.SHOOT_PROJECTILE,
-    start: playerCharacter.position,
-    aim: { x: towardPosition.x, y: towardPosition.y }
-  });
-}
-
-function clearCursors() {
-  cursorContext.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
-}
-
-function updateCursors() {
-  clearCursors();
-  drawCursors();
-}
-
-function drawCursors() {
-  var cursors = [{
-    type: 'SELECTED',
-    source: './images/SelectionCursorSelected.png',
-    tx: cursorCanvas.selectedTileCoords && cursorCanvas.selectedTileCoords.tx || 0,
-    ty: cursorCanvas.selectedTileCoords && cursorCanvas.selectedTileCoords.ty || 0
-  }];
-  if (gameMode === MODE_EDIT) {
-    cursors.push({
-      type: 'FOCUSED',
-      source: './images/SelectionCursorFocused.png',
-      tx: cursorCanvas.focusedTileCoords && cursorCanvas.focusedTileCoords.tx || 0,
-      ty: cursorCanvas.focusedTileCoords && cursorCanvas.focusedTileCoords.ty || 0
-    });
-  }
-  cursors.forEach(function (cursor) {
-    if (cursor.tx === null || cursor.ty === null) return;
-    var cursorSource = cursor.source;
-    var cursorElement = ImageLoader.get(cursorSource);
-    if (!cursorElement) {
-      cursorElement = new Image();
-      cursorElement.src = cursorSource;
-      var onImageLoad = function onImageLoad() {
-        cursorContext.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);
-        ImageLoader.set(cursorSource, cursorElement);
-        cursorElement.removeEventListener('load', onImageLoad);
-      };
-      // TODO: handle errors where images are not found.
-      cursorElement.addEventListener('load', onImageLoad);
-    } else {
-      cursorContext.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);
-    }
-  });
-}
-
-// Event Handler Abstractions
-var tryMovePlayer = function tryMovePlayer(dir) {
-  // TODO: ensure we are allowed to move in the direction we want to before attempting to move.
-  var newPosition = {
-    tx: playerCharacter.tx,
-    ty: playerCharacter.ty
-  };
-  switch (dir) {
-    case 'LEFT':
-      newPosition.tx = playerCharacter.tx - 1;
-      break;
-    case 'RIGHT':
-      newPosition.tx = playerCharacter.tx + 1;
-      break;
-    case 'UP':
-      newPosition.ty = playerCharacter.ty - 1;
-      break;
-    case 'DOWN':
-      newPosition.ty = playerCharacter.ty + 1;
-      break;
-    default:
-      console.log('Invalid Direction');
-      break;
-  }
-  if (isWalkable(newPosition)) {
-    playerCharacter.tx = newPosition.tx;
-    playerCharacter.ty = newPosition.ty;
-  } else {
-    // TODO: play "can't walk" sound.
-  }
-
-  drawCanvas();
-};
-var isWalkable = function isWalkable(tile) {
-  // tile should have at minimum: { x , y }
-  if (tile.ty < 0 || tile.tx < 0) return false;
-
-  var tileTypeAtPosition = tileMap[tile.ty][tile.tx];
-
-  if ([_TileTypes2.default.DIRT, _TileTypes2.default.GRASS, _TileTypes2.default.BRIDGE].includes(tileTypeAtPosition)) {
-    if (!sprites.filter(function (s) {
-      return s.tx === tile.tx && s.ty === tile.ty;
-    }).length > 0) {
-      // SPRITE
-      return true;
-    }
-  }
-  return false;
-};
-
-function initEventHandlers() {
-  document.onkeydown = keyDown;
-  document.onkeyup = keyUp;
-  document.addEventListener('mousemove', (0, _throttling.throttle)(mouseMove, 50));
-  document.addEventListener('click', mouseClick);
-  window.onresize = handleResize;
-  document.ondragstart = function (e) {
-    return e.preventDefault();
-  };
-  document.addEventListener('mousedown', mouseDown);
-  document.addEventListener('mouseup', mouseUp);
-  document.addEventListener('contextmenu', function (e) {
-    e.preventDefault();
-  });
-}
-
-// Initiate game
-function startGame() {
-  initCanvas();
-  initEventHandlers();
-  sendPackage(_MessageTypes2.default.Port, { levelId: 1 });
-  updateLoop();
-}
-
-var loopTime = performance.now();
-function updateLoop() {
-  var timestamp = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : performance.now();
-  // TODO: Rename. (drawLoop() ??? )
-  if (client.socket.readyState !== WebSocket.OPEN) {
-    toast("Websocket has closed.", "stopped drawing");
-    return;
-  }
-
-  var delta = timestamp - loopTime;
-  updateHUD(delta);
-
-  loopTime = timestamp;
-
-  drawCanvas();
-  // ensure next frame runs.
-  window.requestAnimationFrame(updateLoop);
-}
-
-var updateHUD = function updateHUD(delta) {
-  ui.textSprites.forEach(function (cbText) {
-    if (cbText.update) {
-      cbText.update(delta);
-    }
-  });
-
-  var characters = sprites.filter(function (s) {
-    return s instanceof _Character2.default;
-  });
-  characters.forEach(function (character) {
-    // console.log("setting stats to " + character.health + " " + character.stats.maxHp + " for: ", character);
-    if (character.healthBar) {
-      character.healthBar.stats.current = character.stats.hp;
-      character.healthBar.stats.max = character.stats.maxHp;
-    }
-  });
-};
-
-var sendPackage = async function sendPackage() {
-  var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-  var attributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var reconnect = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-
-  if (type === null) throw new Error('Package type must be specified.');
-
-  if ([WebSocket.CLOSED, WebSocket.CLOSING].includes(client.socket.readyState)) {
-    if (reconnect) {
-      console.log("Reconnecting.");
-      client.socket = await openClientSocket();
-    } else {
-      console.log("Socket is closed. This will not work.");
-    }
-  }
-  client.socket.send(JSON.stringify(Object.assign({ type: type }, attributes)));
-};
-
-setInterval(function pingPong() {
-  sendPackage(_MessageTypes2.default.PING, {});
-  // console.log("Ping sent.");
-}, 25000);
-
-startSocketClient(); // TODO: Need to monitor and reconnect
-
-
-// TODO: Move to separate module
-/// UI Manager
-
-var UIParent = document.getElementById('UI_Overlay');
-UIParent.visibleChildren = [document.getElementById('UI_Login')];
-
-function showUI(uiElementId) {
-  // Get UI element
-  var uiElement = document.getElementById(uiElementId);
-
-  // if nothing is returned or if it's already visible we don't need to do anything
-  if (!uiElement || UIParent.visibleChildren.includes(uiElement)) return;
-
-  // otherwise remove the hidden class
-  uiElement.classList.remove("hidden");
-  UIParent.classList.remove("hidden");
-
-  // ... and keep track.
-  UIParent.visibleChildren.push(uiElement);
-}
-
-function hideUI(uiElement) {
-
-  if (!uiElement) return;
-
-  if ((typeof uiElement === 'undefined' ? 'undefined' : _typeof(uiElement)) === _typeof("")) {
-    uiElement = document.querySelector('#' + uiElement);
-  }
-
-  uiElement.classList.add("hidden");
-
-  var index = UIParent.visibleChildren.indexOf(uiElement);
-  if (index !== -1) {
-    UIParent.visibleChildren.splice(index, 1);
-  }
-
-  if (UIParent.visibleChildren.length === 0) UIParent.classList.add("hidden");
-}
-
-// UI Implementation
-
-var loginButton = document.getElementById('UI_Login__Button');
-
-loginButton.addEventListener('click', function (e) {
-  e.preventDefault();
-  console.log("Login button clicked.");
-  var username = document.getElementById('UI_Username__Input').value;
-  var password = document.getElementById('UI_Password__Input').value;
-  sendLogin(username, password);
-});
-
-/***/ }),
-/* 39 */,
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var sprites = [];
-
-var ClientGlobals = function () {
-  function ClientGlobals() {
-    _classCallCheck(this, ClientGlobals);
-  }
-
-  _createClass(ClientGlobals, [{
-    key: "getSpriteById",
-    value: function getSpriteById(instanceId) {
-      return sprites.find(function (s) {
-        return s.instanceId === instanceId;
-      });
-    }
-  }, {
-    key: "addSprite",
-    value: function addSprite(sprite) {
-      return sprites.push(sprite);
-    }
-  }, {
-    key: "removeSprite",
-    value: function removeSprite(sprite) {
-      return sprites.splice(sprites.indexOf(sprite), 1);
-    }
-  }, {
-    key: "sprites",
-    get: function get() {
-      return sprites;
-    },
-    set: function set(value) {
-      sprites = value;
-    }
-  }]);
-
-  return ClientGlobals;
-}();
-
-exports.default = new ClientGlobals();
+eval("\n\nvar _typeof = typeof Symbol === \"function\" && typeof Symbol.iterator === \"symbol\" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === \"function\" && obj.constructor === Symbol && obj !== Symbol.prototype ? \"symbol\" : typeof obj; };\n\nvar _PlayerCharacter = __webpack_require__(/*! ../../classes/shared/PlayerCharacter */ 4);\n\nvar _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);\n\nvar _Character = __webpack_require__(/*! ../../classes/shared/Character */ 10);\n\nvar _Character2 = _interopRequireDefault(_Character);\n\nvar _Sprite = __webpack_require__(/*! ../../classes/shared/Sprite */ 0);\n\nvar _Sprite2 = _interopRequireDefault(_Sprite);\n\nvar _CombatText = __webpack_require__(/*! ../../classes/client/CombatText */ 26);\n\nvar _CombatText2 = _interopRequireDefault(_CombatText);\n\nvar _MessageTypes = __webpack_require__(/*! ../../classes/MessageTypes */ 3);\n\nvar _MessageTypes2 = _interopRequireDefault(_MessageTypes);\n\nvar _TileTypes = __webpack_require__(/*! ../../classes/TileTypes */ 24);\n\nvar _TileTypes2 = _interopRequireDefault(_TileTypes);\n\nvar _SpriteTypes = __webpack_require__(/*! ../../classes/SpriteTypes */ 7);\n\nvar _PlayerActions = __webpack_require__(/*! ../../classes/PlayerActions */ 12);\n\nvar _PlayerActions2 = _interopRequireDefault(_PlayerActions);\n\nvar _GameSettings = __webpack_require__(/*! ../../classes/GameSettings */ 1);\n\nvar _ClientGlobals = __webpack_require__(/*! ../../classes/client/ClientGlobals */ 25);\n\nvar _ClientGlobals2 = _interopRequireDefault(_ClientGlobals);\n\nvar _MediaManager = __webpack_require__(/*! ../../classes/client/MediaManager */ 9);\n\nvar _MediaManager2 = _interopRequireDefault(_MediaManager);\n\nvar _gx2D = __webpack_require__(/*! ../../classes/Helpers/gx2D */ 8);\n\nvar _throttling = __webpack_require__(/*! ../../classes/Helpers/throttling */ 23);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } // Game Objects\n// import FireBall from '../../classes/shared/FireBall';\n\n\n// Constants & Enumerations\n\n\n// Game Managers\n\n\n// Helpers\n\n\n// tile canvas\nvar tileCanvas = document.querySelector('#tileCanvas');\nvar tileContext = tileCanvas.getContext('2d');\n// sprite canvas\nvar spriteCanvas = document.querySelector('#spriteCanvas');\nvar spriteContext = spriteCanvas.getContext('2d');\n// UI canvas \nvar uiCanvas = document.querySelector('#uiCanvas');\nvar uiContext = uiCanvas.getContext('2d');\n// Cursor canvas\nvar cursorCanvas = document.querySelector('#cursorCanvas');\nvar cursorContext = cursorCanvas.getContext('2d');\n\n// Modes\nvar MODE_PLAY = 'PLAY';\nvar MODE_EDIT = 'EDIT';\n\n// Application globals\nvar client = {\n  token: undefined\n};\nvar TILE_SCALE = _GameSettings.GameSettings.TILE_SCALE;\nvar gameMode = MODE_PLAY;\n\nvar TileColorMap = new Map();\nTileColorMap.set(_TileTypes2.default.DIRT, '#5b2607');\nTileColorMap.set(_TileTypes2.default.GRASS, 'green');\nTileColorMap.set(_TileTypes2.default.ROCK, 'grey');\nTileColorMap.set(_TileTypes2.default.WATER, 'blue');\nTileColorMap.set(_TileTypes2.default.PIT, 'black');\nTileColorMap.set(_TileTypes2.default.BRIDGE, '#7c4b2e');\n\n// const SpriteTextureMap = new Map();\n// SpriteTextureMap.set(SpriteTypes.CHEST, './images/ChestClosed.png');\n// SpriteTextureMap.set(SpriteTypes.FIREBALL, './images/FireballStatic.png');\n// SpriteTextureMap.set(SpriteTypes.PLAYER, './images/PlayerOverhead.png');\n\nvar ImageLoader = new Map();\n\nvar playerCharacter = null;\n\n// level tiles / objects for map the player is currently on.\nvar tileMap = [];\nvar sprites = _ClientGlobals2.default.sprites; // []; // SPRITE\nvar ui = {\n  textSprites: [],\n  addCombatText: function addCombatText(text) {\n    this.textSprites.push(text);\n  },\n  removeCombatText: function removeCombatText(text) {\n    this.textSprites.splice(this.textSprites.indexOf(text), 1);\n  }\n};\n\nvar mousePosition = {};\n\nfunction openClientSocket() {\n  console.log(\"Opening socket\");\n  var sock = null;\n  try {\n    var protocol = window.location.protocol === \"https:\" ? \"wss\" : \"ws\";\n    sock = client.socket || new WebSocket(protocol + '://' + location.hostname + ':' + location.port + '/');\n    client.socket = sock;\n  } catch (ex) {\n    // Errors will be thrown if not using http, as location object data will not look the same.\n    console.log(\"Error: \", ex);\n    console.log(\"If you're testing on the server, did you remember to use localhost?\");\n  }\n  console.log(\"Sending socket back\");\n  return sock;\n}\n\n// Start socket\nfunction startSocketClient() {\n  // TODO: Does this cause conflicts if called more than once?\n  var sock = openClientSocket();\n  // try {\n  //   const protocol = window.location.protocol === \"https:\" ? \"wss\" : \"ws\";\n  //   sock = client.socket || new WebSocket(`${protocol}://${location.hostname}:${location.port}/`);\n  //   client.socket = sock;\n  // } catch(ex) {\n  //   // Errors will be thrown if not using http, as location object data will not look the same.\n  //   console.log(\"Error: \", ex);\n  //   console.log(\"If you're testing on the server, did you remember to use localhost?\")\n  // }\n\n  sock.onmessage = function onmessage(event) {\n    var message = JSON.parse(event.data);\n\n    switch (message.type) {\n      case _MessageTypes2.default.PONG:\n        // console.log(\"Pong received.\");\n        break;\n      case _MessageTypes2.default.Who:\n        // sendPackage(MessageTypes.Who, { who: 'James:df8c8023ae' });\n        break;\n      case _MessageTypes2.default.Authentication:\n        if (message.success === true) {\n          LoginSucceeded(message);\n        } else {\n          LoginFailed(message.error);\n        }\n        break;\n      case _MessageTypes2.default.Port:\n        console.log('PORTED');\n        if (message.success === true) {\n          message.level = JSON.parse(message.level);\n          // console.log(message);\n          tileMap = message.level.tileMap;\n          var massagedSpriteData = message.level.sprites.map(function (s) {\n            return classifySprite(s.spawn, s.spawnClass);\n          });\n          sprites.push.apply(sprites, _toConsumableArray(massagedSpriteData)); // SPRITE\n          massagedSpriteData.forEach(function (s) {\n            sprites[s.instanceId] = s;\n          });\n\n          playerCharacter = sprites.find(function (s) {\n            return s.instanceId === message.playerCharacter.instanceId;\n          }); // SPRITE\n          playerCharacter.setPosition(message.playerCharacter.position);\n\n          // TODO: Can we determine if this is a first load?\n          drawCanvas();\n        } else {\n          console.log(\"Message was not successful!!!!\", message);\n        }\n        break;\n      case _MessageTypes2.default.MoveTo:\n        // DEBUG: console.log(\"Attempted to move: \", message);\n        playerCharacter.setPosition(message);\n        drawSprites();\n        break;\n      case _MessageTypes2.default.Spawn:\n        if (!message.spawnClass) {\n          console.error(\"No spawn class provided.\");\n          return;\n        }\n        if (message.spawnClass === _SpriteTypes.SpriteTypes.PLAYER) {\n          console.log(\"Player spawned: \", message.spawn.instanceId);\n          console.log('Spawn info: ', message);\n        }\n        // const spawnClass = SpriteClassMap.get(message.spawnClass);\n        if (message.spawn.instanceId === playerCharacter.instanceId) return;\n        // const newSpawn = Object.assign(new Sprite(), message.spawn, { type: message.spawnClass });\n        var newSpawn = classifySprite(message.spawn, message.spawnClass);\n        sprites.push(newSpawn);\n        sprites[newSpawn.instanceId] = newSpawn;\n        break;\n      case _MessageTypes2.default.Despawn:\n        // console.log('Despawn Message: ', message); // message.spawnId\n        sprites.splice(sprites.findIndex(function (s) {\n          return s.instanceId === message.spawnId;\n        }), 1);\n        sprites[message.spawnId] = undefined;\n        if (message.spawnId === playerCharacter.instanceId) {\n          // TODO: respawn\n        }\n        delete sprites[message.spawnId];\n        break;\n      case _MessageTypes2.default.FrameQueue:\n        // TODO: finish below\n        message.queue.forEach(function (item) {\n          if (item.type === _MessageTypes2.default.UpdateSprite) {\n            var spriteUpdateInfo = JSON.parse(item.sprite);\n            var spriteToUpdate = sprites[spriteUpdateInfo.instanceId];\n            if (spriteToUpdate) {\n              Object.assign(spriteToUpdate, spriteUpdateInfo);\n            } else {\n              // console.log(\"couldn't find sprite.\", spriteUpdateInfo);\n            }\n          } else {\n            console.log(\"Invalid frame action\");\n          }\n        });\n        drawSprites();\n        // TODO: Draw sprite changes all in one go - DO NOT draw them in each iteration above.\n        break;\n      case _MessageTypes2.default.TakeDamage:\n        handleTakeDamage(message);\n        break;\n      case _MessageTypes2.default.PlayerDeath:\n        handlePlayerDeath(message);\n        break;\n      case _MessageTypes2.default.PlayerRespawn:\n        // console.log('Respawn info: ', message);\n        handlePlayerRespawn(message);\n        break;\n      case _MessageTypes2.default.DEBUG:\n        console.log('Debug package received. Message: ' + message.message);\n        break;\n      default:\n        console.log('Message type not recognized: ', message);\n        break;\n    }\n  };\n\n  sock.onclose = function onclose(something) {\n    console.log('Socket Closed -> ', something);\n    // TODO: If user did not purposely disconnect, attempt to reconnect\n  };\n  sock.onerror = function onerror(something) {\n    console.log('Some Error -> ', something);\n    // TODO: Determine conditions for reconnect and then use them to create reconnect logic.\n  };\n}\n\nvar handleTakeDamage = function handleTakeDamage(message) {\n  var target = sprites[message.target];\n  var damage = message.damage;\n  var text = new _CombatText2.default({\n    text: '-' + damage,\n    lifeTime: 1000,\n    position: {\n      x: target.position.x - 16,\n      y: target.position.y - 16\n    }\n  }, function () {\n    ui.removeCombatText(text);\n  });\n  ui.addCombatText(text);\n  target.stats.hp = message.remainingHp;\n  target.stats.maxHp = message.maxHp;\n};\n\nvar handlePlayerDeath = function handlePlayerDeath(message) {\n  var target = sprites.find(function (s) {\n    return s.instanceId === message.target;\n  });\n  target.isDead = true;\n};\nvar handlePlayerRespawn = function handlePlayerRespawn(message) {\n  var target = sprites.find(function (s) {\n    return s.instanceId === message.target;\n  });\n  target.isDead = false;\n  target.stats.hp = target.stats.maxHp;\n  // console.log(\"Found: \", target);\n  // console.log(\"ID: \", message.target);\n  target.setPosition(message.position);\n};\n\nvar sendLogin = function sendLogin(username, password) {\n  sendPackage(_MessageTypes2.default.Who, { who: username + ':' + password });\n};\n\nvar classifySprite = function classifySprite(sprite, spriteClassTag) {\n  if (!spriteClassTag) return sprite;\n  var spriteClass = _SpriteTypes.ClientSpriteClassMap.get(spriteClassTag);\n  if (!spriteClass || sprite instanceof spriteClass) return sprite;\n  var classifiedSprite = Object.assign(new spriteClass(), sprite);\n  return classifiedSprite;\n};\n\n// Pipeline message handlers\nfunction LoginSucceeded() {\n  var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n\n  console.log(\"message: \", message);\n\n  if (!message.instanceId) return;\n  client.instanceId = message.instanceId; // Save to global for later use.\n  toast('Welcome', 'Connected to server.');\n\n  hideUI('UI_Login');\n\n  // TODO: Show loading message / spinner\n  startGame();\n}\n\nfunction LoginFailed() {\n  var error = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'not defined';\n\n  /* eslint-disable no-alert */\n  toast('YOU FAILED (to log in)!!!');\n  // toast('Oh and the error was: ', error);\n}\n\nfunction toast() {\n  var title = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Toast';\n  var message = arguments[1];\n\n  // TODO: Develop/borrow toaster alert\n\n  var t = document.querySelector('#toast__template');\n\n  var tToast = t.content.querySelector('.toast');\n  var toastDiv = document.importNode(tToast, true);\n\n  var tClose = toastDiv.querySelector('.toast__close');\n  var tTitle = toastDiv.querySelector('.toast__title');\n  var tMessage = toastDiv.querySelector('.toast__message');\n\n  tTitle.textContent = title;\n  tMessage.textContent = message;\n  tClose.addEventListener('click', function (e) {\n    // Start CSS animation. Takes 2.5 seconds.\n    toastDiv.classList.add('closing');\n    // Remove after completely faded out. (2.5 seconds)\n    setTimeout(function () {\n      toastDiv.parentElement.removeChild(toastDiv);\n    }, 2500);\n    e.stopPropagation();\n  });\n\n  document.querySelector('#toasts').appendChild(toastDiv);\n}\n\n// Set up canvas: (Note: may need to use this later to reinit when screen size changes.)\nfunction initCanvas() {\n  handleResize();\n  if (tileMap.length > 0) drawCanvas(); // TODO: Put this in a timed loop?\n}\n\nfunction handleResize() {\n  uiCanvas.width = spriteCanvas.width = cursorCanvas.width = tileCanvas.width = document.body.offsetWidth;\n  uiCanvas.height = spriteCanvas.height = cursorCanvas.height = tileCanvas.height = document.body.offsetHeight;\n  drawCanvas();\n}\n\n// Draw canvas\nfunction drawCanvas() {\n  // clear bg\n  tileContext.fillStyle = 'cyan'; // clear color\n  tileContext.fillRect(0, 0, tileCanvas.width, tileCanvas.height);\n\n  // draw background tiles\n  drawBackground();\n\n  // draw sprites\n  drawSprites();\n\n  // draw HUD\n  drawHUD();\n}\n\nvar drawBackground = function drawBackground() {\n  // TODO: Rewrite using array functions for looping.\n  for (var r = 0; r < tileMap.length; r += 1) {\n    var row = tileMap[r];\n    for (var c = 0; c < row.length; c += 1) {\n      var cell = row[c];\n      tileContext.fillStyle = TileColorMap.get(cell);\n      tileContext.fillRect(c * TILE_SCALE, r * TILE_SCALE, TILE_SCALE, TILE_SCALE);\n    }\n  }\n};\n\nvar drawSprites = function drawSprites() {\n  // TODO: Check differences. Only erase previous sprites if they moved and redraw???\n\n  // but for now, lets just clear sprites and redraw\n  spriteContext.clearRect(0, 0, spriteCanvas.width, spriteCanvas.height);\n\n  sprites.forEach(function (sprite) {\n    // SPRITE\n\n    if (sprite.isDead) return;\n    if (sprite.draw) {\n      sprite.draw(spriteContext);\n      return;\n    }\n\n    var imageSource = sprite.texture || _SpriteTypes.SpriteTextureMap.get(sprite.type);\n    if (imageSource === undefined) console.log(\"undefined darnit.\", sprite);\n    drawSprite(sprite.position.x, sprite.position.y, imageSource, sprite.angle || 0);\n  });\n};\n\nvar drawHUD = function drawHUD() {\n  // TODO: draw HUD\n  uiContext.clearRect(0, 0, uiCanvas.width, uiCanvas.height);\n  ui.textSprites.forEach(function (cbText) {\n    if (cbText.draw) {\n      cbText.draw(uiContext);\n    }\n  });\n\n  var characters = sprites.filter(function (s) {\n    return s instanceof _Character2.default;\n  });\n  characters.forEach(function (character) {\n    if (character.instanceId !== playerCharacter.instanceId) console.log(\"checking visibility.\");\n\n    var bounds = {\n      left: 0,\n      right: spriteCanvas.width,\n      top: 0,\n      bottom: spriteCanvas.height\n    };\n\n    if (character.isVisibleTo(bounds)) {\n      character.drawHealthBar(uiContext);\n    } else {\n      // console.log(\"Player is not visible: \", character.instanceId);\n    }\n  });\n};\n\n// Canvas helper functions\nvar drawCircle = function drawCircle(x, y) {\n  var radius = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : TILE_SCALE;\n  var fill = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '#FFFFFF';\n  var strokeColor = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : '#000000';\n\n  var centerX = x * TILE_SCALE + TILE_SCALE / 2;\n  var centerY = y * TILE_SCALE + TILE_SCALE / 2;\n\n  tileContext.beginPath();\n  tileContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);\n  tileContext.fillStyle = fill;\n  tileContext.fill();\n  tileContext.lineWidth = 1;\n  tileContext.strokeStyle = strokeColor;\n  tileContext.stroke();\n};\n\nvar drawSprite = function drawSprite(x, y, imageSource) {\n  var angle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;\n\n  // const imgElement = document.querySelector('#image-loader');\n\n  var imgElement = _MediaManager2.default.loadImage(imageSource);\n  var rotAngle = 0;\n  if (angle) {\n    rotAngle = angle;\n  }\n  if (!imgElement) {\n    imgElement = new Image();\n    imgElement.src = imageSource;\n    var onImageLoad = function onImageLoad() {\n      spriteContext.translate(x, y);\n      spriteContext.rotate(rotAngle);\n      spriteContext.drawImage(imgElement, -16, -16);\n      spriteContext.rotate(-rotAngle);\n      spriteContext.translate(-x, -y);\n\n      ImageLoader.set(imageSource, imgElement);\n      imgElement.removeEventListener('load', onImageLoad);\n    };\n    // TODO: handle errors where images are not found.\n    imgElement.addEventListener('load', onImageLoad);\n  } else {\n    spriteContext.translate(x, y);\n    spriteContext.rotate(rotAngle);\n    spriteContext.drawImage(imgElement, -16, -16);\n    spriteContext.rotate(-rotAngle);\n    spriteContext.translate(-x, -y);\n  }\n};\n\nfunction keyPressed(keyName) {\n  var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};\n\n  // If the keyName starts with Unmapped...\n  if (keyName.toUpperCase().indexOf('UNMAPPED') === 0) {\n    var code = parseInt(keyName.split(':')[1], 10);\n    console.log('Unmapped key pressed: ' + code);\n  } else {\n    sendPackage(_MessageTypes2.default.KeyPressed, { action: keyName, message: message });\n  }\n}\nfunction keyReleased(keyName) {\n  if (keyName.indexOf('UNMAPPED') === 0) {\n    var code = parseInt(keyName.split(':')[1], 10);\n    console.log('Unmapped key released: ' + code);\n  } else {\n    sendPackage(_MessageTypes2.default.KeyReleased, { action: keyName });\n  }\n}\n\nvar keyMap = [{ code: 65, action: _PlayerActions2.default.LEFT }, // a\n{ code: 65, action: _PlayerActions2.default.LEFT }, { code: 37, action: _PlayerActions2.default.LEFT }, // left arrow\n{ code: 87, action: _PlayerActions2.default.UP }, // w\n{ code: 38, action: _PlayerActions2.default.UP }, // up arrow\n{ code: 68, action: _PlayerActions2.default.RIGHT }, // d\n{ code: 39, action: _PlayerActions2.default.RIGHT }, // right arrow\n{ code: 83, action: _PlayerActions2.default.DOWN }, // s\n{ code: 40, action: _PlayerActions2.default.DOWN }, // down arrow\n{ code: 16, action: _PlayerActions2.default.SHIFT }, { code: 32, action: _PlayerActions2.default.SHOOT_PROJECTILE }];\n\n// Low Level Event Handlers\nfunction keyDown(e) {\n  var keyInfo = keyMap.find(function (k) {\n    return k.code === e.keyCode;\n  });\n  if (keyInfo) {\n    var message = {};\n    switch (keyInfo.action) {\n      case _PlayerActions2.default.SHOOT_PROJECTILE:\n        // console.log(\"trying to shoot fireball\");\n        shootFireball(mousePosition);\n        break;\n      default:\n        keyPressed(keyInfo.action, message);\n        break;\n    }\n  } else {\n    keyPressed(_PlayerActions2.default.UNMAPPED + ':' + e.keyCode);\n  }\n}\nfunction keyUp(e) {\n  var keyInfo = keyMap.find(function (k) {\n    return k.code === e.keyCode;\n  });\n  if (keyInfo) {\n    keyReleased(keyInfo.action);\n  } else {\n    keyReleased(_PlayerActions2.default.UNMAPPED + ':' + e.keyCode);\n  }\n}\nvar lastMovePackage = +Date.now();\nvar moveInterval = 250;\nfunction mouseMove(e) {\n\n  var angle = 0;\n  if (!playerCharacter) return;\n\n  if (playerCharacter.position) {\n    angle = (0, _gx2D.angle2d)(playerCharacter.position.x, playerCharacter.position.y, e.clientX, e.clientY);\n  }\n  // Local only\n  if (!playerCharacter.isWalking) {\n    playerCharacter.angle = angle + Math.PI / 2; // Player character starts facing the wrong way. \n  }\n\n  mousePosition = { x: e.clientX, y: e.clientY };\n\n  if (+Date.now() > lastMovePackage + moveInterval) {\n    // console.log(\"sending move package\");\n    sendPackage(_MessageTypes2.default.MouseMove, { aim: mousePosition });\n    lastMovePackage = +Date.now();\n  }\n\n  // cursorCanvas.focusedTileCoords = {\n  //   tx: Math.floor(e.clientX / TILE_SCALE),\n  //   ty: Math.floor(e.clientY / TILE_SCALE)\n  // };\n\n  // clearCursors();\n  // drawCursors();\n}\nfunction mouseClick(e) {\n  // sendPackage(MessageTypes.MouseClick, { \n  //   button: e.button,\n  //   x: e.clientX,\n  //   y: e.clientY\n  // });\n}\nfunction mouseDown(e) {\n  if (e.button === 2) {\n    console.log(\"DOWN: \" + e.button);\n    e.preventDefault();\n    return;\n  } else {\n    sendPackage(_MessageTypes2.default.MouseDown, {\n      button: e.button,\n      x: e.clientX,\n      y: e.clientY\n    });\n  }\n}\nfunction mouseUp(e) {\n  if (e.button === 2) {\n    console.log(\"UP: \" + e.button);\n    e.preventDefault();\n    return;\n  } else {\n    sendPackage(_MessageTypes2.default.MouseUp, {\n      button: e.button,\n      x: e.clientX,\n      y: e.clientY\n    });\n  }\n}\n\nfunction shootFireball(towardPosition) {\n  sendPackage(_MessageTypes2.default.KeyPressed, {\n    action: _PlayerActions2.default.SHOOT_PROJECTILE,\n    start: playerCharacter.position,\n    aim: { x: towardPosition.x, y: towardPosition.y }\n  });\n}\n\nfunction clearCursors() {\n  cursorContext.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);\n}\n\nfunction updateCursors() {\n  clearCursors();\n  drawCursors();\n}\n\nfunction drawCursors() {\n  var cursors = [{\n    type: 'SELECTED',\n    source: './images/SelectionCursorSelected.png',\n    tx: cursorCanvas.selectedTileCoords && cursorCanvas.selectedTileCoords.tx || 0,\n    ty: cursorCanvas.selectedTileCoords && cursorCanvas.selectedTileCoords.ty || 0\n  }];\n  if (gameMode === MODE_EDIT) {\n    cursors.push({\n      type: 'FOCUSED',\n      source: './images/SelectionCursorFocused.png',\n      tx: cursorCanvas.focusedTileCoords && cursorCanvas.focusedTileCoords.tx || 0,\n      ty: cursorCanvas.focusedTileCoords && cursorCanvas.focusedTileCoords.ty || 0\n    });\n  }\n  cursors.forEach(function (cursor) {\n    if (cursor.tx === null || cursor.ty === null) return;\n    var cursorSource = cursor.source;\n    var cursorElement = ImageLoader.get(cursorSource);\n    if (!cursorElement) {\n      cursorElement = new Image();\n      cursorElement.src = cursorSource;\n      var onImageLoad = function onImageLoad() {\n        cursorContext.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);\n        ImageLoader.set(cursorSource, cursorElement);\n        cursorElement.removeEventListener('load', onImageLoad);\n      };\n      // TODO: handle errors where images are not found.\n      cursorElement.addEventListener('load', onImageLoad);\n    } else {\n      cursorContext.drawImage(cursorElement, cursor.tx * TILE_SCALE, cursor.ty * TILE_SCALE);\n    }\n  });\n}\n\n// Event Handler Abstractions\nvar tryMovePlayer = function tryMovePlayer(dir) {\n  // TODO: ensure we are allowed to move in the direction we want to before attempting to move.\n  var newPosition = {\n    tx: playerCharacter.tx,\n    ty: playerCharacter.ty\n  };\n  switch (dir) {\n    case 'LEFT':\n      newPosition.tx = playerCharacter.tx - 1;\n      break;\n    case 'RIGHT':\n      newPosition.tx = playerCharacter.tx + 1;\n      break;\n    case 'UP':\n      newPosition.ty = playerCharacter.ty - 1;\n      break;\n    case 'DOWN':\n      newPosition.ty = playerCharacter.ty + 1;\n      break;\n    default:\n      console.log('Invalid Direction');\n      break;\n  }\n  if (isWalkable(newPosition)) {\n    playerCharacter.tx = newPosition.tx;\n    playerCharacter.ty = newPosition.ty;\n  } else {\n    // TODO: play \"can't walk\" sound.\n  }\n\n  drawCanvas();\n};\nvar isWalkable = function isWalkable(tile) {\n  // tile should have at minimum: { x , y }\n  if (tile.ty < 0 || tile.tx < 0) return false;\n\n  var tileTypeAtPosition = tileMap[tile.ty][tile.tx];\n\n  if ([_TileTypes2.default.DIRT, _TileTypes2.default.GRASS, _TileTypes2.default.BRIDGE].includes(tileTypeAtPosition)) {\n    if (!sprites.filter(function (s) {\n      return s.tx === tile.tx && s.ty === tile.ty;\n    }).length > 0) {\n      // SPRITE\n      return true;\n    }\n  }\n  return false;\n};\n\nfunction initEventHandlers() {\n  document.onkeydown = keyDown;\n  document.onkeyup = keyUp;\n  document.addEventListener('mousemove', (0, _throttling.throttle)(mouseMove, 50));\n  document.addEventListener('click', mouseClick);\n  window.onresize = handleResize;\n  document.ondragstart = function (e) {\n    return e.preventDefault();\n  };\n  document.addEventListener('mousedown', mouseDown);\n  document.addEventListener('mouseup', mouseUp);\n  document.addEventListener('contextmenu', function (e) {\n    e.preventDefault();\n  });\n}\n\n// Initiate game\nfunction startGame() {\n  initCanvas();\n  initEventHandlers();\n  sendPackage(_MessageTypes2.default.Port, { levelId: 1 });\n  updateLoop();\n}\n\nvar loopTime = performance.now();\nfunction updateLoop() {\n  var timestamp = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : performance.now();\n  // TODO: Rename. (drawLoop() ??? )\n  if (client.socket.readyState !== WebSocket.OPEN) {\n    toast(\"Websocket has closed.\", \"stopped drawing\");\n    return;\n  }\n\n  var delta = timestamp - loopTime;\n  updateHUD(delta);\n\n  loopTime = timestamp;\n\n  drawCanvas();\n  // ensure next frame runs.\n  window.requestAnimationFrame(updateLoop);\n}\n\nvar updateHUD = function updateHUD(delta) {\n  ui.textSprites.forEach(function (cbText) {\n    if (cbText.update) {\n      cbText.update(delta);\n    }\n  });\n\n  var characters = sprites.filter(function (s) {\n    return s instanceof _Character2.default;\n  });\n  characters.forEach(function (character) {\n    // console.log(\"setting stats to \" + character.health + \" \" + character.stats.maxHp + \" for: \", character);\n    if (character.healthBar) {\n      character.healthBar.stats.current = character.stats.hp;\n      character.healthBar.stats.max = character.stats.maxHp;\n    }\n  });\n};\n\nvar sendPackage = async function sendPackage() {\n  var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;\n  var attributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};\n  var reconnect = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;\n\n  if (type === null) throw new Error('Package type must be specified.');\n\n  if ([WebSocket.CLOSED, WebSocket.CLOSING].includes(client.socket.readyState)) {\n    if (reconnect) {\n      console.log(\"Reconnecting.\");\n      client.socket = await openClientSocket();\n    } else {\n      console.log(\"Socket is closed. This will not work.\");\n    }\n  }\n  client.socket.send(JSON.stringify(Object.assign({ type: type }, attributes)));\n};\n\nsetInterval(function pingPong() {\n  sendPackage(_MessageTypes2.default.PING, {});\n  // console.log(\"Ping sent.\");\n}, 25000);\n\nstartSocketClient(); // TODO: Need to monitor and reconnect\n\n\n// TODO: Move to separate module\n/// UI Manager\n\nvar UIParent = document.getElementById('UI_Overlay');\nUIParent.visibleChildren = [document.getElementById('UI_Login')];\n\nfunction showUI(uiElementId) {\n  // Get UI element\n  var uiElement = document.getElementById(uiElementId);\n\n  // if nothing is returned or if it's already visible we don't need to do anything\n  if (!uiElement || UIParent.visibleChildren.includes(uiElement)) return;\n\n  // otherwise remove the hidden class\n  uiElement.classList.remove(\"hidden\");\n  UIParent.classList.remove(\"hidden\");\n\n  // ... and keep track.\n  UIParent.visibleChildren.push(uiElement);\n}\n\nfunction hideUI(uiElement) {\n\n  if (!uiElement) return;\n\n  if ((typeof uiElement === 'undefined' ? 'undefined' : _typeof(uiElement)) === _typeof(\"\")) {\n    uiElement = document.querySelector('#' + uiElement);\n  }\n\n  uiElement.classList.add(\"hidden\");\n\n  var index = UIParent.visibleChildren.indexOf(uiElement);\n  if (index !== -1) {\n    UIParent.visibleChildren.splice(index, 1);\n  }\n\n  if (UIParent.visibleChildren.length === 0) UIParent.classList.add(\"hidden\");\n}\n\n// UI Implementation\n\nvar loginButton = document.getElementById('UI_Login__Button');\n\nloginButton.addEventListener('click', function (e) {\n  e.preventDefault();\n  console.log(\"Login button clicked.\");\n  var username = document.getElementById('UI_Username__Input').value;\n  var password = document.getElementById('UI_Password__Input').value;\n  sendLogin(username, password);\n});//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMzkuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xpZW50L2phdmFzY3JpcHQvaW5kZXguanM/NzVhYyJdLCJzb3VyY2VzQ29udGVudCI6WyIvLyBHYW1lIE9iamVjdHNcbi8vIGltcG9ydCBGaXJlQmFsbCBmcm9tICcuLi8uLi9jbGFzc2VzL3NoYXJlZC9GaXJlQmFsbCc7XG5pbXBvcnQgUGxheWVyQ2hhcmFjdGVyIGZyb20gJy4uLy4uL2NsYXNzZXMvc2hhcmVkL1BsYXllckNoYXJhY3Rlcic7XG5pbXBvcnQgQ2hhcmFjdGVyIGZyb20gJy4uLy4uL2NsYXNzZXMvc2hhcmVkL0NoYXJhY3Rlcic7XG5pbXBvcnQgU3ByaXRlIGZyb20gJy4uLy4uL2NsYXNzZXMvc2hhcmVkL1Nwcml0ZSc7XG5pbXBvcnQgQ29tYmF0VGV4dCBmcm9tICcuLi8uLi9jbGFzc2VzL2NsaWVudC9Db21iYXRUZXh0JztcblxuLy8gQ29uc3RhbnRzICYgRW51bWVyYXRpb25zXG5pbXBvcnQgTWVzc2FnZVR5cGVzIGZyb20gJy4uLy4uL2NsYXNzZXMvTWVzc2FnZVR5cGVzJztcbmltcG9ydCBUaWxlVHlwZXMgZnJvbSAnLi4vLi4vY2xhc3Nlcy9UaWxlVHlwZXMnO1xuaW1wb3J0IHsgU3ByaXRlVHlwZXMsIFNwcml0ZVRleHR1cmVNYXAsIENsaWVudFNwcml0ZUNsYXNzTWFwIH0gZnJvbSAnLi4vLi4vY2xhc3Nlcy9TcHJpdGVUeXBlcyc7XG5pbXBvcnQgUGxheWVyQWN0aW9ucyBmcm9tICcuLi8uLi9jbGFzc2VzL1BsYXllckFjdGlvbnMnO1xuXG4vLyBHYW1lIE1hbmFnZXJzXG5pbXBvcnQgeyBHYW1lU2V0dGluZ3MgfSBmcm9tICcuLi8uLi9jbGFzc2VzL0dhbWVTZXR0aW5ncyc7XG5pbXBvcnQgQ2xpZW50R2xvYmFscyBmcm9tICcuLi8uLi9jbGFzc2VzL2NsaWVudC9DbGllbnRHbG9iYWxzJztcbmltcG9ydCBNZWRpYU1hbmFnZXIgZnJvbSAnLi4vLi4vY2xhc3Nlcy9jbGllbnQvTWVkaWFNYW5hZ2VyJztcblxuLy8gSGVscGVyc1xuaW1wb3J0IHsgYW5nbGUyZCB9IGZyb20gJy4uLy4uL2NsYXNzZXMvSGVscGVycy9neDJEJztcbmltcG9ydCB7IHRocm90dGxlIH0gZnJvbSAnLi4vLi4vY2xhc3Nlcy9IZWxwZXJzL3Rocm90dGxpbmcnO1xuXG4vLyB0aWxlIGNhbnZhc1xuY29uc3QgdGlsZUNhbnZhcyA9IGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyN0aWxlQ2FudmFzJyk7XG5jb25zdCB0aWxlQ29udGV4dCA9IHRpbGVDYW52YXMuZ2V0Q29udGV4dCgnMmQnKTtcbi8vIHNwcml0ZSBjYW52YXNcbmNvbnN0IHNwcml0ZUNhbnZhcyA9IGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyNzcHJpdGVDYW52YXMnKTtcbmNvbnN0IHNwcml0ZUNvbnRleHQgPSBzcHJpdGVDYW52YXMuZ2V0Q29udGV4dCgnMmQnKTtcbi8vIFVJIGNhbnZhcyBcbmNvbnN0IHVpQ2FudmFzID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI3VpQ2FudmFzJyk7XG5jb25zdCB1aUNvbnRleHQgPSB1aUNhbnZhcy5nZXRDb250ZXh0KCcyZCcpO1xuLy8gQ3Vyc29yIGNhbnZhc1xuY29uc3QgY3Vyc29yQ2FudmFzID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI2N1cnNvckNhbnZhcycpO1xuY29uc3QgY3Vyc29yQ29udGV4dCA9IGN1cnNvckNhbnZhcy5nZXRDb250ZXh0KCcyZCcpO1xuXG4vLyBNb2Rlc1xuY29uc3QgTU9ERV9QTEFZID0gJ1BMQVknO1xuY29uc3QgTU9ERV9FRElUID0gJ0VESVQnO1xuXG4vLyBBcHBsaWNhdGlvbiBnbG9iYWxzXG5jb25zdCBjbGllbnQgPSB7XG4gIHRva2VuOiB1bmRlZmluZWQsXG59O1xuY29uc3QgVElMRV9TQ0FMRSA9IEdhbWVTZXR0aW5ncy5USUxFX1NDQUxFO1xuY29uc3QgZ2FtZU1vZGUgPSBNT0RFX1BMQVk7XG5cbmNvbnN0IFRpbGVDb2xvck1hcCA9IG5ldyBNYXAoKTtcblRpbGVDb2xvck1hcC5zZXQoVGlsZVR5cGVzLkRJUlQsICcjNWIyNjA3Jyk7XG5UaWxlQ29sb3JNYXAuc2V0KFRpbGVUeXBlcy5HUkFTUywgJ2dyZWVuJyk7XG5UaWxlQ29sb3JNYXAuc2V0KFRpbGVUeXBlcy5ST0NLLCAnZ3JleScpO1xuVGlsZUNvbG9yTWFwLnNldChUaWxlVHlwZXMuV0FURVIsICdibHVlJyk7XG5UaWxlQ29sb3JNYXAuc2V0KFRpbGVUeXBlcy5QSVQsICdibGFjaycpO1xuVGlsZUNvbG9yTWFwLnNldChUaWxlVHlwZXMuQlJJREdFLCAnIzdjNGIyZScpO1xuXG4vLyBjb25zdCBTcHJpdGVUZXh0dXJlTWFwID0gbmV3IE1hcCgpO1xuLy8gU3ByaXRlVGV4dHVyZU1hcC5zZXQoU3ByaXRlVHlwZXMuQ0hFU1QsICcuL2ltYWdlcy9DaGVzdENsb3NlZC5wbmcnKTtcbi8vIFNwcml0ZVRleHR1cmVNYXAuc2V0KFNwcml0ZVR5cGVzLkZJUkVCQUxMLCAnLi9pbWFnZXMvRmlyZWJhbGxTdGF0aWMucG5nJyk7XG4vLyBTcHJpdGVUZXh0dXJlTWFwLnNldChTcHJpdGVUeXBlcy5QTEFZRVIsICcuL2ltYWdlcy9QbGF5ZXJPdmVyaGVhZC5wbmcnKTtcblxuY29uc3QgSW1hZ2VMb2FkZXIgPSBuZXcgTWFwKCk7XG5cbmxldCBwbGF5ZXJDaGFyYWN0ZXIgPSBudWxsO1xuXG4vLyBsZXZlbCB0aWxlcyAvIG9iamVjdHMgZm9yIG1hcCB0aGUgcGxheWVyIGlzIGN1cnJlbnRseSBvbi5cbmxldCB0aWxlTWFwID0gW107XG5sZXQgc3ByaXRlcyA9IENsaWVudEdsb2JhbHMuc3ByaXRlczsgLy8gW107IC8vIFNQUklURVxubGV0IHVpID0ge1xuICB0ZXh0U3ByaXRlczogW10sXG4gIGFkZENvbWJhdFRleHQodGV4dCkge1xuICAgIHRoaXMudGV4dFNwcml0ZXMucHVzaCh0ZXh0KTtcbiAgfSxcbiAgcmVtb3ZlQ29tYmF0VGV4dCh0ZXh0KSB7XG4gICAgdGhpcy50ZXh0U3ByaXRlcy5zcGxpY2UodGhpcy50ZXh0U3ByaXRlcy5pbmRleE9mKHRleHQpLCAxKTtcbiAgfVxufTtcblxubGV0IG1vdXNlUG9zaXRpb24gPSB7fTtcblxuZnVuY3Rpb24gb3BlbkNsaWVudFNvY2tldCgpIHtcbiAgY29uc29sZS5sb2coXCJPcGVuaW5nIHNvY2tldFwiKTtcbiAgbGV0IHNvY2sgPSBudWxsO1xuICB0cnkge1xuICAgIGNvbnN0IHByb3RvY29sID0gd2luZG93LmxvY2F0aW9uLnByb3RvY29sID09PSBcImh0dHBzOlwiID8gXCJ3c3NcIiA6IFwid3NcIjtcbiAgICBzb2NrID0gY2xpZW50LnNvY2tldCB8fCBuZXcgV2ViU29ja2V0KGAke3Byb3RvY29sfTovLyR7bG9jYXRpb24uaG9zdG5hbWV9OiR7bG9jYXRpb24ucG9ydH0vYCk7XG4gICAgY2xpZW50LnNvY2tldCA9IHNvY2s7XG4gIH0gY2F0Y2goZXgpIHtcbiAgICAvLyBFcnJvcnMgd2lsbCBiZSB0aHJvd24gaWYgbm90IHVzaW5nIGh0dHAsIGFzIGxvY2F0aW9uIG9iamVjdCBkYXRhIHdpbGwgbm90IGxvb2sgdGhlIHNhbWUuXG4gICAgY29uc29sZS5sb2coXCJFcnJvcjogXCIsIGV4KTtcbiAgICBjb25zb2xlLmxvZyhcIklmIHlvdSdyZSB0ZXN0aW5nIG9uIHRoZSBzZXJ2ZXIsIGRpZCB5b3UgcmVtZW1iZXIgdG8gdXNlIGxvY2FsaG9zdD9cIilcbiAgfVxuICBjb25zb2xlLmxvZyhcIlNlbmRpbmcgc29ja2V0IGJhY2tcIik7XG4gIHJldHVybiBzb2NrO1xufVxuXG4vLyBTdGFydCBzb2NrZXRcbmZ1bmN0aW9uIHN0YXJ0U29ja2V0Q2xpZW50KCkge1xuICAvLyBUT0RPOiBEb2VzIHRoaXMgY2F1c2UgY29uZmxpY3RzIGlmIGNhbGxlZCBtb3JlIHRoYW4gb25jZT9cbiAgbGV0IHNvY2sgPSBvcGVuQ2xpZW50U29ja2V0KCk7XG4gIC8vIHRyeSB7XG4gIC8vICAgY29uc3QgcHJvdG9jb2wgPSB3aW5kb3cubG9jYXRpb24ucHJvdG9jb2wgPT09IFwiaHR0cHM6XCIgPyBcIndzc1wiIDogXCJ3c1wiO1xuICAvLyAgIHNvY2sgPSBjbGllbnQuc29ja2V0IHx8IG5ldyBXZWJTb2NrZXQoYCR7cHJvdG9jb2x9Oi8vJHtsb2NhdGlvbi5ob3N0bmFtZX06JHtsb2NhdGlvbi5wb3J0fS9gKTtcbiAgLy8gICBjbGllbnQuc29ja2V0ID0gc29jaztcbiAgLy8gfSBjYXRjaChleCkge1xuICAvLyAgIC8vIEVycm9ycyB3aWxsIGJlIHRocm93biBpZiBub3QgdXNpbmcgaHR0cCwgYXMgbG9jYXRpb24gb2JqZWN0IGRhdGEgd2lsbCBub3QgbG9vayB0aGUgc2FtZS5cbiAgLy8gICBjb25zb2xlLmxvZyhcIkVycm9yOiBcIiwgZXgpO1xuICAvLyAgIGNvbnNvbGUubG9nKFwiSWYgeW91J3JlIHRlc3Rpbmcgb24gdGhlIHNlcnZlciwgZGlkIHlvdSByZW1lbWJlciB0byB1c2UgbG9jYWxob3N0P1wiKVxuICAvLyB9XG5cbiAgc29jay5vbm1lc3NhZ2UgPSBmdW5jdGlvbiBvbm1lc3NhZ2UoZXZlbnQpIHtcbiAgICBjb25zdCBtZXNzYWdlID0gSlNPTi5wYXJzZShldmVudC5kYXRhKTtcblxuICAgIHN3aXRjaCAobWVzc2FnZS50eXBlKSB7XG4gICAgICBjYXNlIE1lc3NhZ2VUeXBlcy5QT05HOlxuICAgICAgICAvLyBjb25zb2xlLmxvZyhcIlBvbmcgcmVjZWl2ZWQuXCIpO1xuICAgICAgICBicmVhaztcbiAgICAgIGNhc2UgTWVzc2FnZVR5cGVzLldobzpcbiAgICAgICAgLy8gc2VuZFBhY2thZ2UoTWVzc2FnZVR5cGVzLldobywgeyB3aG86ICdKYW1lczpkZjhjODAyM2FlJyB9KTtcbiAgICAgICAgYnJlYWs7XG4gICAgICBjYXNlIE1lc3NhZ2VUeXBlcy5BdXRoZW50aWNhdGlvbjpcbiAgICAgICAgaWYgKG1lc3NhZ2Uuc3VjY2VzcyA9PT0gdHJ1ZSkge1xuICAgICAgICAgIExvZ2luU3VjY2VlZGVkKG1lc3NhZ2UpO1xuICAgICAgICB9IGVsc2Uge1xuICAgICAgICAgIExvZ2luRmFpbGVkKG1lc3NhZ2UuZXJyb3IpO1xuICAgICAgICB9XG4gICAgICAgIGJyZWFrO1xuICAgICAgY2FzZSBNZXNzYWdlVHlwZXMuUG9ydDpcbiAgICAgICAgY29uc29sZS5sb2coJ1BPUlRFRCcpO1xuICAgICAgICBpZiAobWVzc2FnZS5zdWNjZXNzID09PSB0cnVlKSB7XG4gICAgICAgICAgbWVzc2FnZS5sZXZlbCA9IEpTT04ucGFyc2UobWVzc2FnZS5sZXZlbCk7XG4gICAgICAgICAgLy8gY29uc29sZS5sb2cobWVzc2FnZSk7XG4gICAgICAgICAgdGlsZU1hcCA9IG1lc3NhZ2UubGV2ZWwudGlsZU1hcDtcbiAgICAgICAgICBjb25zdCBtYXNzYWdlZFNwcml0ZURhdGEgPSBtZXNzYWdlLmxldmVsLnNwcml0ZXMubWFwKHMgPT4gY2xhc3NpZnlTcHJpdGUocy5zcGF3biwgcy5zcGF3bkNsYXNzKSk7XG4gICAgICAgICAgc3ByaXRlcy5wdXNoKC4uLm1hc3NhZ2VkU3ByaXRlRGF0YSk7IC8vIFNQUklURVxuICAgICAgICAgIG1hc3NhZ2VkU3ByaXRlRGF0YS5mb3JFYWNoKHMgPT4ge1xuICAgICAgICAgICAgc3ByaXRlc1tzLmluc3RhbmNlSWRdID0gcztcbiAgICAgICAgICB9KTtcbiAgICAgICAgICBcbiAgICAgICAgICBwbGF5ZXJDaGFyYWN0ZXIgPSBzcHJpdGVzLmZpbmQocyA9PiBzLmluc3RhbmNlSWQgPT09IG1lc3NhZ2UucGxheWVyQ2hhcmFjdGVyLmluc3RhbmNlSWQpOyAvLyBTUFJJVEVcbiAgICAgICAgICBwbGF5ZXJDaGFyYWN0ZXIuc2V0UG9zaXRpb24obWVzc2FnZS5wbGF5ZXJDaGFyYWN0ZXIucG9zaXRpb24pO1xuXG4gICAgICAgICAgLy8gVE9ETzogQ2FuIHdlIGRldGVybWluZSBpZiB0aGlzIGlzIGEgZmlyc3QgbG9hZD9cbiAgICAgICAgICBkcmF3Q2FudmFzKCk7XG4gICAgICAgIH0gZWxzZSB7XG4gICAgICAgICAgY29uc29sZS5sb2coXCJNZXNzYWdlIHdhcyBub3Qgc3VjY2Vzc2Z1bCEhISFcIiwgbWVzc2FnZSk7XG4gICAgICAgIH1cbiAgICAgICAgYnJlYWs7XG4gICAgICBjYXNlIE1lc3NhZ2VUeXBlcy5Nb3ZlVG86XG4gICAgICAgIC8vIERFQlVHOiBjb25zb2xlLmxvZyhcIkF0dGVtcHRlZCB0byBtb3ZlOiBcIiwgbWVzc2FnZSk7XG4gICAgICAgIHBsYXllckNoYXJhY3Rlci5zZXRQb3NpdGlvbihtZXNzYWdlKTtcbiAgICAgICAgZHJhd1Nwcml0ZXMoKTtcbiAgICAgICAgYnJlYWs7XG4gICAgICBjYXNlIE1lc3NhZ2VUeXBlcy5TcGF3bjpcbiAgICAgICAgaWYoIW1lc3NhZ2Uuc3Bhd25DbGFzcykge1xuICAgICAgICAgIGNvbnNvbGUuZXJyb3IoXCJObyBzcGF3biBjbGFzcyBwcm92aWRlZC5cIik7XG4gICAgICAgICAgcmV0dXJuO1xuICAgICAgICB9XG4gICAgICAgIGlmKG1lc3NhZ2Uuc3Bhd25DbGFzcyA9PT0gU3ByaXRlVHlwZXMuUExBWUVSKSB7XG4gICAgICAgICAgY29uc29sZS5sb2coXCJQbGF5ZXIgc3Bhd25lZDogXCIsIG1lc3NhZ2Uuc3Bhd24uaW5zdGFuY2VJZCk7XG4gICAgICAgICAgY29uc29sZS5sb2coJ1NwYXduIGluZm86ICcsIG1lc3NhZ2UpO1xuICAgICAgICB9XG4gICAgICAgIC8vIGNvbnN0IHNwYXduQ2xhc3MgPSBTcHJpdGVDbGFzc01hcC5nZXQobWVzc2FnZS5zcGF3bkNsYXNzKTtcbiAgICAgICAgaWYobWVzc2FnZS5zcGF3bi5pbnN0YW5jZUlkID09PSBwbGF5ZXJDaGFyYWN0ZXIuaW5zdGFuY2VJZCkgcmV0dXJuO1xuICAgICAgICAvLyBjb25zdCBuZXdTcGF3biA9IE9iamVjdC5hc3NpZ24obmV3IFNwcml0ZSgpLCBtZXNzYWdlLnNwYXduLCB7IHR5cGU6IG1lc3NhZ2Uuc3Bhd25DbGFzcyB9KTtcbiAgICAgICAgY29uc3QgbmV3U3Bhd24gPSBjbGFzc2lmeVNwcml0ZShtZXNzYWdlLnNwYXduLCBtZXNzYWdlLnNwYXduQ2xhc3MpO1xuICAgICAgICBzcHJpdGVzLnB1c2gobmV3U3Bhd24pO1xuICAgICAgICBzcHJpdGVzW25ld1NwYXduLmluc3RhbmNlSWRdID0gbmV3U3Bhd247XG4gICAgICAgIGJyZWFrO1xuICAgICAgY2FzZSBNZXNzYWdlVHlwZXMuRGVzcGF3bjpcbiAgICAgICAgLy8gY29uc29sZS5sb2coJ0Rlc3Bhd24gTWVzc2FnZTogJywgbWVzc2FnZSk7IC8vIG1lc3NhZ2Uuc3Bhd25JZFxuICAgICAgICBzcHJpdGVzLnNwbGljZShzcHJpdGVzLmZpbmRJbmRleChzID0+IHMuaW5zdGFuY2VJZCA9PT0gbWVzc2FnZS5zcGF3bklkKSwgMSk7XG4gICAgICAgIHNwcml0ZXNbbWVzc2FnZS5zcGF3bklkXSA9IHVuZGVmaW5lZDtcbiAgICAgICAgaWYobWVzc2FnZS5zcGF3bklkID09PSBwbGF5ZXJDaGFyYWN0ZXIuaW5zdGFuY2VJZCkge1xuICAgICAgICAgIC8vIFRPRE86IHJlc3Bhd25cbiAgICAgICAgfVxuICAgICAgICBkZWxldGUgc3ByaXRlc1ttZXNzYWdlLnNwYXduSWRdO1xuICAgICAgICBicmVhaztcbiAgICAgIGNhc2UgTWVzc2FnZVR5cGVzLkZyYW1lUXVldWU6XG4gICAgICAgIC8vIFRPRE86IGZpbmlzaCBiZWxvd1xuICAgICAgICBtZXNzYWdlLnF1ZXVlLmZvckVhY2goKGl0ZW0pID0+IHtcbiAgICAgICAgICBpZihpdGVtLnR5cGUgPT09IE1lc3NhZ2VUeXBlcy5VcGRhdGVTcHJpdGUpIHtcbiAgICAgICAgICAgIGNvbnN0IHNwcml0ZVVwZGF0ZUluZm8gPSBKU09OLnBhcnNlKGl0ZW0uc3ByaXRlKTtcbiAgICAgICAgICAgIGNvbnN0IHNwcml0ZVRvVXBkYXRlID0gc3ByaXRlc1tzcHJpdGVVcGRhdGVJbmZvLmluc3RhbmNlSWRdO1xuICAgICAgICAgICAgaWYoc3ByaXRlVG9VcGRhdGUpIHtcbiAgICAgICAgICAgICAgT2JqZWN0LmFzc2lnbihzcHJpdGVUb1VwZGF0ZSwgc3ByaXRlVXBkYXRlSW5mbyk7XG4gICAgICAgICAgICB9IGVsc2Uge1xuICAgICAgICAgICAgICAvLyBjb25zb2xlLmxvZyhcImNvdWxkbid0IGZpbmQgc3ByaXRlLlwiLCBzcHJpdGVVcGRhdGVJbmZvKTtcbiAgICAgICAgICAgIH1cbiAgICAgICAgICB9IGVsc2Uge1xuICAgICAgICAgICAgY29uc29sZS5sb2coXCJJbnZhbGlkIGZyYW1lIGFjdGlvblwiKTtcbiAgICAgICAgICB9XG4gICAgICAgIH0pO1xuICAgICAgICBkcmF3U3ByaXRlcygpO1xuICAgICAgICAvLyBUT0RPOiBEcmF3IHNwcml0ZSBjaGFuZ2VzIGFsbCBpbiBvbmUgZ28gLSBETyBOT1QgZHJhdyB0aGVtIGluIGVhY2ggaXRlcmF0aW9uIGFib3ZlLlxuICAgICAgICBicmVhaztcbiAgICAgIGNhc2UgTWVzc2FnZVR5cGVzLlRha2VEYW1hZ2U6XG4gICAgICAgIGhhbmRsZVRha2VEYW1hZ2UobWVzc2FnZSk7XG4gICAgICAgIGJyZWFrO1xuICAgICAgY2FzZSBNZXNzYWdlVHlwZXMuUGxheWVyRGVhdGg6XG4gICAgICAgIGhhbmRsZVBsYXllckRlYXRoKG1lc3NhZ2UpO1xuICAgICAgICBicmVhaztcbiAgICAgIGNhc2UgTWVzc2FnZVR5cGVzLlBsYXllclJlc3Bhd246XG4gICAgICAgIC8vIGNvbnNvbGUubG9nKCdSZXNwYXduIGluZm86ICcsIG1lc3NhZ2UpO1xuICAgICAgICBoYW5kbGVQbGF5ZXJSZXNwYXduKG1lc3NhZ2UpO1xuICAgICAgICBicmVhaztcbiAgICAgIGNhc2UgTWVzc2FnZVR5cGVzLkRFQlVHOlxuICAgICAgICBjb25zb2xlLmxvZygnRGVidWcgcGFja2FnZSByZWNlaXZlZC4gTWVzc2FnZTogJyArIG1lc3NhZ2UubWVzc2FnZSk7XG4gICAgICAgIGJyZWFrO1xuICAgICAgZGVmYXVsdDpcbiAgICAgICAgY29uc29sZS5sb2coJ01lc3NhZ2UgdHlwZSBub3QgcmVjb2duaXplZDogJywgbWVzc2FnZSk7XG4gICAgICAgIGJyZWFrO1xuICAgIH1cbiAgfTtcblxuICBzb2NrLm9uY2xvc2UgPSBmdW5jdGlvbiBvbmNsb3NlKHNvbWV0aGluZykge1xuICAgIGNvbnNvbGUubG9nKCdTb2NrZXQgQ2xvc2VkIC0+ICcsIHNvbWV0aGluZyk7XG4gICAgLy8gVE9ETzogSWYgdXNlciBkaWQgbm90IHB1cnBvc2VseSBkaXNjb25uZWN0LCBhdHRlbXB0IHRvIHJlY29ubmVjdFxuICB9O1xuICBzb2NrLm9uZXJyb3IgPSBmdW5jdGlvbiBvbmVycm9yKHNvbWV0aGluZykge1xuICAgIGNvbnNvbGUubG9nKCdTb21lIEVycm9yIC0+ICcsIHNvbWV0aGluZyk7XG4gICAgLy8gVE9ETzogRGV0ZXJtaW5lIGNvbmRpdGlvbnMgZm9yIHJlY29ubmVjdCBhbmQgdGhlbiB1c2UgdGhlbSB0byBjcmVhdGUgcmVjb25uZWN0IGxvZ2ljLlxuICB9O1xufVxuXG5jb25zdCBoYW5kbGVUYWtlRGFtYWdlID0gZnVuY3Rpb24gaGFuZGxlVGFrZURhbWFnZShtZXNzYWdlKSB7XG4gIGNvbnN0IHRhcmdldCA9IHNwcml0ZXNbbWVzc2FnZS50YXJnZXRdO1xuICBjb25zdCBkYW1hZ2UgPSBtZXNzYWdlLmRhbWFnZTtcbiAgY29uc3QgdGV4dCA9IG5ldyBDb21iYXRUZXh0KFxuICAgIHsgXG4gICAgICB0ZXh0OiAnLScgKyBkYW1hZ2UsIFxuICAgICAgbGlmZVRpbWU6IDEwMDAsXG4gICAgICBwb3NpdGlvbjoge1xuICAgICAgICB4OiB0YXJnZXQucG9zaXRpb24ueCAtIDE2LFxuICAgICAgICB5OiB0YXJnZXQucG9zaXRpb24ueSAtIDE2LFxuICAgICAgfVxuICAgIH0sIFxuICAgIGZ1bmN0aW9uKCkge1xuICAgICAgdWkucmVtb3ZlQ29tYmF0VGV4dCh0ZXh0KTtcbiAgICB9XG4gICk7XG4gIHVpLmFkZENvbWJhdFRleHQodGV4dCk7XG4gIHRhcmdldC5zdGF0cy5ocCA9IG1lc3NhZ2UucmVtYWluaW5nSHA7XG4gIHRhcmdldC5zdGF0cy5tYXhIcCA9IG1lc3NhZ2UubWF4SHA7XG59XG5cbmNvbnN0IGhhbmRsZVBsYXllckRlYXRoID0gZnVuY3Rpb24gaGFuZGxlUGxheWVyRGVhdGgobWVzc2FnZSkge1xuICBjb25zdCB0YXJnZXQgPSBzcHJpdGVzLmZpbmQocyA9PiBzLmluc3RhbmNlSWQgPT09IG1lc3NhZ2UudGFyZ2V0KTtcbiAgdGFyZ2V0LmlzRGVhZCA9IHRydWU7XG4gIFxufVxuY29uc3QgaGFuZGxlUGxheWVyUmVzcGF3biA9IGZ1bmN0aW9uIGhhbmRsZVBsYXllclJlc3Bhd24obWVzc2FnZSkge1xuICBjb25zdCB0YXJnZXQgPSBzcHJpdGVzLmZpbmQocyA9PiBzLmluc3RhbmNlSWQgPT09IG1lc3NhZ2UudGFyZ2V0KTtcbiAgdGFyZ2V0LmlzRGVhZCA9IGZhbHNlO1xuICB0YXJnZXQuc3RhdHMuaHAgPSB0YXJnZXQuc3RhdHMubWF4SHA7XG4gIC8vIGNvbnNvbGUubG9nKFwiRm91bmQ6IFwiLCB0YXJnZXQpO1xuICAvLyBjb25zb2xlLmxvZyhcIklEOiBcIiwgbWVzc2FnZS50YXJnZXQpO1xuICB0YXJnZXQuc2V0UG9zaXRpb24obWVzc2FnZS5wb3NpdGlvbik7XG59XG5cbmNvbnN0IHNlbmRMb2dpbiA9ICh1c2VybmFtZSwgcGFzc3dvcmQpID0+IHtcbiAgc2VuZFBhY2thZ2UoTWVzc2FnZVR5cGVzLldobywgeyB3aG86IHVzZXJuYW1lICsgJzonICsgcGFzc3dvcmQgfSk7XG59XG5cbmNvbnN0IGNsYXNzaWZ5U3ByaXRlID0gZnVuY3Rpb24gY2xhc3NpZnlTcHJpdGUoc3ByaXRlLCBzcHJpdGVDbGFzc1RhZykge1xuICBpZighc3ByaXRlQ2xhc3NUYWcpIHJldHVybiBzcHJpdGU7XG4gIGNvbnN0IHNwcml0ZUNsYXNzID0gQ2xpZW50U3ByaXRlQ2xhc3NNYXAuZ2V0KHNwcml0ZUNsYXNzVGFnKTtcbiAgaWYoIXNwcml0ZUNsYXNzIHx8IHNwcml0ZSBpbnN0YW5jZW9mIHNwcml0ZUNsYXNzKSByZXR1cm4gc3ByaXRlO1xuICBjb25zdCBjbGFzc2lmaWVkU3ByaXRlID0gT2JqZWN0LmFzc2lnbihuZXcgc3ByaXRlQ2xhc3MoKSwgc3ByaXRlKTtcbiAgcmV0dXJuIGNsYXNzaWZpZWRTcHJpdGU7XG59XG5cbi8vIFBpcGVsaW5lIG1lc3NhZ2UgaGFuZGxlcnNcbmZ1bmN0aW9uIExvZ2luU3VjY2VlZGVkKG1lc3NhZ2UgPSB7fSkge1xuXG4gIGNvbnNvbGUubG9nKFwibWVzc2FnZTogXCIsIG1lc3NhZ2UpO1xuXG4gIGlmICghbWVzc2FnZS5pbnN0YW5jZUlkKSByZXR1cm47XG4gIGNsaWVudC5pbnN0YW5jZUlkID0gbWVzc2FnZS5pbnN0YW5jZUlkOyAvLyBTYXZlIHRvIGdsb2JhbCBmb3IgbGF0ZXIgdXNlLlxuICB0b2FzdCgnV2VsY29tZScsICdDb25uZWN0ZWQgdG8gc2VydmVyLicpO1xuXG4gIGhpZGVVSSgnVUlfTG9naW4nKTtcbiAgXG4gIC8vIFRPRE86IFNob3cgbG9hZGluZyBtZXNzYWdlIC8gc3Bpbm5lclxuICBzdGFydEdhbWUoKTtcbn1cblxuZnVuY3Rpb24gTG9naW5GYWlsZWQoZXJyb3IgPSAnbm90IGRlZmluZWQnKSB7XG4gIC8qIGVzbGludC1kaXNhYmxlIG5vLWFsZXJ0ICovXG4gIHRvYXN0KCdZT1UgRkFJTEVEICh0byBsb2cgaW4pISEhJyk7XG4gIC8vIHRvYXN0KCdPaCBhbmQgdGhlIGVycm9yIHdhczogJywgZXJyb3IpO1xufVxuXG5mdW5jdGlvbiB0b2FzdCh0aXRsZSA9ICdUb2FzdCcsIG1lc3NhZ2UpIHtcbiAgLy8gVE9ETzogRGV2ZWxvcC9ib3Jyb3cgdG9hc3RlciBhbGVydFxuXG4gIGNvbnN0IHQgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yKCcjdG9hc3RfX3RlbXBsYXRlJyk7XG5cbiAgY29uc3QgdFRvYXN0ID0gdC5jb250ZW50LnF1ZXJ5U2VsZWN0b3IoJy50b2FzdCcpO1xuICBjb25zdCB0b2FzdERpdiA9IGRvY3VtZW50LmltcG9ydE5vZGUodFRvYXN0LCB0cnVlKTtcblxuICBjb25zdCB0Q2xvc2UgPSB0b2FzdERpdi5xdWVyeVNlbGVjdG9yKCcudG9hc3RfX2Nsb3NlJyk7XG4gIGNvbnN0IHRUaXRsZSA9IHRvYXN0RGl2LnF1ZXJ5U2VsZWN0b3IoJy50b2FzdF9fdGl0bGUnKTtcbiAgY29uc3QgdE1lc3NhZ2UgPSB0b2FzdERpdi5xdWVyeVNlbGVjdG9yKCcudG9hc3RfX21lc3NhZ2UnKTtcblxuICB0VGl0bGUudGV4dENvbnRlbnQgPSB0aXRsZTtcbiAgdE1lc3NhZ2UudGV4dENvbnRlbnQgPSBtZXNzYWdlO1xuICB0Q2xvc2UuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCAoZSkgPT4ge1xuICAgIC8vIFN0YXJ0IENTUyBhbmltYXRpb24uIFRha2VzIDIuNSBzZWNvbmRzLlxuICAgIHRvYXN0RGl2LmNsYXNzTGlzdC5hZGQoJ2Nsb3NpbmcnKTtcbiAgICAvLyBSZW1vdmUgYWZ0ZXIgY29tcGxldGVseSBmYWRlZCBvdXQuICgyLjUgc2Vjb25kcylcbiAgICBzZXRUaW1lb3V0KCgpID0+IHsgdG9hc3REaXYucGFyZW50RWxlbWVudC5yZW1vdmVDaGlsZCh0b2FzdERpdik7IH0sIDI1MDApO1xuICAgIGUuc3RvcFByb3BhZ2F0aW9uKCk7XG4gIH0pO1xuXG4gIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyN0b2FzdHMnKS5hcHBlbmRDaGlsZCh0b2FzdERpdik7XG59XG5cbi8vIFNldCB1cCBjYW52YXM6IChOb3RlOiBtYXkgbmVlZCB0byB1c2UgdGhpcyBsYXRlciB0byByZWluaXQgd2hlbiBzY3JlZW4gc2l6ZSBjaGFuZ2VzLilcbmZ1bmN0aW9uIGluaXRDYW52YXMoKSB7XG4gIGhhbmRsZVJlc2l6ZSgpO1xuICBpZiAodGlsZU1hcC5sZW5ndGggPiAwKSBkcmF3Q2FudmFzKCk7IC8vIFRPRE86IFB1dCB0aGlzIGluIGEgdGltZWQgbG9vcD9cbn1cblxuZnVuY3Rpb24gaGFuZGxlUmVzaXplKCkge1xuICB1aUNhbnZhcy53aWR0aCA9IHNwcml0ZUNhbnZhcy53aWR0aCA9IGN1cnNvckNhbnZhcy53aWR0aCA9IHRpbGVDYW52YXMud2lkdGggPSBkb2N1bWVudC5ib2R5Lm9mZnNldFdpZHRoO1xuICB1aUNhbnZhcy5oZWlnaHQgPSBzcHJpdGVDYW52YXMuaGVpZ2h0ID0gY3Vyc29yQ2FudmFzLmhlaWdodCA9IHRpbGVDYW52YXMuaGVpZ2h0ID0gZG9jdW1lbnQuYm9keS5vZmZzZXRIZWlnaHQ7XG4gIGRyYXdDYW52YXMoKTtcbn1cblxuLy8gRHJhdyBjYW52YXNcbmZ1bmN0aW9uIGRyYXdDYW52YXMoKSB7XG4gIC8vIGNsZWFyIGJnXG4gIHRpbGVDb250ZXh0LmZpbGxTdHlsZSA9ICdjeWFuJzsgLy8gY2xlYXIgY29sb3JcbiAgdGlsZUNvbnRleHQuZmlsbFJlY3QoMCwgMCwgdGlsZUNhbnZhcy53aWR0aCwgdGlsZUNhbnZhcy5oZWlnaHQpO1xuXG4gIC8vIGRyYXcgYmFja2dyb3VuZCB0aWxlc1xuICBkcmF3QmFja2dyb3VuZCgpO1xuXG4gIC8vIGRyYXcgc3ByaXRlc1xuICBkcmF3U3ByaXRlcygpO1xuXG4gIC8vIGRyYXcgSFVEXG4gIGRyYXdIVUQoKTtcbn1cblxuY29uc3QgZHJhd0JhY2tncm91bmQgPSBmdW5jdGlvbiBkcmF3QmFja2dyb3VuZCgpIHtcbiAgLy8gVE9ETzogUmV3cml0ZSB1c2luZyBhcnJheSBmdW5jdGlvbnMgZm9yIGxvb3BpbmcuXG4gIGZvciAobGV0IHIgPSAwOyByIDwgdGlsZU1hcC5sZW5ndGg7IHIgKz0gMSkge1xuICAgIGNvbnN0IHJvdyA9IHRpbGVNYXBbcl07XG4gICAgZm9yIChsZXQgYyA9IDA7IGMgPCByb3cubGVuZ3RoOyBjICs9IDEpIHtcbiAgICAgIGNvbnN0IGNlbGwgPSByb3dbY107XG4gICAgICB0aWxlQ29udGV4dC5maWxsU3R5bGUgPSBUaWxlQ29sb3JNYXAuZ2V0KGNlbGwpO1xuICAgICAgdGlsZUNvbnRleHQuZmlsbFJlY3QoYyAqIFRJTEVfU0NBTEUsIHIgKiBUSUxFX1NDQUxFLCBUSUxFX1NDQUxFLCBUSUxFX1NDQUxFKTtcbiAgICB9XG4gIH1cbn07XG5cbmNvbnN0IGRyYXdTcHJpdGVzID0gZnVuY3Rpb24gZHJhd1Nwcml0ZXMoKSB7XG4gIC8vIFRPRE86IENoZWNrIGRpZmZlcmVuY2VzLiBPbmx5IGVyYXNlIHByZXZpb3VzIHNwcml0ZXMgaWYgdGhleSBtb3ZlZCBhbmQgcmVkcmF3Pz8/XG5cbiAgLy8gYnV0IGZvciBub3csIGxldHMganVzdCBjbGVhciBzcHJpdGVzIGFuZCByZWRyYXdcbiAgc3ByaXRlQ29udGV4dC5jbGVhclJlY3QoMCwgMCwgc3ByaXRlQ2FudmFzLndpZHRoLCBzcHJpdGVDYW52YXMuaGVpZ2h0KTtcblxuICBzcHJpdGVzLmZvckVhY2goKHNwcml0ZSkgPT4geyAgLy8gU1BSSVRFXG5cbiAgICBpZihzcHJpdGUuaXNEZWFkKSByZXR1cm47XG4gICAgaWYoc3ByaXRlLmRyYXcpIHtcbiAgICAgIHNwcml0ZS5kcmF3KHNwcml0ZUNvbnRleHQpO1xuICAgICAgcmV0dXJuO1xuICAgIH1cblxuICAgIGNvbnN0IGltYWdlU291cmNlID0gc3ByaXRlLnRleHR1cmUgfHwgU3ByaXRlVGV4dHVyZU1hcC5nZXQoc3ByaXRlLnR5cGUpO1xuICAgIGlmKGltYWdlU291cmNlID09PSB1bmRlZmluZWQpIGNvbnNvbGUubG9nKFwidW5kZWZpbmVkIGRhcm5pdC5cIiwgc3ByaXRlKTtcbiAgICBkcmF3U3ByaXRlKHNwcml0ZS5wb3NpdGlvbi54LCBzcHJpdGUucG9zaXRpb24ueSwgaW1hZ2VTb3VyY2UsIHNwcml0ZS5hbmdsZSB8fCAwKTtcblxuICB9KTtcbn07XG5cbmNvbnN0IGRyYXdIVUQgPSBmdW5jdGlvbiBkcmF3SFVEKCkge1xuICAvLyBUT0RPOiBkcmF3IEhVRFxuICB1aUNvbnRleHQuY2xlYXJSZWN0KDAsIDAsIHVpQ2FudmFzLndpZHRoLCB1aUNhbnZhcy5oZWlnaHQpO1xuICB1aS50ZXh0U3ByaXRlcy5mb3JFYWNoKChjYlRleHQpID0+IHtcbiAgICBpZihjYlRleHQuZHJhdykge1xuICAgICAgY2JUZXh0LmRyYXcodWlDb250ZXh0KTtcbiAgICB9XG4gIH0pO1xuXG4gIGNvbnN0IGNoYXJhY3RlcnMgPSBzcHJpdGVzLmZpbHRlcihzID0+IHMgaW5zdGFuY2VvZiBDaGFyYWN0ZXIpO1xuICBjaGFyYWN0ZXJzLmZvckVhY2goY2hhcmFjdGVyID0+IHtcbiAgICBpZihjaGFyYWN0ZXIuaW5zdGFuY2VJZCAhPT0gcGxheWVyQ2hhcmFjdGVyLmluc3RhbmNlSWQpXG4gICAgICBjb25zb2xlLmxvZyhcImNoZWNraW5nIHZpc2liaWxpdHkuXCIpO1xuXG4gICAgY29uc3QgYm91bmRzID0ge1xuICAgICAgbGVmdDogMCxcbiAgICAgIHJpZ2h0OiBzcHJpdGVDYW52YXMud2lkdGgsXG4gICAgICB0b3A6IDAsXG4gICAgICBib3R0b206IHNwcml0ZUNhbnZhcy5oZWlnaHRcbiAgICB9O1xuXG4gICAgaWYoY2hhcmFjdGVyLmlzVmlzaWJsZVRvKGJvdW5kcykpIHtcbiAgICAgIGNoYXJhY3Rlci5kcmF3SGVhbHRoQmFyKHVpQ29udGV4dCk7XG4gICAgfSBlbHNlIHtcbiAgICAgIC8vIGNvbnNvbGUubG9nKFwiUGxheWVyIGlzIG5vdCB2aXNpYmxlOiBcIiwgY2hhcmFjdGVyLmluc3RhbmNlSWQpO1xuICAgIH1cbiAgfSk7XG5cbn1cblxuLy8gQ2FudmFzIGhlbHBlciBmdW5jdGlvbnNcbmNvbnN0IGRyYXdDaXJjbGUgPSBmdW5jdGlvbiBkcmF3Q2lyY2xlKHgsIHksIHJhZGl1cyA9IFRJTEVfU0NBTEUsIGZpbGwgPSAnI0ZGRkZGRicsIHN0cm9rZUNvbG9yID0gJyMwMDAwMDAnKSB7XG4gIGNvbnN0IGNlbnRlclggPSAoeCAqIFRJTEVfU0NBTEUpICsgKFRJTEVfU0NBTEUgLyAyKTtcbiAgY29uc3QgY2VudGVyWSA9ICh5ICogVElMRV9TQ0FMRSkgKyAoVElMRV9TQ0FMRSAvIDIpO1xuXG4gIHRpbGVDb250ZXh0LmJlZ2luUGF0aCgpO1xuICB0aWxlQ29udGV4dC5hcmMoY2VudGVyWCwgY2VudGVyWSwgcmFkaXVzLCAwLCAyICogTWF0aC5QSSwgZmFsc2UpO1xuICB0aWxlQ29udGV4dC5maWxsU3R5bGUgPSBmaWxsO1xuICB0aWxlQ29udGV4dC5maWxsKCk7XG4gIHRpbGVDb250ZXh0LmxpbmVXaWR0aCA9IDE7XG4gIHRpbGVDb250ZXh0LnN0cm9rZVN0eWxlID0gc3Ryb2tlQ29sb3I7XG4gIHRpbGVDb250ZXh0LnN0cm9rZSgpO1xufTtcblxuY29uc3QgZHJhd1Nwcml0ZSA9IGZ1bmN0aW9uIGRyYXdTcHJpdGUoeCwgeSwgaW1hZ2VTb3VyY2UsIGFuZ2xlID0gbnVsbCkge1xuICAvLyBjb25zdCBpbWdFbGVtZW50ID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI2ltYWdlLWxvYWRlcicpO1xuXG4gIGxldCBpbWdFbGVtZW50ID0gTWVkaWFNYW5hZ2VyLmxvYWRJbWFnZShpbWFnZVNvdXJjZSk7XG4gIGxldCByb3RBbmdsZSA9IDA7XG4gIGlmIChhbmdsZSkge1xuICAgIHJvdEFuZ2xlID0gYW5nbGU7XG4gIH1cbiAgaWYgKCFpbWdFbGVtZW50KSB7XG4gICAgaW1nRWxlbWVudCA9IG5ldyBJbWFnZSgpO1xuICAgIGltZ0VsZW1lbnQuc3JjID0gaW1hZ2VTb3VyY2U7XG4gICAgY29uc3Qgb25JbWFnZUxvYWQgPSAoKSA9PiB7XG4gICAgICBzcHJpdGVDb250ZXh0LnRyYW5zbGF0ZSh4ICwgeSk7XG4gICAgICBzcHJpdGVDb250ZXh0LnJvdGF0ZShyb3RBbmdsZSk7XG4gICAgICBzcHJpdGVDb250ZXh0LmRyYXdJbWFnZShpbWdFbGVtZW50LCAtMTYsIC0xNik7XG4gICAgICBzcHJpdGVDb250ZXh0LnJvdGF0ZSgtcm90QW5nbGUpO1xuICAgICAgc3ByaXRlQ29udGV4dC50cmFuc2xhdGUoLXgsIC15KTtcblxuICAgICAgSW1hZ2VMb2FkZXIuc2V0KGltYWdlU291cmNlLCBpbWdFbGVtZW50KTtcbiAgICAgIGltZ0VsZW1lbnQucmVtb3ZlRXZlbnRMaXN0ZW5lcignbG9hZCcsIG9uSW1hZ2VMb2FkKTtcbiAgICB9O1xuICAgIC8vIFRPRE86IGhhbmRsZSBlcnJvcnMgd2hlcmUgaW1hZ2VzIGFyZSBub3QgZm91bmQuXG4gICAgaW1nRWxlbWVudC5hZGRFdmVudExpc3RlbmVyKCdsb2FkJywgb25JbWFnZUxvYWQpO1xuICB9IGVsc2Uge1xuICAgIHNwcml0ZUNvbnRleHQudHJhbnNsYXRlKHgsIHkpO1xuICAgIHNwcml0ZUNvbnRleHQucm90YXRlKHJvdEFuZ2xlKTtcbiAgICBzcHJpdGVDb250ZXh0LmRyYXdJbWFnZShpbWdFbGVtZW50LCAtMTYsIC0xNik7XG4gICAgc3ByaXRlQ29udGV4dC5yb3RhdGUoLXJvdEFuZ2xlKTtcbiAgICBzcHJpdGVDb250ZXh0LnRyYW5zbGF0ZSgteCwgLXkpO1xuICB9XG5cbn07XG5cbmZ1bmN0aW9uIGtleVByZXNzZWQoa2V5TmFtZSwgbWVzc2FnZSA9IHt9KSB7XG4gIC8vIElmIHRoZSBrZXlOYW1lIHN0YXJ0cyB3aXRoIFVubWFwcGVkLi4uXG4gIGlmIChrZXlOYW1lLnRvVXBwZXJDYXNlKCkuaW5kZXhPZignVU5NQVBQRUQnKSA9PT0gMCkge1xuICAgIGNvbnN0IGNvZGUgPSBwYXJzZUludChrZXlOYW1lLnNwbGl0KCc6JylbMV0sIDEwKTtcbiAgICBjb25zb2xlLmxvZyhgVW5tYXBwZWQga2V5IHByZXNzZWQ6ICR7Y29kZX1gKTtcbiAgfSBlbHNlIHtcbiAgICBzZW5kUGFja2FnZShNZXNzYWdlVHlwZXMuS2V5UHJlc3NlZCwgeyBhY3Rpb246IGtleU5hbWUsIG1lc3NhZ2U6IG1lc3NhZ2UgfSk7XG4gIH1cbn1cbmZ1bmN0aW9uIGtleVJlbGVhc2VkKGtleU5hbWUpIHtcbiAgaWYgKGtleU5hbWUuaW5kZXhPZignVU5NQVBQRUQnKSA9PT0gMCkge1xuICAgIGNvbnN0IGNvZGUgPSBwYXJzZUludChrZXlOYW1lLnNwbGl0KCc6JylbMV0sIDEwKTtcbiAgICBjb25zb2xlLmxvZyhgVW5tYXBwZWQga2V5IHJlbGVhc2VkOiAke2NvZGV9YCk7XG4gIH0gZWxzZSB7XG4gICAgc2VuZFBhY2thZ2UoTWVzc2FnZVR5cGVzLktleVJlbGVhc2VkLCB7IGFjdGlvbjoga2V5TmFtZSB9KTtcbiAgfVxufVxuXG5cbmNvbnN0IGtleU1hcCA9IFtcbiAgeyBjb2RlOiA2NSwgYWN0aW9uOiBQbGF5ZXJBY3Rpb25zLkxFRlQgfSwgLy8gYVxuICB7IGNvZGU6IDY1LCBhY3Rpb246IFBsYXllckFjdGlvbnMuTEVGVCB9LFxuICB7IGNvZGU6IDM3LCBhY3Rpb246IFBsYXllckFjdGlvbnMuTEVGVCB9LCAvLyBsZWZ0IGFycm93XG4gIHsgY29kZTogODcsIGFjdGlvbjogUGxheWVyQWN0aW9ucy5VUCB9LCAvLyB3XG4gIHsgY29kZTogMzgsIGFjdGlvbjogUGxheWVyQWN0aW9ucy5VUCB9LCAvLyB1cCBhcnJvd1xuICB7IGNvZGU6IDY4LCBhY3Rpb246IFBsYXllckFjdGlvbnMuUklHSFQgfSwgLy8gZFxuICB7IGNvZGU6IDM5LCBhY3Rpb246IFBsYXllckFjdGlvbnMuUklHSFQgfSwgLy8gcmlnaHQgYXJyb3dcbiAgeyBjb2RlOiA4MywgYWN0aW9uOiBQbGF5ZXJBY3Rpb25zLkRPV04gfSwgLy8gc1xuICB7IGNvZGU6IDQwLCBhY3Rpb246IFBsYXllckFjdGlvbnMuRE9XTiB9LCAvLyBkb3duIGFycm93XG4gIHsgY29kZTogMTYsIGFjdGlvbjogUGxheWVyQWN0aW9ucy5TSElGVCB9LFxuICB7IGNvZGU6IDMyLCBhY3Rpb246IFBsYXllckFjdGlvbnMuU0hPT1RfUFJPSkVDVElMRSB9LCAvLyBzcGFjZSBiYXJcbl07XG5cbi8vIExvdyBMZXZlbCBFdmVudCBIYW5kbGVyc1xuZnVuY3Rpb24ga2V5RG93bihlKSB7XG4gIGNvbnN0IGtleUluZm8gPSBrZXlNYXAuZmluZChrID0+IGsuY29kZSA9PT0gZS5rZXlDb2RlKTtcbiAgaWYgKGtleUluZm8pIHtcbiAgICBsZXQgbWVzc2FnZSA9IHt9O1xuICAgIHN3aXRjaChrZXlJbmZvLmFjdGlvbikge1xuICAgICAgY2FzZSBQbGF5ZXJBY3Rpb25zLlNIT09UX1BST0pFQ1RJTEU6XG4gICAgICAgIC8vIGNvbnNvbGUubG9nKFwidHJ5aW5nIHRvIHNob290IGZpcmViYWxsXCIpO1xuICAgICAgICBzaG9vdEZpcmViYWxsKG1vdXNlUG9zaXRpb24pO1xuICAgICAgICBicmVhaztcbiAgICAgIGRlZmF1bHQ6XG4gICAgICAgIGtleVByZXNzZWQoa2V5SW5mby5hY3Rpb24sIG1lc3NhZ2UpO1xuICAgICAgICBicmVhaztcbiAgICB9XG4gIH0gZWxzZSB7XG4gICAga2V5UHJlc3NlZChgJHtQbGF5ZXJBY3Rpb25zLlVOTUFQUEVEfToke2Uua2V5Q29kZX1gKTtcbiAgfVxufVxuZnVuY3Rpb24ga2V5VXAoZSkge1xuICBjb25zdCBrZXlJbmZvID0ga2V5TWFwLmZpbmQoayA9PiBrLmNvZGUgPT09IGUua2V5Q29kZSk7XG4gIGlmIChrZXlJbmZvKSB7XG4gICAga2V5UmVsZWFzZWQoa2V5SW5mby5hY3Rpb24pO1xuICB9IGVsc2Uge1xuICAgIGtleVJlbGVhc2VkKGAke1BsYXllckFjdGlvbnMuVU5NQVBQRUR9OiR7ZS5rZXlDb2RlfWApO1xuICB9XG59XG5sZXQgbGFzdE1vdmVQYWNrYWdlID0gK0RhdGUubm93KCk7XG5jb25zdCBtb3ZlSW50ZXJ2YWwgPSAyNTA7XG5mdW5jdGlvbiBtb3VzZU1vdmUoZSkge1xuXG4gIGxldCBhbmdsZSA9IDA7XG4gIGlmKCFwbGF5ZXJDaGFyYWN0ZXIpIHJldHVybjtcblxuICBpZihwbGF5ZXJDaGFyYWN0ZXIucG9zaXRpb24pIHtcbiAgICBhbmdsZSA9IGFuZ2xlMmQocGxheWVyQ2hhcmFjdGVyLnBvc2l0aW9uLngsIHBsYXllckNoYXJhY3Rlci5wb3NpdGlvbi55LCBlLmNsaWVudFgsIGUuY2xpZW50WSk7XG4gIH1cbiAgLy8gTG9jYWwgb25seVxuICBpZighcGxheWVyQ2hhcmFjdGVyLmlzV2Fsa2luZykge1xuICAgIHBsYXllckNoYXJhY3Rlci5hbmdsZSA9IGFuZ2xlICsgTWF0aC5QSSAvIDI7IC8vIFBsYXllciBjaGFyYWN0ZXIgc3RhcnRzIGZhY2luZyB0aGUgd3Jvbmcgd2F5LiBcbiAgfVxuXG4gIG1vdXNlUG9zaXRpb24gPSB7IHg6IGUuY2xpZW50WCwgeTogZS5jbGllbnRZIH07XG5cbiAgaWYoK0RhdGUubm93KCkgPiBsYXN0TW92ZVBhY2thZ2UgKyBtb3ZlSW50ZXJ2YWwpIHtcbiAgICAvLyBjb25zb2xlLmxvZyhcInNlbmRpbmcgbW92ZSBwYWNrYWdlXCIpO1xuICAgIHNlbmRQYWNrYWdlKE1lc3NhZ2VUeXBlcy5Nb3VzZU1vdmUsIHsgYWltOiBtb3VzZVBvc2l0aW9uIH0pO1xuICAgIGxhc3RNb3ZlUGFja2FnZSA9ICtEYXRlLm5vdygpO1xuICB9XG5cbiAgLy8gY3Vyc29yQ2FudmFzLmZvY3VzZWRUaWxlQ29vcmRzID0ge1xuICAvLyAgIHR4OiBNYXRoLmZsb29yKGUuY2xpZW50WCAvIFRJTEVfU0NBTEUpLFxuICAvLyAgIHR5OiBNYXRoLmZsb29yKGUuY2xpZW50WSAvIFRJTEVfU0NBTEUpXG4gIC8vIH07XG5cbiAgLy8gY2xlYXJDdXJzb3JzKCk7XG4gIC8vIGRyYXdDdXJzb3JzKCk7XG59XG5mdW5jdGlvbiBtb3VzZUNsaWNrKGUpIHtcbiAgLy8gc2VuZFBhY2thZ2UoTWVzc2FnZVR5cGVzLk1vdXNlQ2xpY2ssIHsgXG4gIC8vICAgYnV0dG9uOiBlLmJ1dHRvbixcbiAgLy8gICB4OiBlLmNsaWVudFgsXG4gIC8vICAgeTogZS5jbGllbnRZXG4gIC8vIH0pO1xufVxuZnVuY3Rpb24gbW91c2VEb3duKGUpIHtcbiAgaWYoZS5idXR0b24gPT09IDIpIHtcbiAgICBjb25zb2xlLmxvZyhcIkRPV046IFwiICsgZS5idXR0b24pO1xuICAgIGUucHJldmVudERlZmF1bHQoKTtcbiAgICByZXR1cm47XG4gIH0gZWxzZSB7XG4gICAgc2VuZFBhY2thZ2UoTWVzc2FnZVR5cGVzLk1vdXNlRG93biwgeyBcbiAgICAgIGJ1dHRvbjogZS5idXR0b24sXG4gICAgICB4OiBlLmNsaWVudFgsXG4gICAgICB5OiBlLmNsaWVudFlcbiAgICB9KTtcbiAgfVxufVxuZnVuY3Rpb24gbW91c2VVcChlKSB7XG4gIGlmKGUuYnV0dG9uID09PSAyKSB7XG4gICAgY29uc29sZS5sb2coXCJVUDogXCIgKyBlLmJ1dHRvbik7XG4gICAgZS5wcmV2ZW50RGVmYXVsdCgpO1xuICAgIHJldHVybjtcbiAgfSBlbHNlIHtcbiAgICBzZW5kUGFja2FnZShNZXNzYWdlVHlwZXMuTW91c2VVcCwgeyBcbiAgICAgIGJ1dHRvbjogZS5idXR0b24sXG4gICAgICB4OiBlLmNsaWVudFgsXG4gICAgICB5OiBlLmNsaWVudFlcbiAgICB9KTtcbiAgfVxufVxuXG5mdW5jdGlvbiBzaG9vdEZpcmViYWxsKHRvd2FyZFBvc2l0aW9uKSB7XG4gIHNlbmRQYWNrYWdlKE1lc3NhZ2VUeXBlcy5LZXlQcmVzc2VkLCB7IFxuICAgIGFjdGlvbjogUGxheWVyQWN0aW9ucy5TSE9PVF9QUk9KRUNUSUxFLCBcbiAgICBzdGFydDogcGxheWVyQ2hhcmFjdGVyLnBvc2l0aW9uLCBcbiAgICBhaW06IHsgeDogdG93YXJkUG9zaXRpb24ueCwgeTogdG93YXJkUG9zaXRpb24ueSB9XG4gIH0pO1xufVxuXG5mdW5jdGlvbiBjbGVhckN1cnNvcnMoKSB7XG4gIGN1cnNvckNvbnRleHQuY2xlYXJSZWN0KDAsIDAsIGN1cnNvckNhbnZhcy53aWR0aCwgY3Vyc29yQ2FudmFzLmhlaWdodCk7XG59XG5cbmZ1bmN0aW9uIHVwZGF0ZUN1cnNvcnMoKSB7XG4gIGNsZWFyQ3Vyc29ycygpO1xuICBkcmF3Q3Vyc29ycygpO1xufVxuXG5mdW5jdGlvbiBkcmF3Q3Vyc29ycygpIHtcbiAgY29uc3QgY3Vyc29ycyA9IFtcbiAgICB7XG4gICAgICB0eXBlOiAnU0VMRUNURUQnLFxuICAgICAgc291cmNlOiAnLi9pbWFnZXMvU2VsZWN0aW9uQ3Vyc29yU2VsZWN0ZWQucG5nJyxcbiAgICAgIHR4OiAoY3Vyc29yQ2FudmFzLnNlbGVjdGVkVGlsZUNvb3JkcyAmJiBjdXJzb3JDYW52YXMuc2VsZWN0ZWRUaWxlQ29vcmRzLnR4KSB8fCAwLFxuICAgICAgdHk6IChjdXJzb3JDYW52YXMuc2VsZWN0ZWRUaWxlQ29vcmRzICYmIGN1cnNvckNhbnZhcy5zZWxlY3RlZFRpbGVDb29yZHMudHkpIHx8IDBcbiAgICB9LFxuICBdO1xuICBpZiAoZ2FtZU1vZGUgPT09IE1PREVfRURJVCkge1xuICAgIGN1cnNvcnMucHVzaCh7XG4gICAgICB0eXBlOiAnRk9DVVNFRCcsXG4gICAgICBzb3VyY2U6ICcuL2ltYWdlcy9TZWxlY3Rpb25DdXJzb3JGb2N1c2VkLnBuZycsXG4gICAgICB0eDogKGN1cnNvckNhbnZhcy5mb2N1c2VkVGlsZUNvb3JkcyAmJiBjdXJzb3JDYW52YXMuZm9jdXNlZFRpbGVDb29yZHMudHgpIHx8IDAsXG4gICAgICB0eTogKGN1cnNvckNhbnZhcy5mb2N1c2VkVGlsZUNvb3JkcyAmJiBjdXJzb3JDYW52YXMuZm9jdXNlZFRpbGVDb29yZHMudHkpIHx8IDBcbiAgICB9KTtcbiAgfVxuICBjdXJzb3JzLmZvckVhY2goKGN1cnNvcikgPT4ge1xuICAgIGlmIChjdXJzb3IudHggPT09IG51bGwgfHwgY3Vyc29yLnR5ID09PSBudWxsKSByZXR1cm47XG4gICAgY29uc3QgY3Vyc29yU291cmNlID0gY3Vyc29yLnNvdXJjZTtcbiAgICBsZXQgY3Vyc29yRWxlbWVudCA9IEltYWdlTG9hZGVyLmdldChjdXJzb3JTb3VyY2UpO1xuICAgIGlmICghY3Vyc29yRWxlbWVudCkge1xuICAgICAgY3Vyc29yRWxlbWVudCA9IG5ldyBJbWFnZSgpO1xuICAgICAgY3Vyc29yRWxlbWVudC5zcmMgPSBjdXJzb3JTb3VyY2U7XG4gICAgICBjb25zdCBvbkltYWdlTG9hZCA9ICgpID0+IHtcbiAgICAgICAgY3Vyc29yQ29udGV4dC5kcmF3SW1hZ2UoY3Vyc29yRWxlbWVudCwgY3Vyc29yLnR4ICogVElMRV9TQ0FMRSwgY3Vyc29yLnR5ICogVElMRV9TQ0FMRSk7XG4gICAgICAgIEltYWdlTG9hZGVyLnNldChjdXJzb3JTb3VyY2UsIGN1cnNvckVsZW1lbnQpO1xuICAgICAgICBjdXJzb3JFbGVtZW50LnJlbW92ZUV2ZW50TGlzdGVuZXIoJ2xvYWQnLCBvbkltYWdlTG9hZCk7XG4gICAgICB9O1xuICAgICAgLy8gVE9ETzogaGFuZGxlIGVycm9ycyB3aGVyZSBpbWFnZXMgYXJlIG5vdCBmb3VuZC5cbiAgICAgIGN1cnNvckVsZW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignbG9hZCcsIG9uSW1hZ2VMb2FkKTtcbiAgICB9IGVsc2Uge1xuICAgICAgY3Vyc29yQ29udGV4dC5kcmF3SW1hZ2UoY3Vyc29yRWxlbWVudCwgY3Vyc29yLnR4ICogVElMRV9TQ0FMRSwgY3Vyc29yLnR5ICogVElMRV9TQ0FMRSk7XG4gICAgfVxuICB9KTtcbn1cblxuLy8gRXZlbnQgSGFuZGxlciBBYnN0cmFjdGlvbnNcbmNvbnN0IHRyeU1vdmVQbGF5ZXIgPSBmdW5jdGlvbiB0cnlNb3ZlUGxheWVyKGRpcikge1xuICAvLyBUT0RPOiBlbnN1cmUgd2UgYXJlIGFsbG93ZWQgdG8gbW92ZSBpbiB0aGUgZGlyZWN0aW9uIHdlIHdhbnQgdG8gYmVmb3JlIGF0dGVtcHRpbmcgdG8gbW92ZS5cbiAgY29uc3QgbmV3UG9zaXRpb24gPSB7XG4gICAgdHg6IHBsYXllckNoYXJhY3Rlci50eCxcbiAgICB0eTogcGxheWVyQ2hhcmFjdGVyLnR5LFxuICB9O1xuICBzd2l0Y2ggKGRpcikge1xuICAgIGNhc2UgJ0xFRlQnOlxuICAgICAgbmV3UG9zaXRpb24udHggPSBwbGF5ZXJDaGFyYWN0ZXIudHggLSAxO1xuICAgICAgYnJlYWs7XG4gICAgY2FzZSAnUklHSFQnOlxuICAgICAgbmV3UG9zaXRpb24udHggPSBwbGF5ZXJDaGFyYWN0ZXIudHggKyAxO1xuICAgICAgYnJlYWs7XG4gICAgY2FzZSAnVVAnOlxuICAgICAgbmV3UG9zaXRpb24udHkgPSBwbGF5ZXJDaGFyYWN0ZXIudHkgLSAxO1xuICAgICAgYnJlYWs7XG4gICAgY2FzZSAnRE9XTic6XG4gICAgICBuZXdQb3NpdGlvbi50eSA9IHBsYXllckNoYXJhY3Rlci50eSArIDE7XG4gICAgICBicmVhaztcbiAgICBkZWZhdWx0OlxuICAgICAgY29uc29sZS5sb2coJ0ludmFsaWQgRGlyZWN0aW9uJyk7XG4gICAgICBicmVhaztcbiAgfVxuICBpZiAoaXNXYWxrYWJsZShuZXdQb3NpdGlvbikpIHtcbiAgICBwbGF5ZXJDaGFyYWN0ZXIudHggPSBuZXdQb3NpdGlvbi50eDtcbiAgICBwbGF5ZXJDaGFyYWN0ZXIudHkgPSBuZXdQb3NpdGlvbi50eTtcbiAgfSBlbHNlIHtcbiAgICAvLyBUT0RPOiBwbGF5IFwiY2FuJ3Qgd2Fsa1wiIHNvdW5kLlxuICB9XG5cbiAgZHJhd0NhbnZhcygpO1xufTtcbmNvbnN0IGlzV2Fsa2FibGUgPSBmdW5jdGlvbiBpc1dhbGthYmxlKHRpbGUpIHtcbiAgLy8gdGlsZSBzaG91bGQgaGF2ZSBhdCBtaW5pbXVtOiB7IHggLCB5IH1cbiAgaWYgKHRpbGUudHkgPCAwIHx8IHRpbGUudHggPCAwKSByZXR1cm4gZmFsc2U7XG5cbiAgY29uc3QgdGlsZVR5cGVBdFBvc2l0aW9uID0gdGlsZU1hcFt0aWxlLnR5XVt0aWxlLnR4XTtcblxuICBpZiAoW1RpbGVUeXBlcy5ESVJULCBUaWxlVHlwZXMuR1JBU1MsIFRpbGVUeXBlcy5CUklER0VdLmluY2x1ZGVzKHRpbGVUeXBlQXRQb3NpdGlvbikpIHtcbiAgICBpZiAoIXNwcml0ZXMuZmlsdGVyKHMgPT4gcy50eCA9PT0gdGlsZS50eCAmJiBzLnR5ID09PSB0aWxlLnR5KS5sZW5ndGggPiAwKSB7IC8vIFNQUklURVxuICAgICAgcmV0dXJuIHRydWU7XG4gICAgfVxuICB9XG4gIHJldHVybiBmYWxzZTtcbn07XG5cbmZ1bmN0aW9uIGluaXRFdmVudEhhbmRsZXJzKCkge1xuICBkb2N1bWVudC5vbmtleWRvd24gPSBrZXlEb3duO1xuICBkb2N1bWVudC5vbmtleXVwID0ga2V5VXA7XG4gIGRvY3VtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ21vdXNlbW92ZScsIHRocm90dGxlKG1vdXNlTW92ZSwgNTApKTtcbiAgZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCBtb3VzZUNsaWNrKTtcbiAgd2luZG93Lm9ucmVzaXplID0gaGFuZGxlUmVzaXplO1xuICBkb2N1bWVudC5vbmRyYWdzdGFydCA9IChlKSA9PiBlLnByZXZlbnREZWZhdWx0KCk7XG4gIGRvY3VtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ21vdXNlZG93bicsIG1vdXNlRG93bik7XG4gIGRvY3VtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ21vdXNldXAnLCBtb3VzZVVwKVxuICBkb2N1bWVudC5hZGRFdmVudExpc3RlbmVyKCdjb250ZXh0bWVudScsIGZ1bmN0aW9uKGUpIHtcbiAgICBlLnByZXZlbnREZWZhdWx0KCk7XG4gIH0pXG59XG5cbi8vIEluaXRpYXRlIGdhbWVcbmZ1bmN0aW9uIHN0YXJ0R2FtZSgpIHtcbiAgaW5pdENhbnZhcygpO1xuICBpbml0RXZlbnRIYW5kbGVycygpO1xuICBzZW5kUGFja2FnZShNZXNzYWdlVHlwZXMuUG9ydCwgeyBsZXZlbElkOiAxIH0pO1xuICB1cGRhdGVMb29wKCk7XG59XG5cbmxldCBsb29wVGltZSA9IHBlcmZvcm1hbmNlLm5vdygpO1xuZnVuY3Rpb24gdXBkYXRlTG9vcCh0aW1lc3RhbXAgPSBwZXJmb3JtYW5jZS5ub3coKSkgeyAvLyBUT0RPOiBSZW5hbWUuIChkcmF3TG9vcCgpID8/PyApXG4gIGlmKGNsaWVudC5zb2NrZXQucmVhZHlTdGF0ZSAhPT0gV2ViU29ja2V0Lk9QRU4pIHtcbiAgICB0b2FzdChcIldlYnNvY2tldCBoYXMgY2xvc2VkLlwiLCBcInN0b3BwZWQgZHJhd2luZ1wiKTtcbiAgICByZXR1cm47XG4gIH1cblxuICBsZXQgZGVsdGEgPSB0aW1lc3RhbXAgLSBsb29wVGltZTtcbiAgdXBkYXRlSFVEKGRlbHRhKTtcblxuICBsb29wVGltZSA9IHRpbWVzdGFtcDtcblxuICBkcmF3Q2FudmFzKCk7XG4gIC8vIGVuc3VyZSBuZXh0IGZyYW1lIHJ1bnMuXG4gIHdpbmRvdy5yZXF1ZXN0QW5pbWF0aW9uRnJhbWUodXBkYXRlTG9vcCk7XG59XG5cbmNvbnN0IHVwZGF0ZUhVRCA9IGZ1bmN0aW9uIHVwZGF0ZUhVRChkZWx0YSkge1xuICB1aS50ZXh0U3ByaXRlcy5mb3JFYWNoKChjYlRleHQpID0+IHtcbiAgICBpZihjYlRleHQudXBkYXRlKSB7XG4gICAgICBjYlRleHQudXBkYXRlKGRlbHRhKTtcbiAgICB9XG4gIH0pO1xuXG4gIGNvbnN0IGNoYXJhY3RlcnMgPSBzcHJpdGVzLmZpbHRlcihzID0+IHMgaW5zdGFuY2VvZiBDaGFyYWN0ZXIpO1xuICBjaGFyYWN0ZXJzLmZvckVhY2goY2hhcmFjdGVyID0+IHtcbiAgICAvLyBjb25zb2xlLmxvZyhcInNldHRpbmcgc3RhdHMgdG8gXCIgKyBjaGFyYWN0ZXIuaGVhbHRoICsgXCIgXCIgKyBjaGFyYWN0ZXIuc3RhdHMubWF4SHAgKyBcIiBmb3I6IFwiLCBjaGFyYWN0ZXIpO1xuICAgIGlmKGNoYXJhY3Rlci5oZWFsdGhCYXIpIHtcbiAgICAgIGNoYXJhY3Rlci5oZWFsdGhCYXIuc3RhdHMuY3VycmVudCA9IGNoYXJhY3Rlci5zdGF0cy5ocDtcbiAgICAgIGNoYXJhY3Rlci5oZWFsdGhCYXIuc3RhdHMubWF4ID0gY2hhcmFjdGVyLnN0YXRzLm1heEhwO1xuICAgIH1cbiAgfSk7XG59XG5cbmNvbnN0IHNlbmRQYWNrYWdlID0gYXN5bmMgZnVuY3Rpb24gc2VuZFBhY2thZ2UodHlwZSA9IG51bGwsIGF0dHJpYnV0ZXMgPSB7fSwgcmVjb25uZWN0ID0gdHJ1ZSkge1xuICBpZiAodHlwZSA9PT0gbnVsbCkgdGhyb3cgbmV3IEVycm9yKCdQYWNrYWdlIHR5cGUgbXVzdCBiZSBzcGVjaWZpZWQuJyk7XG5cbiAgaWYoW1dlYlNvY2tldC5DTE9TRUQsIFdlYlNvY2tldC5DTE9TSU5HXS5pbmNsdWRlcyhjbGllbnQuc29ja2V0LnJlYWR5U3RhdGUpKSB7XG4gICAgaWYocmVjb25uZWN0KSB7XG4gICAgICBjb25zb2xlLmxvZyhcIlJlY29ubmVjdGluZy5cIik7XG4gICAgICBjbGllbnQuc29ja2V0ID0gYXdhaXQgb3BlbkNsaWVudFNvY2tldCgpO1xuICAgIH0gZWxzZSB7XG4gICAgICBjb25zb2xlLmxvZyhcIlNvY2tldCBpcyBjbG9zZWQuIFRoaXMgd2lsbCBub3Qgd29yay5cIik7XG4gICAgfVxuICB9XG4gIGNsaWVudC5zb2NrZXQuc2VuZChKU09OLnN0cmluZ2lmeShPYmplY3QuYXNzaWduKHsgdHlwZSB9LCBhdHRyaWJ1dGVzKSkpO1xufTtcblxuXG5zZXRJbnRlcnZhbChmdW5jdGlvbiBwaW5nUG9uZygpIHtcbiAgc2VuZFBhY2thZ2UoTWVzc2FnZVR5cGVzLlBJTkcsIHt9KTtcbiAgLy8gY29uc29sZS5sb2coXCJQaW5nIHNlbnQuXCIpO1xufSwgMjUwMDApO1xuXG5zdGFydFNvY2tldENsaWVudCgpOyAvLyBUT0RPOiBOZWVkIHRvIG1vbml0b3IgYW5kIHJlY29ubmVjdFxuXG5cblxuXG5cblxuXG5cblxuXG5cblxuXG4vLyBUT0RPOiBNb3ZlIHRvIHNlcGFyYXRlIG1vZHVsZVxuLy8vIFVJIE1hbmFnZXJcblxuY29uc3QgVUlQYXJlbnQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnVUlfT3ZlcmxheScpO1xuVUlQYXJlbnQudmlzaWJsZUNoaWxkcmVuID0gW2RvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdVSV9Mb2dpbicpXTtcblxuZnVuY3Rpb24gc2hvd1VJKHVpRWxlbWVudElkKSB7XG4gIC8vIEdldCBVSSBlbGVtZW50XG4gIGNvbnN0IHVpRWxlbWVudCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKHVpRWxlbWVudElkKTtcblxuICAvLyBpZiBub3RoaW5nIGlzIHJldHVybmVkIG9yIGlmIGl0J3MgYWxyZWFkeSB2aXNpYmxlIHdlIGRvbid0IG5lZWQgdG8gZG8gYW55dGhpbmdcbiAgaWYoIXVpRWxlbWVudCB8fCBVSVBhcmVudC52aXNpYmxlQ2hpbGRyZW4uaW5jbHVkZXModWlFbGVtZW50KSkgcmV0dXJuO1xuXG4gIC8vIG90aGVyd2lzZSByZW1vdmUgdGhlIGhpZGRlbiBjbGFzc1xuICB1aUVsZW1lbnQuY2xhc3NMaXN0LnJlbW92ZShcImhpZGRlblwiKTtcbiAgVUlQYXJlbnQuY2xhc3NMaXN0LnJlbW92ZShcImhpZGRlblwiKTtcblxuICAvLyAuLi4gYW5kIGtlZXAgdHJhY2suXG4gIFVJUGFyZW50LnZpc2libGVDaGlsZHJlbi5wdXNoKHVpRWxlbWVudCk7XG59XG5cbmZ1bmN0aW9uIGhpZGVVSSh1aUVsZW1lbnQpIHtcbiAgXG4gIGlmKCF1aUVsZW1lbnQpIHJldHVybjtcblxuICBpZih0eXBlb2YgdWlFbGVtZW50ID09PSB0eXBlb2YgXCJcIikge1xuICAgIHVpRWxlbWVudCA9IGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoYCMke3VpRWxlbWVudH1gKTtcbiAgfVxuXG4gIHVpRWxlbWVudC5jbGFzc0xpc3QuYWRkKFwiaGlkZGVuXCIpO1xuXG4gIGNvbnN0IGluZGV4ID0gVUlQYXJlbnQudmlzaWJsZUNoaWxkcmVuLmluZGV4T2YodWlFbGVtZW50KTtcbiAgaWYoaW5kZXggIT09IC0xKSB7XG4gICAgVUlQYXJlbnQudmlzaWJsZUNoaWxkcmVuLnNwbGljZShpbmRleCwgMSk7XG4gIH1cblxuICBpZihVSVBhcmVudC52aXNpYmxlQ2hpbGRyZW4ubGVuZ3RoID09PSAwKSBVSVBhcmVudC5jbGFzc0xpc3QuYWRkKFwiaGlkZGVuXCIpO1xuXG59XG5cbi8vIFVJIEltcGxlbWVudGF0aW9uXG5cbmNvbnN0IGxvZ2luQnV0dG9uID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ1VJX0xvZ2luX19CdXR0b24nKTtcblxubG9naW5CdXR0b24uYWRkRXZlbnRMaXN0ZW5lcignY2xpY2snLCAoZSkgPT4ge1xuICBlLnByZXZlbnREZWZhdWx0KCk7XG4gIGNvbnNvbGUubG9nKFwiTG9naW4gYnV0dG9uIGNsaWNrZWQuXCIpO1xuICBjb25zdCB1c2VybmFtZSA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdVSV9Vc2VybmFtZV9fSW5wdXQnKS52YWx1ZTtcbiAgY29uc3QgcGFzc3dvcmQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnVUlfUGFzc3dvcmRfX0lucHV0JykudmFsdWU7XG4gIHNlbmRMb2dpbih1c2VybmFtZSwgcGFzc3dvcmQpO1xufSlcblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xpZW50L2phdmFzY3JpcHQvaW5kZXguanMiXSwibWFwcGluZ3MiOiI7Ozs7QUFFQTtBQUNBOzs7QUFBQTtBQUNBOzs7QUFBQTtBQUNBOzs7QUFBQTtBQUNBOzs7QUFFQTtBQUNBOzs7QUFBQTtBQUNBOzs7QUFBQTtBQUNBO0FBQUE7QUFDQTs7O0FBRUE7QUFDQTtBQUFBO0FBQ0E7OztBQUFBO0FBQ0E7OztBQUVBO0FBQ0E7QUFBQTtBQUNBOzs7QUFyQkE7QUFDQTtBQUNBO0FBQ0E7QUFJQTtBQUNBO0FBQ0E7QUFJQTtBQUNBO0FBQ0E7QUFHQTtBQUNBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBREE7QUFHQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQVBBO0FBQ0E7QUFTQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBbEdBO0FBb0dBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUZBO0FBSEE7QUFTQTtBQUNBO0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFBQTtBQUFBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUpBO0FBQ0E7QUFNQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUVBO0FBQ0E7QUFDQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUE7QUFFQTtBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFHQTtBQUNBO0FBQ0E7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFQQTtBQVNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFIQTtBQUtBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUhBO0FBS0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUhBO0FBS0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUpBO0FBT0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBSkE7QUFNQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFGQTtBQUlBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBZkE7QUFpQkE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBWUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSIsInNvdXJjZVJvb3QiOiIifQ==");
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=client.bundle.js.map
