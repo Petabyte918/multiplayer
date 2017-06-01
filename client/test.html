@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <img src="./images/FireballAnimated.png" alt="" id="image">
+  <script>
+
+  const createdAt = +Date.now();
+
+  const frameWidth = 32;
+  const frameHeight = 32;
+  const frameRate = 18;
+
+  const frames = 3;
+
+  const imageElement = document.getElementById("image");
+
+  imageElement.style.objectFit = 'none';
+  imageElement.style.width = frameWidth + "px";
+  imageElement.style.height = frameHeight + "px";
+
+  imageElement.addEventListener('load', () => {
+    frames = imageElement.width / frameWidth;
+  });
+
+  function getFrame() {
+    const currentFrame = parseInt( (+Date.now() - createdAt) / 1000 * frameRate ) % frames;
+    imageElement.style.objectPosition = "-" + (frameWidth * currentFrame) + "px 0";
+  }
+
+  setInterval(getFrame, 10);
+
+  </script>
+</body>
+</html>

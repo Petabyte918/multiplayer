@@ -5,6 +5,8 @@ import ColliderTypes from '../ColliderTypes';
 
 import { distance2d, angle2d } from '../Helpers/gx2D';
 
+// import FireballAbility from './abilities/FireballAbility';
+
 //import World, { MessageTypes, sendPackage, broadcastPackage  } from '../GameEngine';
 
 class PlayerCharacter extends Character {
@@ -37,6 +39,10 @@ class PlayerCharacter extends Character {
     this.moveTarget = {};
 
     this.setTexture('./images/PlayerOverhead.png');
+
+    this.abilities = ['FIREBALL', 'BLUEBEAM'];
+
+    console.log("Abilities: ", this.abilities);
 
   }
 

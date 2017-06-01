@@ -15,10 +15,12 @@ import World from './classes/GameEngine';
 import { guid } from './classes/Helpers/guid';
 import { hashPassword } from './classes/Helpers/passhashing';
 import { sendPackage, broadcastPackage } from './classes/Helpers/messaging';
+import { addDistance2d } from './classes/Helpers/gx2D';
 
 // Internal Dependencies
 import Client from './classes/server/Client';
 import Level from './classes/shared/Level';
+import CharacterController from './classes/server/CharacterController';
 
 // Game Managers
 import DatabaseManager from './classes/server/DatabaseManager';
@@ -29,8 +31,10 @@ import fs from 'fs';
 // const serverConfig = JSON.parse(fs.readFileSync('./config.json'));
 
 // Game Objects
-import FireBall from './classes/shared/FireBall';
-import PlayerCharacter from './classes/shared/PlayerCharacter';
+// import FireBall from './classes/shared/FireBall';
+// import PlayerCharacter from './classes/shared/PlayerCharacter';
+// import FireballAbility from './classes/shared/abilities/FireballAbility'
+import Abilities from './classes/server/Abilities';
 
 // Constants & Enumerations
 import MessageTypes from './classes/MessageTypes';
@@ -141,6 +145,7 @@ const clientMessage = async function clientMessage(incoming = '{}') {
       if (await authenticate(this, message.who)) {
         // log("Getting player.");
         this.playerCharacter = DatabaseManager.getPlayer(this.user.character.name);
+        World.CharacterManager.addController(this.playerCharacter);
         sendPackage(
           this.socket,
           MessageTypes.Authentication,
@@ -310,27 +315,37 @@ const handlePlayerMoveRequest = function handlePlayerMoveRequest(client, message
 
 const handlePlayerFireRequest = function handlePlayerFireRequest(client, message) {
   const pc = client.playerCharacter;
-  //console.log("Firing from: ", client.playerCharacter.position);
-  const fireball = new FireBall(
-    {
-      start: pc.position,
-      aim: pc.hasMoveTarget ? pc.moveTarget : message.aim,
-      speed: GameSettings.TILE_SCALE * 12, // TODO: up to 12 when things seem good.
-      // owner: pc,
-      collider: {
-        ignoresIds: [ pc.instanceId ]
-      }
-    }
-  );
-  pc.collider.ignoresIds.push(fireball.instanceId);
-  let sprites = World.levels[pc.levelId].sprites;
-  sprites.push(fireball);
-  broadcastPackage(MessageTypes.Spawn, { spawnClass: SpriteTypes.FIREBALL, spawn: fireball });
+  const pcController = World.CharacterManager.getController(pc);
 
-  fireball.delete = () => {
-    sprites = sprites.splice(sprites.indexOf(fireball), 1);
-    broadcastPackage(MessageTypes.Despawn, { spawnId: fireball.instanceId });
-  };
+  // console.log(Abilities["FIREBALL"]);
+
+  // const fbAbility = new Abilities["FIREBALL"]();
+
+  pcController.useAbility("BLUEBEAM", message);
+
+  // fbAbility.use(pc);
+
+  // console.log("Player -> Fireball: ", pc.position, "->", addDistance2d(pc.position, pc.angle, 1));
+  // const fireball = new FireBall(
+  //   {
+  //     start: addDistance2d(pc.position, pc.angle - Math.PI / 2, .5 * GameSettings.TILE_SCALE),
+  //     aim: pc.hasMoveTarget ? pc.moveTarget : message.aim, // If the player is moving shoot the fireball at the movement position, otherwise shoot at the mouse position.
+  //     speed: GameSettings.TILE_SCALE * 12,
+  //     collider: {
+  //       ignoresIds: [ pc.instanceId ]
+  //     }
+  //   }
+  // );
+  // // pc.collider.ignoresIds.push(fireball.instanceId);
+  // let sprites = World.levels[pc.levelId].sprites;
+  // sprites.push(fireball);
+  // broadcastPackage(MessageTypes.Spawn, { spawnClass: SpriteTypes.FIREBALL, spawn: fireball });
+
+  // fireball.delete = () => {
+
+  //   sprites = sprites.splice(sprites.indexOf(fireball), 1);
+  //   broadcastPackage(MessageTypes.Despawn, { spawnId: fireball.instanceId });
+  // };
 
   // log("Number of sprites in level: " + World.levels[pc.levelId].sprites.length);
   // log("Level sprites: ", World.levels[pc.levelId].sprites);

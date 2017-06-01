@@ -1,14 +1,38 @@
 
+import Character from '../shared/Character';
+import CharacterController from '../server/CharacterController';
+
 import { broadcastPackage } from '../Helpers/messaging';
 import MessageTypes from '../MessageTypes';
 import { SpriteTypes } from '../SpriteTypes';
 
 import World from '../GameEngine';
 
+const controllers = [];
+
+
 class CharacterManager {
+
+  addController(character) {
+    return controllers.push(new CharacterController(character));
+  }
+  /**
+   * 
+   * @param {Character} character 
+   * @returns {CharacterController}
+   */
+  getController(character) {
+    const controller = controllers.find(c => c.character === character);
+    // console.log("getting controller: ", controller);
+    return controller;
+  }
+
   applyDamage(character, damageInfo) {
-    // TODO: handle other damage types: bleeding, poison, arcane, fire, frost, etc.???
-    character.tookDamage(damageInfo.damage, damageInfo.source);
+    if(character instanceof Character) {
+      character.tookDamage(damageInfo.damage, damageInfo.source);
+    } else if(character instanceof CharacterController) {
+      character.applyDamage(damageInfo);
+    }
     broadcastPackage(MessageTypes.TakeDamage, {
       target: character.instanceId,
       damage: damageInfo.damage,

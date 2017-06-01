@@ -63,439 +63,3406 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 33);
+/******/ 	return __webpack_require__(__webpack_require__.s = 37);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/* unknown exports provided */
-/* all exports used */
-/*!**********************************!*\
-  !*** ./classes/shared/Sprite.js ***!
-  \**********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if (\"value\" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };\n\nvar _MediaManager = __webpack_require__(/*! ../client/MediaManager */ 9);\n\nvar _MediaManager2 = _interopRequireDefault(_MediaManager);\n\nvar _GameObject2 = __webpack_require__(/*! ./GameObject */ 13);\n\nvar _GameObject3 = _interopRequireDefault(_GameObject2);\n\nvar _Collider = __webpack_require__(/*! ./Collider */ 11);\n\nvar _Collider2 = _interopRequireDefault(_Collider);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n// import { SpriteTextureMap } from '../SpriteTypes';\n\nvar Sprite = function (_GameObject) {\n  _inherits(Sprite, _GameObject);\n\n  function Sprite() {\n    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n    _classCallCheck(this, Sprite);\n\n    // ensure we don't get undefined errors and then pass params to the Collider constructor\n    var _this = _possibleConstructorReturn(this, (Sprite.__proto__ || Object.getPrototypeOf(Sprite)).call(this, params));\n\n    params.collider = params.collider || {};\n    // TODO: shall we take this one level deeper and put it on GameObject?\n    //        Since base game object technically doesn't move, it should only have collider if it is a wall, trigger or switch.\n    _this.collider = new _Collider2.default(params.collider, params.owner || _this);\n\n    _this.moving = params.moving || false;\n    _this.aim = params.aim || { x: -1, y: -1, placeholder: true };\n\n    _this.texture = './images/SpritePlaceholder.png';\n\n    if (!_this.angle) _this.angle = params.angle || 0;\n    // TODO: Add sprite frame dimensions\n    // TODO: Add framerate.\n    // TODO: ANIMATE!!! Yay!\n    return _this;\n  }\n\n  _createClass(Sprite, [{\n    key: 'setTexture',\n    value: function setTexture(imageSource) {\n      this.texture = imageSource;\n    }\n  }, {\n    key: 'checkCollision',\n    value: function checkCollision(target) {\n      if (this.collider) return this.collider.getCollisionStatus(target);\n      return _Collider.CollisionStatus.NONE;\n    }\n  }, {\n    key: 'setPosition',\n    value: function setPosition() {\n      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };\n\n      this.position.x = position.x;\n      this.position.y = position.y;\n    }\n  }, {\n    key: 'onCollisionEnter',\n    value: function onCollisionEnter(otherCollider) {\n      // console.log(\"OTHER Collider is: \", otherCollider.ownerGO);\n\n      // console.log(\"Collision detected between: \", this.instanceId, otherCollider.ownerGO.instanceId);\n    }\n  }, {\n    key: 'toJSON',\n    value: function toJSON() {\n      var output = Object.assign({}, this);\n      if (output.collider) {\n        output.collider = Object.assign({}, output.collider);\n        output.collider.ownerGO = undefined;\n      }\n      return output;\n    }\n  }, {\n    key: 'update',\n    value: function update(delta) {\n      // console.log(\"updating sprite\");\n      _get(Sprite.prototype.__proto__ || Object.getPrototypeOf(Sprite.prototype), 'update', this).call(this, delta);\n      // if(this.moving) {\n      //   console.log(\"Updating\");\n      //   if(this.aim.placeholder) return;\n      //   // SOH, CAH, TOA\n      //   const deltaY = Math.sin(this.angle) * this.speed * delta / 1000;\n      //   const deltaX = Math.cos(this.angle) * this.speed * delta / 1000;\n      //   this.setPosition({\n      //     x: this.position.x + deltaX,\n      //     y: this.position.y + deltaY\n      //   });\n      // }\n    }\n  }, {\n    key: 'draw',\n    value: function draw(context) {\n      if (!this.texture) return;\n      var imgElement = _MediaManager2.default.loadImage(this.texture);\n\n      var rotAngle = 0;\n      if (this.angle) {\n        rotAngle = this.angle;\n      }\n      context.translate(this.position.x, this.position.y);\n      context.rotate(rotAngle);\n      context.drawImage(imgElement, -16, -16);\n      context.rotate(-rotAngle);\n      context.translate(-this.position.x, -this.position.y);\n\n      if (this.children) {\n        this.children.forEach(function (child) {\n          if (child.draw) {\n            child.draw(context);\n          }\n        });\n      }\n    }\n  }]);\n\n  return Sprite;\n}(_GameObject3.default);\n\nexports.default = Sprite;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMC5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL3NoYXJlZC9TcHJpdGUuanM/OTliZiJdLCJzb3VyY2VzQ29udGVudCI6WyJcbi8vIGltcG9ydCB7IFNwcml0ZVRleHR1cmVNYXAgfSBmcm9tICcuLi9TcHJpdGVUeXBlcyc7XG5cbmltcG9ydCBNZWRpYU1hbmFnZXIgIGZyb20gJy4uL2NsaWVudC9NZWRpYU1hbmFnZXInO1xuXG5pbXBvcnQgR2FtZU9iamVjdCBmcm9tICcuL0dhbWVPYmplY3QnO1xuaW1wb3J0IENvbGxpZGVyLCB7IENvbGxpc2lvblN0YXR1cyB9IGZyb20gJy4vQ29sbGlkZXInO1xuXG5jbGFzcyBTcHJpdGUgZXh0ZW5kcyBHYW1lT2JqZWN0IHtcbiAgXG4gIGNvbnN0cnVjdG9yKHBhcmFtcyA9IHt9KSB7XG4gICAgc3VwZXIocGFyYW1zKTtcblxuICAgIC8vIGVuc3VyZSB3ZSBkb24ndCBnZXQgdW5kZWZpbmVkIGVycm9ycyBhbmQgdGhlbiBwYXNzIHBhcmFtcyB0byB0aGUgQ29sbGlkZXIgY29uc3RydWN0b3JcbiAgICBwYXJhbXMuY29sbGlkZXIgPSBwYXJhbXMuY29sbGlkZXIgfHwge307XG4gICAgLy8gVE9ETzogc2hhbGwgd2UgdGFrZSB0aGlzIG9uZSBsZXZlbCBkZWVwZXIgYW5kIHB1dCBpdCBvbiBHYW1lT2JqZWN0P1xuICAgIC8vICAgICAgICBTaW5jZSBiYXNlIGdhbWUgb2JqZWN0IHRlY2huaWNhbGx5IGRvZXNuJ3QgbW92ZSwgaXQgc2hvdWxkIG9ubHkgaGF2ZSBjb2xsaWRlciBpZiBpdCBpcyBhIHdhbGwsIHRyaWdnZXIgb3Igc3dpdGNoLlxuICAgIHRoaXMuY29sbGlkZXIgPSBuZXcgQ29sbGlkZXIocGFyYW1zLmNvbGxpZGVyLCBwYXJhbXMub3duZXIgfHwgdGhpcyk7XG5cbiAgICB0aGlzLm1vdmluZyA9IHBhcmFtcy5tb3ZpbmcgfHwgZmFsc2U7XG4gICAgdGhpcy5haW0gPSBwYXJhbXMuYWltIHx8IHsgeDogLTEsIHk6IC0xLCBwbGFjZWhvbGRlcjogdHJ1ZSB9O1xuXG4gICAgdGhpcy50ZXh0dXJlID0gJy4vaW1hZ2VzL1Nwcml0ZVBsYWNlaG9sZGVyLnBuZyc7XG5cbiAgICBpZighdGhpcy5hbmdsZSkgdGhpcy5hbmdsZSA9IHBhcmFtcy5hbmdsZSB8fCAwO1xuICAgIC8vIFRPRE86IEFkZCBzcHJpdGUgZnJhbWUgZGltZW5zaW9uc1xuICAgIC8vIFRPRE86IEFkZCBmcmFtZXJhdGUuXG4gICAgLy8gVE9ETzogQU5JTUFURSEhISBZYXkhXG4gIH1cblxuICBzZXRUZXh0dXJlKGltYWdlU291cmNlKSB7XG4gICAgdGhpcy50ZXh0dXJlID0gaW1hZ2VTb3VyY2U7XG4gIH1cblxuICBjaGVja0NvbGxpc2lvbih0YXJnZXQpIHtcbiAgICBpZih0aGlzLmNvbGxpZGVyKSByZXR1cm4gdGhpcy5jb2xsaWRlci5nZXRDb2xsaXNpb25TdGF0dXModGFyZ2V0KTtcbiAgICByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG4gIH1cblxuICBzZXRQb3NpdGlvbihwb3NpdGlvbiA9IHsgeDogMCwgeTogMCB9KSB7XG4gICAgdGhpcy5wb3NpdGlvbi54ID0gcG9zaXRpb24ueDtcbiAgICB0aGlzLnBvc2l0aW9uLnkgPSBwb3NpdGlvbi55O1xuICB9XG5cbiAgb25Db2xsaXNpb25FbnRlcihvdGhlckNvbGxpZGVyKSB7XG4gICAgLy8gY29uc29sZS5sb2coXCJPVEhFUiBDb2xsaWRlciBpczogXCIsIG90aGVyQ29sbGlkZXIub3duZXJHTyk7XG5cbiAgICAvLyBjb25zb2xlLmxvZyhcIkNvbGxpc2lvbiBkZXRlY3RlZCBiZXR3ZWVuOiBcIiwgdGhpcy5pbnN0YW5jZUlkLCBvdGhlckNvbGxpZGVyLm93bmVyR08uaW5zdGFuY2VJZCk7XG4gIH1cblxuICB0b0pTT04oKSB7XG4gICAgY29uc3Qgb3V0cHV0ID0gT2JqZWN0LmFzc2lnbih7fSwgdGhpcyk7XG4gICAgaWYob3V0cHV0LmNvbGxpZGVyKSB7XG4gICAgICBvdXRwdXQuY29sbGlkZXIgPSBPYmplY3QuYXNzaWduKHt9LCBvdXRwdXQuY29sbGlkZXIpO1xuICAgICAgb3V0cHV0LmNvbGxpZGVyLm93bmVyR08gPSB1bmRlZmluZWQ7XG4gICAgfSBcbiAgICByZXR1cm4gb3V0cHV0O1xuICB9XG5cblxuICB1cGRhdGUoZGVsdGEpIHtcbiAgICAvLyBjb25zb2xlLmxvZyhcInVwZGF0aW5nIHNwcml0ZVwiKTtcbiAgICBzdXBlci51cGRhdGUoZGVsdGEpO1xuICAgIC8vIGlmKHRoaXMubW92aW5nKSB7XG4gICAgLy8gICBjb25zb2xlLmxvZyhcIlVwZGF0aW5nXCIpO1xuICAgIC8vICAgaWYodGhpcy5haW0ucGxhY2Vob2xkZXIpIHJldHVybjtcbiAgICAvLyAgIC8vIFNPSCwgQ0FILCBUT0FcbiAgICAvLyAgIGNvbnN0IGRlbHRhWSA9IE1hdGguc2luKHRoaXMuYW5nbGUpICogdGhpcy5zcGVlZCAqIGRlbHRhIC8gMTAwMDtcbiAgICAvLyAgIGNvbnN0IGRlbHRhWCA9IE1hdGguY29zKHRoaXMuYW5nbGUpICogdGhpcy5zcGVlZCAqIGRlbHRhIC8gMTAwMDtcbiAgICAvLyAgIHRoaXMuc2V0UG9zaXRpb24oe1xuICAgIC8vICAgICB4OiB0aGlzLnBvc2l0aW9uLnggKyBkZWx0YVgsXG4gICAgLy8gICAgIHk6IHRoaXMucG9zaXRpb24ueSArIGRlbHRhWVxuICAgIC8vICAgfSk7XG4gICAgLy8gfVxuICB9XG5cbiAgZHJhdyhjb250ZXh0KSB7XG4gICAgaWYoIXRoaXMudGV4dHVyZSkgcmV0dXJuO1xuICAgIGxldCBpbWdFbGVtZW50ID0gTWVkaWFNYW5hZ2VyLmxvYWRJbWFnZSh0aGlzLnRleHR1cmUpO1xuXG4gICAgbGV0IHJvdEFuZ2xlID0gMDtcbiAgICBpZiAodGhpcy5hbmdsZSkge1xuICAgICAgcm90QW5nbGUgPSB0aGlzLmFuZ2xlO1xuICAgIH1cbiAgICBjb250ZXh0LnRyYW5zbGF0ZSh0aGlzLnBvc2l0aW9uLngsIHRoaXMucG9zaXRpb24ueSk7XG4gICAgY29udGV4dC5yb3RhdGUocm90QW5nbGUpO1xuICAgIGNvbnRleHQuZHJhd0ltYWdlKGltZ0VsZW1lbnQsIC0xNiwgLTE2KTtcbiAgICBjb250ZXh0LnJvdGF0ZSgtcm90QW5nbGUpO1xuICAgIGNvbnRleHQudHJhbnNsYXRlKC10aGlzLnBvc2l0aW9uLngsIC10aGlzLnBvc2l0aW9uLnkpO1xuXG4gICAgaWYodGhpcy5jaGlsZHJlbikge1xuICAgICAgdGhpcy5jaGlsZHJlbi5mb3JFYWNoKGNoaWxkID0+IHtcbiAgICAgICAgaWYoY2hpbGQuZHJhdykge1xuICAgICAgICAgIGNoaWxkLmRyYXcoY29udGV4dCk7XG4gICAgICAgIH1cbiAgICAgIH0pXG4gICAgfVxuXG4gIH1cbn1cblxuZXhwb3J0IGRlZmF1bHQgU3ByaXRlO1xuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL3NoYXJlZC9TcHJpdGUuanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFHQTtBQUNBOzs7QUFDQTtBQUNBOzs7QUFBQTtBQUNBOzs7Ozs7Ozs7O0FBTkE7QUFDQTtBQU1BOzs7QUFFQTtBQUFBO0FBQ0E7QUFEQTtBQUNBO0FBRUE7QUFIQTtBQUNBO0FBR0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQWpCQTtBQWtCQTtBQUNBOzs7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBOzs7QUFFQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUdBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUE7Ozs7OztBQUdBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _MediaManager = __webpack_require__(8);
+
+var _MediaManager2 = _interopRequireDefault(_MediaManager);
+
+var _GameObject2 = __webpack_require__(15);
+
+var _GameObject3 = _interopRequireDefault(_GameObject2);
+
+var _Collider = __webpack_require__(12);
+
+var _Collider2 = _interopRequireDefault(_Collider);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+// import { SpriteTextureMap } from '../SpriteTypes';
+
+var Sprite = function (_GameObject) {
+  _inherits(Sprite, _GameObject);
+
+  function Sprite() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Sprite);
+
+    // ensure we don't get undefined errors and then pass params to the Collider constructor
+    var _this = _possibleConstructorReturn(this, (Sprite.__proto__ || Object.getPrototypeOf(Sprite)).call(this, params));
+
+    params.collider = params.collider || {};
+    // TODO: shall we take this one level deeper and put it on GameObject?
+    //        Since base game object technically doesn't move, it should only have collider if it is a wall, trigger or switch.
+    _this.collider = new _Collider2.default(params.collider, params.owner || _this);
+
+    _this.moving = params.moving || false;
+    _this.aim = params.aim || { x: -1, y: -1, placeholder: true };
+
+    _this.texture = './images/SpritePlaceholder.png';
+
+    if (!_this.angle) _this.angle = params.angle || 0;
+    // TODO: Add sprite frame dimensions
+    // TODO: Add framerate.
+    // TODO: ANIMATE!!! Yay!
+    return _this;
+  }
+
+  _createClass(Sprite, [{
+    key: 'setTexture',
+    value: function setTexture(imageSource) {
+      this.texture = imageSource;
+    }
+  }, {
+    key: 'checkCollision',
+    value: function checkCollision(target) {
+      if (this.collider) return this.collider.getCollisionStatus(target);
+      return _Collider.CollisionStatus.NONE;
+    }
+  }, {
+    key: 'setPosition',
+    value: function setPosition() {
+      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
+
+      this.position.x = position.x;
+      this.position.y = position.y;
+    }
+  }, {
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(otherCollider) {
+      // console.log("OTHER Collider is: ", otherCollider.ownerGO);
+
+      // console.log("Collision detected between: ", this.instanceId, otherCollider.ownerGO.instanceId);
+    }
+  }, {
+    key: 'toJSON',
+    value: function toJSON() {
+      var output = Object.assign({}, this);
+      if (output.collider) {
+        output.collider = Object.assign({}, output.collider);
+        output.collider.ownerGO = undefined;
+      }
+      return output;
+    }
+  }, {
+    key: 'update',
+    value: function update(delta) {
+      // console.log("updating sprite");
+      _get(Sprite.prototype.__proto__ || Object.getPrototypeOf(Sprite.prototype), 'update', this).call(this, delta);
+      // if(this.moving) {
+      //   console.log("Updating");
+      //   if(this.aim.placeholder) return;
+      //   // SOH, CAH, TOA
+      //   const deltaY = Math.sin(this.angle) * this.speed * delta / 1000;
+      //   const deltaX = Math.cos(this.angle) * this.speed * delta / 1000;
+      //   this.setPosition({
+      //     x: this.position.x + deltaX,
+      //     y: this.position.y + deltaY
+      //   });
+      // }
+    }
+  }, {
+    key: 'draw',
+    value: function draw(context) {
+      if (!this.texture) return;
+      var imgElement = _MediaManager2.default.loadImage(this.texture);
+
+      var rotAngle = 0;
+      if (this.angle) {
+        rotAngle = this.angle;
+      }
+      context.translate(this.position.x, this.position.y);
+      context.rotate(rotAngle);
+      context.drawImage(imgElement, -16, -16);
+      context.rotate(-rotAngle);
+      context.translate(-this.position.x, -this.position.y);
+
+      if (this.children) {
+        this.children.forEach(function (child) {
+          if (child.draw) {
+            child.draw(context);
+          }
+        });
+      }
+    }
+  }]);
+
+  return Sprite;
+}(_GameObject3.default);
+
+exports.default = Sprite;
 
 /***/ }),
 /* 1 */
-/* unknown exports provided */
-/* all exports used */
-/*!*********************************!*\
-  !*** ./classes/GameSettings.js ***!
-  \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n// GameSettings is a shared settings file that will share info to both the server and the client.\nvar GameSettings = exports.GameSettings = {\n  TILE_SCALE: 32\n};//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMS5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL0dhbWVTZXR0aW5ncy5qcz9kYzhkIl0sInNvdXJjZXNDb250ZW50IjpbIi8vIEdhbWVTZXR0aW5ncyBpcyBhIHNoYXJlZCBzZXR0aW5ncyBmaWxlIHRoYXQgd2lsbCBzaGFyZSBpbmZvIHRvIGJvdGggdGhlIHNlcnZlciBhbmQgdGhlIGNsaWVudC5cbmV4cG9ydCBjb25zdCBHYW1lU2V0dGluZ3MgPSB7XG4gIFRJTEVfU0NBTEU6IDMyLFxuICAvL01PTkdPREJfQ09OTkVDVElPTlNUUklORzogc2VydmVyQ29uZmlnLk1PTkdPREJfQ09OTkVDVElPTlNUUklOR1xufVxuXG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvR2FtZVNldHRpbmdzLmpzIl0sIm1hcHBpbmdzIjoiOzs7OztBQUFBO0FBQ0E7QUFDQTtBQURBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+// GameSettings is a shared settings file that will share info to both the server and the client.
+var GameSettings = exports.GameSettings = {
+  TILE_SCALE: 32
+};
 
 /***/ }),
 /* 2 */
-/* unknown exports provided */
-/* all exports used */
-/*!*********************************!*\
-  !*** ./classes/Helpers/guid.js ***!
-  \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.guid = guid;\nfunction guid() {\n  function s4() {\n    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);\n  }\n  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();\n}//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMi5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL0hlbHBlcnMvZ3VpZC5qcz81NmRmIl0sInNvdXJjZXNDb250ZW50IjpbIlxuZXhwb3J0IGZ1bmN0aW9uIGd1aWQoKSB7XG4gIGZ1bmN0aW9uIHM0KCkge1xuICAgIHJldHVybiBNYXRoLmZsb29yKCgxICsgTWF0aC5yYW5kb20oKSkgKiAweDEwMDAwKVxuICAgICAgLnRvU3RyaW5nKDE2KVxuICAgICAgLnN1YnN0cmluZygxKTtcbiAgfVxuICByZXR1cm4gczQoKSArIHM0KCkgKyAnLScgKyBzNCgpICsgJy0nICsgczQoKSArICctJyArXG4gICAgczQoKSArICctJyArIHM0KCkgKyBzNCgpICsgczQoKTtcbn1cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9IZWxwZXJzL2d1aWQuanMiXSwibWFwcGluZ3MiOiI7Ozs7O0FBQ0E7QUFBQTtBQUNBO0FBQ0E7QUFHQTtBQUNBO0FBRUEiLCJzb3VyY2VSb290IjoiIn0=");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SpriteTextureMap = exports.ClientSpriteClassMap = exports.SpriteTypes = undefined;
+exports.GetSpriteTypeName = GetSpriteTypeName;
+
+var _PlayerCharacter = __webpack_require__(10);
+
+var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
+
+var _BlueBeam = __webpack_require__(14);
+
+var _BlueBeam2 = _interopRequireDefault(_BlueBeam);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var SpriteTypes = exports.SpriteTypes = {
+  PLAYER: 'SpriteTypes.PLAYER',
+  CHEST: 'SpriteTypes.CHEST',
+  FIREBALL: 'SpriteTypes.FIREBALL',
+  BLUEBEAM: 'SpriteTypes.BLUEBEAM',
+  EXPLOSION: 'SpriteTypes.EXPLOSION',
+  BLOODSTAIN: 'SpriteTypes.BLOODSTAIN'
+};
+
+var ClientSpriteClassMap = exports.ClientSpriteClassMap = new Map();
+ClientSpriteClassMap.set(SpriteTypes.PLAYER, _PlayerCharacter2.default);
+ClientSpriteClassMap.set(SpriteTypes.BLUEBEAM, _BlueBeam2.default);
+
+var SpriteTextureMap = exports.SpriteTextureMap = new Map();
+SpriteTextureMap.set(SpriteTypes.CHEST, './images/ChestClosed.png');
+SpriteTextureMap.set(SpriteTypes.FIREBALL, './images/FireballStatic.png');
+SpriteTextureMap.set(SpriteTypes.FIREBALL, './images/BlueBeam.png');
+SpriteTextureMap.set(SpriteTypes.PLAYER, './images/PlayerOverhead.png');
+
+function GetSpriteTypeName(obj) {
+  var iterator = ClientSpriteClassMap.entries();
+  var mapCursor = {};
+
+  do {
+
+    mapCursor = iterator.next();
+    if (mapCursor.done) break;
+
+    if (obj instanceof mapCursor.value[1]) {
+      return mapCursor.value[0];
+    }
+  } while (!mapCursor.done);
+
+  console.warn("didn't find it.");
+  return undefined;
+}
 
 /***/ }),
 /* 3 */
-/* unknown exports provided */
-/* all exports used */
-/*!*********************************!*\
-  !*** ./classes/MessageTypes.js ***!
-  \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nvar MessageTypes = {\n  Who: 'WHO',\n  Authentication: 'AUTHENTICATION',\n  Port: 'PORT',\n  KeyPressed: 'KEY_PRESSED',\n  KeyReleased: 'KEY_RELEASED',\n  MouseDown: 'MOUSE_DOWN',\n  MouseUp: 'MOUSE_UP',\n  MouseClick: 'MOUSE_CLICK',\n  MouseMove: 'MOUSE_MOVE',\n  MoveTo: 'MOVE_TO',\n  Cast: 'CAST',\n  Spawn: 'SPAWN',\n  Despawn: 'DESPAWN',\n  DEBUG: 'DEBUG',\n  UpdateSprite: 'UPDATE_SPRITE',\n  FrameQueue: 'FRAME_QUEUE',\n  TakeDamage: 'TAKE_DAMAGE',\n  PlayerDeath: 'PLAYER_DEATH',\n  PlayerRespawn: 'PLAYER_RESPAWN',\n  PING: 'PING',\n  PONG: 'PONG'\n};\nexports.default = MessageTypes;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMy5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL01lc3NhZ2VUeXBlcy5qcz83ZDI5Il0sInNvdXJjZXNDb250ZW50IjpbImNvbnN0IE1lc3NhZ2VUeXBlcyA9IHtcbiAgV2hvOiAnV0hPJyxcbiAgQXV0aGVudGljYXRpb246ICdBVVRIRU5USUNBVElPTicsXG4gIFBvcnQ6ICdQT1JUJyxcbiAgS2V5UHJlc3NlZDogJ0tFWV9QUkVTU0VEJyxcbiAgS2V5UmVsZWFzZWQ6ICdLRVlfUkVMRUFTRUQnLFxuICBNb3VzZURvd246ICdNT1VTRV9ET1dOJyxcbiAgTW91c2VVcDogJ01PVVNFX1VQJyxcbiAgTW91c2VDbGljazogJ01PVVNFX0NMSUNLJyxcbiAgTW91c2VNb3ZlOiAnTU9VU0VfTU9WRScsXG4gIE1vdmVUbzogJ01PVkVfVE8nLFxuICBDYXN0OiAnQ0FTVCcsXG4gIFNwYXduOiAnU1BBV04nLFxuICBEZXNwYXduOiAnREVTUEFXTicsXG4gIERFQlVHOiAnREVCVUcnLFxuICBVcGRhdGVTcHJpdGU6ICdVUERBVEVfU1BSSVRFJyxcbiAgRnJhbWVRdWV1ZTogJ0ZSQU1FX1FVRVVFJyxcbiAgVGFrZURhbWFnZTogJ1RBS0VfREFNQUdFJyxcbiAgUGxheWVyRGVhdGg6ICdQTEFZRVJfREVBVEgnLFxuICBQbGF5ZXJSZXNwYXduOiAnUExBWUVSX1JFU1BBV04nLFxuICBQSU5HOiAnUElORycsXG4gIFBPTkc6ICdQT05HJyxcbn07XG5leHBvcnQgZGVmYXVsdCBNZXNzYWdlVHlwZXM7XG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvTWVzc2FnZVR5cGVzLmpzIl0sIm1hcHBpbmdzIjoiOzs7OztBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBckJBO0FBdUJBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MessageTypes = exports.broadcastPackage = exports.sendPackage = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+// Game elements
+// import Client from './server/Client';
+
+
+var _messaging = __webpack_require__(11);
+
+Object.defineProperty(exports, 'sendPackage', {
+  enumerable: true,
+  get: function get() {
+    return _messaging.sendPackage;
+  }
+});
+Object.defineProperty(exports, 'broadcastPackage', {
+  enumerable: true,
+  get: function get() {
+    return _messaging.broadcastPackage;
+  }
+});
+Object.defineProperty(exports, 'MessageTypes', {
+  enumerable: true,
+  get: function get() {
+    return _messaging.MessageTypes;
+  }
+});
+
+var _GameSettings = __webpack_require__(1);
+
+var _SpriteClassMap = __webpack_require__(17);
+
+var _guid = __webpack_require__(7);
+
+var _LevelManager = __webpack_require__(40);
+
+var _LevelManager2 = _interopRequireDefault(_LevelManager);
+
+var _CharacterManager = __webpack_require__(39);
+
+var _CharacterManager2 = _interopRequireDefault(_CharacterManager);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// Database elements???
+
+var clients = {};
+// const levels = {};
+
+var GameEngine = function () {
+  _createClass(GameEngine, [{
+    key: 'levels',
+
+
+    // read only so that we cannot reassign from outside.
+    get: function get() {
+      return _LevelManager2.default.levels;
+    }
+  }, {
+    key: 'clients',
+    get: function get() {
+      return clients;
+    }
+  }, {
+    key: 'CharacterManager',
+    get: function get() {
+      return _CharacterManager2.default;
+    }
+  }]);
+
+  function GameEngine() {
+    _classCallCheck(this, GameEngine);
+
+    this.getLevel = _LevelManager2.default.getLevel.bind(_LevelManager2.default);
+    this.getLevelBySprite = _LevelManager2.default.getLevelBySprite.bind(_LevelManager2.default);
+  }
+
+  // So at this point, it's pretty clear that sprites are bound to their map. 
+
+
+  _createClass(GameEngine, [{
+    key: 'spawnSprite',
+    value: function spawnSprite(levelId, spriteTypeName, attributes) {
+      // console.log("Spawning sprite");
+      var classType = _SpriteClassMap.SpriteClassMap.get(spriteTypeName);
+      var spawn = new classType(attributes);
+      _LevelManager2.default.addSprite(levelId, spawn);
+      return spawn;
+    }
+  }, {
+    key: 'despawnSprite',
+    value: function despawnSprite(sprite) {
+      _LevelManager2.default.removeSprite(this.getLevelBySprite(sprite).id, sprite);
+    }
+  }, {
+    key: 'despawnSpriteByLevel',
+    value: function despawnSpriteByLevel(levelId, sprite) {
+      _LevelManager2.default.removeSprite(levelId, sprite);
+    }
+
+    // Clients
+
+  }, {
+    key: 'addClient',
+    value: function addClient(client) {
+
+      if (!client.instanceId) client.instanceId = (0, _guid.guid)();
+      clients[client.instanceId] = client;
+    }
+  }, {
+    key: 'addClientWithAttributes',
+    value: function addClientWithAttributes(attributes) {
+      // TODO: Is there a use for this?
+      throw new Error("Not implemented");
+    }
+  }, {
+    key: 'removeClient',
+    value: function removeClient(client) {
+      delete clients[client.instanceId];
+    }
+  }, {
+    key: 'getClientByInstanceId',
+    value: function getClientByInstanceId(instanceId) {
+      return clients[instanceId];
+    }
+  }, {
+    key: 'getClientByPlayerCharacter',
+    value: function getClientByPlayerCharacter(character) {
+      return clients.find(function (c) {
+        return c.playerCharacter === character;
+      });
+    }
+  }, {
+    key: 'getPlayerByInstanceId',
+    value: function getPlayerByInstanceId(instanceId) {
+      // Can pass either the client's instance Id or the character's instanceId
+      return clients.find(function (c) {
+        return c.instanceId === instanceId || c.playerCharacter && c.playerCharacter.instanceId === instanceId;
+      });
+    }
+  }, {
+    key: 'getRandomSpawnPoint',
+    value: function getRandomSpawnPoint(levelId) {
+      var level = _LevelManager2.default.getLevel(levelId);
+      // console.log("Getting random point for level: ", level);
+      // console.log("Level width & scale settings: ", level.width, GameSettings.TILE_SCALE);
+      var position = {
+        x: Math.random() * (_GameSettings.GameSettings.TILE_SCALE * level.width - _GameSettings.GameSettings.TILE_SCALE) + _GameSettings.GameSettings.TILE_SCALE,
+        y: Math.random() * (_GameSettings.GameSettings.TILE_SCALE * level.height - _GameSettings.GameSettings.TILE_SCALE) + _GameSettings.GameSettings.TILE_SCALE
+      };
+      return position;
+    }
+  }]);
+
+  return GameEngine;
+}();
+
+// Ensures singleton (I think)
+
+
+var World = new GameEngine();
+
+exports.default = World;
 
 /***/ }),
 /* 4 */
-/* unknown exports provided */
-/* all exports used */
-/*!*******************************************!*\
-  !*** ./classes/shared/PlayerCharacter.js ***!
-  \*******************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if (\"value\" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };\n\nvar _Character2 = __webpack_require__(/*! ./Character */ 10);\n\nvar _Character3 = _interopRequireDefault(_Character2);\n\nvar _GameSettings = __webpack_require__(/*! ../GameSettings */ 1);\n\nvar _ColliderTypes = __webpack_require__(/*! ../ColliderTypes */ 5);\n\nvar _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);\n\nvar _gx2D = __webpack_require__(/*! ../Helpers/gx2D */ 8);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\n//import World, { MessageTypes, sendPackage, broadcastPackage  } from '../GameEngine';\n\nvar PlayerCharacter = function (_Character) {\n  _inherits(PlayerCharacter, _Character);\n\n  function PlayerCharacter() {\n    var characterName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Frank';\n\n    _classCallCheck(this, PlayerCharacter);\n\n    var _this = _possibleConstructorReturn(this, (PlayerCharacter.__proto__ || Object.getPrototypeOf(PlayerCharacter)).call(this, {\n      collider: {\n        type: _ColliderTypes2.default.RADIUS,\n        tags: ['PLAYER'],\n        radius: 5\n      }\n    }));\n\n    _this.id = -1;\n\n    _this.name = characterName;\n    _this.stats = {\n      level: 1,\n      strength: 1,\n      hp: 50,\n      maxHp: 50,\n      maxVelocity: 8 * _GameSettings.GameSettings.TILE_SCALE,\n      acceleration: 16 * _GameSettings.GameSettings.TILE_SCALE\n    };\n    _this.levelId = 1;\n    _this.strength = 1;\n    // this.health = 50; <- this is now tracked using getters and setters.\n    _this.maxHealth = 50;\n    _this.velocity = 0;\n\n    _this.moveTarget = {};\n\n    _this.setTexture('./images/PlayerOverhead.png');\n\n    return _this;\n  }\n\n  _createClass(PlayerCharacter, [{\n    key: 'setPosition',\n    value: function setPosition(position) {\n      _get(PlayerCharacter.prototype.__proto__ || Object.getPrototypeOf(PlayerCharacter.prototype), 'setPosition', this).call(this, position);\n      this.tx = Math.round(this.position.x / _GameSettings.GameSettings.TILE_SCALE);\n      this.ty = Math.round(this.position.y / _GameSettings.GameSettings.TILE_SCALE);\n      if (this.tx < 0) this.tx = 0;\n      if (this.ty < 0) this.ty = 0;\n    }\n  }, {\n    key: 'setMoveTarget',\n    value: function setMoveTarget(x, y) {\n      this.moveTarget = { x: x, y: y };\n    }\n  }, {\n    key: 'clearMoveTarget',\n    value: function clearMoveTarget() {\n      this.moveTarget = undefined;\n      this.moveAngle = undefined;\n    }\n  }, {\n    key: 'update',\n    value: function update(delta) {\n      if (this.hasMoveTarget) {\n        this.isWalking = true;\n\n        // TODO: make 8 = some STOPPING_DISTANCE constant ... GameSettings?\n        if ((0, _gx2D.distance2d)(this.position, this.moveTarget) < 8) {\n          this.clearMoveTarget();\n          return;\n        }\n\n        this.moveAngle = (0, _gx2D.angle2d)(this.position.x, this.position.y, this.moveTarget.x, this.moveTarget.y);\n        this.angle = this.moveAngle + Math.PI / 2;\n\n        if (this.velocity < this.stats.maxVelocity) {\n          // console.log('accelerating from: ' + this.velocity, \"DELTA: \" + delta, \"ANGLE: \" + this.angle);\n          this.velocity += this.stats.acceleration * delta / 1000;\n          if (this.velocity > this.stats.maxVelocity) this.velocity = this.stats.maxVelocity;\n          // console.log('New velocity: ' + this.velocity + '/' + this.stats.maxVelocity);\n        }\n\n        var deltaY = Math.sin(this.moveAngle) * this.velocity * (delta / 1000);\n        var deltaX = Math.cos(this.moveAngle) * this.velocity * (delta / 1000);\n\n        var newPosition = {\n          x: this.position.x + deltaX,\n          y: this.position.y + deltaY\n        };\n        //console.log(this.position, newPosition);\n        this.setPosition(newPosition);\n      } else {\n        this.isWalking = false;\n        if (this.hasMoveTarget) this.clearMoveTarget();\n        this.velocity = 0;\n      }\n      // console.log(\"updated player. calling super.\");\n      _get(PlayerCharacter.prototype.__proto__ || Object.getPrototypeOf(PlayerCharacter.prototype), 'update', this).call(this, delta);\n    }\n  }, {\n    key: 'toJSON',\n    value: function toJSON() {\n      var _this2 = this;\n\n      var out = Object.assign({}, this);\n      if (out.children) {\n        out.children = out.children.map(function (c) {\n          var newChild = Object.assign({}, c);\n          c.parentGO = undefined;\n          c.parentId = _this2.instanceId;\n          return newChild;\n        });\n      }\n      if (out.collider && out.collider.ownerGO) {\n        out.collider = Object.assign({}, out.collider);\n        out.collider.ownerGO = undefined;\n      }\n      return out;\n    }\n  }, {\n    key: 'health',\n    get: function get() {\n      return this.stats.hp;\n    },\n    set: function set(value) {\n      this.stats.hp = value;\n    }\n  }, {\n    key: 'hasMoveTarget',\n    get: function get() {\n      return this.moveTarget && this.moveTarget.x && this.moveTarget.y;\n    }\n  }]);\n\n  return PlayerCharacter;\n}(_Character3.default);\n\nexports.default = PlayerCharacter;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiNC5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL3NoYXJlZC9QbGF5ZXJDaGFyYWN0ZXIuanM/YTQyMSJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmltcG9ydCBDaGFyYWN0ZXIgZnJvbSAnLi9DaGFyYWN0ZXInO1xuaW1wb3J0IHsgR2FtZVNldHRpbmdzIH0gZnJvbSAnLi4vR2FtZVNldHRpbmdzJztcbmltcG9ydCBDb2xsaWRlclR5cGVzIGZyb20gJy4uL0NvbGxpZGVyVHlwZXMnO1xuXG5pbXBvcnQgeyBkaXN0YW5jZTJkLCBhbmdsZTJkIH0gZnJvbSAnLi4vSGVscGVycy9neDJEJztcblxuLy9pbXBvcnQgV29ybGQsIHsgTWVzc2FnZVR5cGVzLCBzZW5kUGFja2FnZSwgYnJvYWRjYXN0UGFja2FnZSAgfSBmcm9tICcuLi9HYW1lRW5naW5lJztcblxuY2xhc3MgUGxheWVyQ2hhcmFjdGVyIGV4dGVuZHMgQ2hhcmFjdGVyIHtcbiAgY29uc3RydWN0b3IoY2hhcmFjdGVyTmFtZSA9ICdGcmFuaycpIHtcbiAgICBzdXBlcih7XG4gICAgICBjb2xsaWRlcjoge1xuICAgICAgICB0eXBlOiBDb2xsaWRlclR5cGVzLlJBRElVUyxcbiAgICAgICAgdGFnczogWydQTEFZRVInXSxcbiAgICAgICAgcmFkaXVzOiA1XG4gICAgICB9XG4gICAgfSk7XG5cbiAgICB0aGlzLmlkID0gLTE7XG4gICAgXG4gICAgdGhpcy5uYW1lID0gY2hhcmFjdGVyTmFtZTtcbiAgICB0aGlzLnN0YXRzID0ge1xuICAgICAgbGV2ZWw6IDEsXG4gICAgICBzdHJlbmd0aDogMSxcbiAgICAgIGhwOiA1MCxcbiAgICAgIG1heEhwOiA1MCxcbiAgICAgIG1heFZlbG9jaXR5OiA4ICogR2FtZVNldHRpbmdzLlRJTEVfU0NBTEUsXG4gICAgICBhY2NlbGVyYXRpb246IDE2ICogR2FtZVNldHRpbmdzLlRJTEVfU0NBTEUsXG4gICAgfTtcbiAgICB0aGlzLmxldmVsSWQgPSAxO1xuICAgIHRoaXMuc3RyZW5ndGggPSAxO1xuICAgIC8vIHRoaXMuaGVhbHRoID0gNTA7IDwtIHRoaXMgaXMgbm93IHRyYWNrZWQgdXNpbmcgZ2V0dGVycyBhbmQgc2V0dGVycy5cbiAgICB0aGlzLm1heEhlYWx0aCA9IDUwO1xuICAgIHRoaXMudmVsb2NpdHkgPSAwO1xuXG4gICAgdGhpcy5tb3ZlVGFyZ2V0ID0ge307XG5cbiAgICB0aGlzLnNldFRleHR1cmUoJy4vaW1hZ2VzL1BsYXllck92ZXJoZWFkLnBuZycpO1xuXG4gIH1cblxuICBnZXQgaGVhbHRoKCkgeyByZXR1cm4gdGhpcy5zdGF0cy5ocDsgfVxuICBzZXQgaGVhbHRoKHZhbHVlKSB7IHRoaXMuc3RhdHMuaHAgPSB2YWx1ZTsgfVxuXG4gIHNldFBvc2l0aW9uKHBvc2l0aW9uKSB7XG4gICAgc3VwZXIuc2V0UG9zaXRpb24ocG9zaXRpb24pO1xuICAgIHRoaXMudHggPSBNYXRoLnJvdW5kKHRoaXMucG9zaXRpb24ueCAvIEdhbWVTZXR0aW5ncy5USUxFX1NDQUxFKTtcbiAgICB0aGlzLnR5ID0gTWF0aC5yb3VuZCh0aGlzLnBvc2l0aW9uLnkgLyBHYW1lU2V0dGluZ3MuVElMRV9TQ0FMRSk7XG4gICAgaWYodGhpcy50eCA8IDApIHRoaXMudHggPSAwO1xuICAgIGlmKHRoaXMudHkgPCAwKSB0aGlzLnR5ID0gMDtcbiAgfVxuXG4gIGdldCBoYXNNb3ZlVGFyZ2V0KCkge1xuICAgIHJldHVybiB0aGlzLm1vdmVUYXJnZXQgJiYgdGhpcy5tb3ZlVGFyZ2V0LnggJiYgdGhpcy5tb3ZlVGFyZ2V0Lnk7XG4gIH1cbiAgc2V0TW92ZVRhcmdldCh4LCB5KSB7XG4gICAgdGhpcy5tb3ZlVGFyZ2V0ID0geyB4LCB5IH07XG4gIH1cbiAgY2xlYXJNb3ZlVGFyZ2V0KCkge1xuICAgIHRoaXMubW92ZVRhcmdldCA9IHVuZGVmaW5lZDtcbiAgICB0aGlzLm1vdmVBbmdsZSA9IHVuZGVmaW5lZDtcbiAgfVxuXG4gIHVwZGF0ZShkZWx0YSkge1xuICAgIGlmKHRoaXMuaGFzTW92ZVRhcmdldCkge1xuICAgICAgdGhpcy5pc1dhbGtpbmcgPSB0cnVlO1xuXG4gICAgICAvLyBUT0RPOiBtYWtlIDggPSBzb21lIFNUT1BQSU5HX0RJU1RBTkNFIGNvbnN0YW50IC4uLiBHYW1lU2V0dGluZ3M/XG4gICAgICBpZihkaXN0YW5jZTJkKHRoaXMucG9zaXRpb24sIHRoaXMubW92ZVRhcmdldCkgPCA4KSB7XG4gICAgICAgIHRoaXMuY2xlYXJNb3ZlVGFyZ2V0KCk7XG4gICAgICAgIHJldHVybjtcbiAgICAgIH1cblxuICAgICAgdGhpcy5tb3ZlQW5nbGUgPSBhbmdsZTJkKHRoaXMucG9zaXRpb24ueCwgdGhpcy5wb3NpdGlvbi55LCB0aGlzLm1vdmVUYXJnZXQueCwgdGhpcy5tb3ZlVGFyZ2V0LnkpO1xuICAgICAgdGhpcy5hbmdsZSA9IHRoaXMubW92ZUFuZ2xlICsgTWF0aC5QSSAvIDI7XG5cbiAgICAgIFxuICAgICAgaWYgKHRoaXMudmVsb2NpdHkgPCB0aGlzLnN0YXRzLm1heFZlbG9jaXR5KSB7XG4gICAgICAgIC8vIGNvbnNvbGUubG9nKCdhY2NlbGVyYXRpbmcgZnJvbTogJyArIHRoaXMudmVsb2NpdHksIFwiREVMVEE6IFwiICsgZGVsdGEsIFwiQU5HTEU6IFwiICsgdGhpcy5hbmdsZSk7XG4gICAgICAgIHRoaXMudmVsb2NpdHkgKz0gKHRoaXMuc3RhdHMuYWNjZWxlcmF0aW9uICogZGVsdGEgLyAxMDAwKTtcbiAgICAgICAgaWYodGhpcy52ZWxvY2l0eSA+IHRoaXMuc3RhdHMubWF4VmVsb2NpdHkpIHRoaXMudmVsb2NpdHkgPSB0aGlzLnN0YXRzLm1heFZlbG9jaXR5XG4gICAgICAgIC8vIGNvbnNvbGUubG9nKCdOZXcgdmVsb2NpdHk6ICcgKyB0aGlzLnZlbG9jaXR5ICsgJy8nICsgdGhpcy5zdGF0cy5tYXhWZWxvY2l0eSk7XG4gICAgICB9XG5cbiAgICAgIGNvbnN0IGRlbHRhWSA9IE1hdGguc2luKHRoaXMubW92ZUFuZ2xlKSAqIHRoaXMudmVsb2NpdHkgKiAoZGVsdGEgLyAxMDAwKTtcbiAgICAgIGNvbnN0IGRlbHRhWCA9IE1hdGguY29zKHRoaXMubW92ZUFuZ2xlKSAqIHRoaXMudmVsb2NpdHkgKiAoZGVsdGEgLyAxMDAwKTtcblxuICAgICAgY29uc3QgbmV3UG9zaXRpb24gPSB7XG4gICAgICAgIHg6IHRoaXMucG9zaXRpb24ueCArIGRlbHRhWCxcbiAgICAgICAgeTogdGhpcy5wb3NpdGlvbi55ICsgZGVsdGFZXG4gICAgICB9O1xuICAgICAgLy9jb25zb2xlLmxvZyh0aGlzLnBvc2l0aW9uLCBuZXdQb3NpdGlvbik7XG4gICAgICB0aGlzLnNldFBvc2l0aW9uKG5ld1Bvc2l0aW9uKTtcbiAgICB9IGVsc2Uge1xuICAgICAgdGhpcy5pc1dhbGtpbmcgPSBmYWxzZTtcbiAgICAgIGlmKHRoaXMuaGFzTW92ZVRhcmdldCkgdGhpcy5jbGVhck1vdmVUYXJnZXQoKTtcbiAgICAgIHRoaXMudmVsb2NpdHkgPSAwO1xuICAgIH1cbiAgICAvLyBjb25zb2xlLmxvZyhcInVwZGF0ZWQgcGxheWVyLiBjYWxsaW5nIHN1cGVyLlwiKTtcbiAgICBzdXBlci51cGRhdGUoZGVsdGEpO1xuICB9XG5cbiAgdG9KU09OKCkge1xuICAgIGNvbnN0IG91dCA9IE9iamVjdC5hc3NpZ24oe30sIHRoaXMpO1xuICAgIGlmKG91dC5jaGlsZHJlbikge1xuICAgICAgb3V0LmNoaWxkcmVuID0gb3V0LmNoaWxkcmVuLm1hcChjID0+IHtcbiAgICAgICAgY29uc3QgbmV3Q2hpbGQgPSBPYmplY3QuYXNzaWduKHt9LCBjKTtcbiAgICAgICAgYy5wYXJlbnRHTyA9IHVuZGVmaW5lZDtcbiAgICAgICAgYy5wYXJlbnRJZCA9IHRoaXMuaW5zdGFuY2VJZDtcbiAgICAgICAgcmV0dXJuIG5ld0NoaWxkO1xuICAgICAgfSk7XG4gICAgfVxuICAgIGlmKG91dC5jb2xsaWRlciAmJiBvdXQuY29sbGlkZXIub3duZXJHTykge1xuICAgICAgb3V0LmNvbGxpZGVyID0gT2JqZWN0LmFzc2lnbih7fSwgb3V0LmNvbGxpZGVyKTtcbiAgICAgIG91dC5jb2xsaWRlci5vd25lckdPID0gdW5kZWZpbmVkO1xuICAgIH1cbiAgICByZXR1cm4gb3V0O1xuICB9XG5cbn1cblxuZXhwb3J0IGRlZmF1bHQgUGxheWVyQ2hhcmFjdGVyO1xuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL3NoYXJlZC9QbGF5ZXJDaGFyYWN0ZXIuanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFDQTtBQUNBOzs7QUFBQTtBQUNBO0FBQUE7QUFDQTs7O0FBQ0E7QUFDQTs7Ozs7Ozs7O0FBQ0E7QUFDQTtBQUNBOzs7QUFDQTtBQUFBO0FBQ0E7QUFEQTtBQUNBO0FBREE7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUhBO0FBREE7QUFDQTtBQU9BO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBTkE7QUFRQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQTdCQTtBQThCQTtBQUNBOzs7QUFJQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBS0E7QUFDQTtBQUNBOzs7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUZBO0FBSUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQUE7QUFDQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBNUVBO0FBQUE7QUFBQTtBQUNBO0FBQUE7QUFBQTs7O0FBVUE7QUFDQTtBQUNBOzs7Ozs7QUFtRUEiLCJzb3VyY2VSb290IjoiIn0=");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var ColliderTypes = {
+  NONE: 'NONE',
+  RADIUS: 'RADIUS',
+  RECTANGLE: 'RECTANGLE'
+};
+
+exports.default = ColliderTypes;
 
 /***/ }),
 /* 5 */
-/* unknown exports provided */
-/* all exports used */
-/*!**********************************!*\
-  !*** ./classes/ColliderTypes.js ***!
-  \**********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar ColliderTypes = {\n  NONE: 'NONE',\n  RADIUS: 'RADIUS',\n  RECTANGLE: 'RECTANGLE'\n};\n\nexports.default = ColliderTypes;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiNS5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL0NvbGxpZGVyVHlwZXMuanM/MzVlNyJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmNvbnN0IENvbGxpZGVyVHlwZXMgPSB7XG4gIE5PTkU6ICdOT05FJyxcbiAgUkFESVVTOiAnUkFESVVTJyxcbiAgUkVDVEFOR0xFOiAnUkVDVEFOR0xFJyxcbn07XG5cbmV4cG9ydCBkZWZhdWx0IENvbGxpZGVyVHlwZXM7XG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvQ29sbGlkZXJUeXBlcy5qcyJdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFIQTtBQUNBO0FBS0EiLCJzb3VyY2VSb290IjoiIn0=");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var MessageTypes = {
+  Who: 'WHO',
+  Authentication: 'AUTHENTICATION',
+  Port: 'PORT',
+  KeyPressed: 'KEY_PRESSED',
+  KeyReleased: 'KEY_RELEASED',
+  MouseDown: 'MOUSE_DOWN',
+  MouseUp: 'MOUSE_UP',
+  MouseClick: 'MOUSE_CLICK',
+  MouseMove: 'MOUSE_MOVE',
+  MoveTo: 'MOVE_TO',
+  Cast: 'CAST',
+  Spawn: 'SPAWN',
+  Despawn: 'DESPAWN',
+  DEBUG: 'DEBUG',
+  UpdateSprite: 'UPDATE_SPRITE',
+  FrameQueue: 'FRAME_QUEUE',
+  TakeDamage: 'TAKE_DAMAGE',
+  PlayerDeath: 'PLAYER_DEATH',
+  PlayerRespawn: 'PLAYER_RESPAWN',
+  PING: 'PING',
+  PONG: 'PONG'
+};
+exports.default = MessageTypes;
 
 /***/ }),
 /* 6 */
-/* unknown exports provided */
-/* all exports used */
-/*!*******************************!*\
-  !*** ./classes/GameEngine.js ***!
-  \*******************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.MessageTypes = exports.broadcastPackage = exports.sendPackage = undefined;\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\n// Game elements\n// import Client from './server/Client';\n\n\nvar _messaging = __webpack_require__(/*! ./Helpers/messaging */ 14);\n\nObject.defineProperty(exports, 'sendPackage', {\n  enumerable: true,\n  get: function get() {\n    return _messaging.sendPackage;\n  }\n});\nObject.defineProperty(exports, 'broadcastPackage', {\n  enumerable: true,\n  get: function get() {\n    return _messaging.broadcastPackage;\n  }\n});\nObject.defineProperty(exports, 'MessageTypes', {\n  enumerable: true,\n  get: function get() {\n    return _messaging.MessageTypes;\n  }\n});\n\nvar _GameSettings = __webpack_require__(/*! ./GameSettings */ 1);\n\nvar _SpriteClassMap = __webpack_require__(/*! ./SpriteClassMap */ 16);\n\nvar _guid = __webpack_require__(/*! ./Helpers/guid */ 2);\n\nvar _LevelManager = __webpack_require__(/*! ./server/LevelManager */ 35);\n\nvar _LevelManager2 = _interopRequireDefault(_LevelManager);\n\nvar _CharacterManager = __webpack_require__(/*! ./server/CharacterManager */ 34);\n\nvar _CharacterManager2 = _interopRequireDefault(_CharacterManager);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\n// Database elements???\n\nvar clients = {};\n// const levels = {};\n\nvar GameEngine = function () {\n  _createClass(GameEngine, [{\n    key: 'levels',\n\n\n    // read only so that we cannot reassign from outside.\n    get: function get() {\n      return _LevelManager2.default.levels;\n    }\n  }, {\n    key: 'clients',\n    get: function get() {\n      return clients;\n    }\n  }, {\n    key: 'CharacterManager',\n    get: function get() {\n      return _CharacterManager2.default;\n    }\n  }]);\n\n  function GameEngine() {\n    _classCallCheck(this, GameEngine);\n\n    this.getLevel = _LevelManager2.default.getLevel.bind(_LevelManager2.default);\n    this.getLevelBySprite = _LevelManager2.default.getLevelBySprite.bind(_LevelManager2.default);\n  }\n\n  // So at this point, it's pretty clear that sprites are bound to their map. \n\n\n  _createClass(GameEngine, [{\n    key: 'spawnSprite',\n    value: function spawnSprite(levelId, spriteTypeName, attributes) {\n      // console.log(\"Spawning sprite\");\n      var classType = _SpriteClassMap.SpriteClassMap.get(spriteTypeName);\n      var spawn = new classType(attributes);\n      _LevelManager2.default.addSprite(levelId, spawn);\n      return spawn;\n    }\n  }, {\n    key: 'despawnSprite',\n    value: function despawnSprite(sprite) {\n      _LevelManager2.default.removeSprite(this.getLevelBySprite(sprite).id, sprite);\n    }\n  }, {\n    key: 'despawnSpriteByLevel',\n    value: function despawnSpriteByLevel(levelId, sprite) {\n      _LevelManager2.default.removeSprite(levelId, sprite);\n    }\n\n    // Clients\n\n  }, {\n    key: 'addClient',\n    value: function addClient(client) {\n\n      if (!client.instanceId) client.instanceId = (0, _guid.guid)();\n      clients[client.instanceId] = client;\n    }\n  }, {\n    key: 'addClientWithAttributes',\n    value: function addClientWithAttributes(attributes) {\n      // TODO: Is there a use for this?\n      throw new Error(\"Not implemented\");\n    }\n  }, {\n    key: 'removeClient',\n    value: function removeClient(client) {\n      delete clients[client.instanceId];\n    }\n  }, {\n    key: 'getClientByInstanceId',\n    value: function getClientByInstanceId(instanceId) {\n      return clients[instanceId];\n    }\n  }, {\n    key: 'getClientByPlayerCharacter',\n    value: function getClientByPlayerCharacter(character) {\n      return clients.find(function (c) {\n        return c.playerCharacter === character;\n      });\n    }\n  }, {\n    key: 'getPlayerByInstanceId',\n    value: function getPlayerByInstanceId(instanceId) {\n      // Can pass either the client's instance Id or the character's instanceId\n      return clients.find(function (c) {\n        return c.instanceId === instanceId || c.playerCharacter && c.playerCharacter.instanceId === instanceId;\n      });\n    }\n  }, {\n    key: 'getRandomSpawnPoint',\n    value: function getRandomSpawnPoint(levelId) {\n      var level = _LevelManager2.default.getLevel(levelId);\n      // console.log(\"Getting random point for level: \", level);\n      // console.log(\"Level width & scale settings: \", level.width, GameSettings.TILE_SCALE);\n      var position = {\n        x: Math.random() * (_GameSettings.GameSettings.TILE_SCALE * level.width - _GameSettings.GameSettings.TILE_SCALE) + _GameSettings.GameSettings.TILE_SCALE,\n        y: Math.random() * (_GameSettings.GameSettings.TILE_SCALE * level.height - _GameSettings.GameSettings.TILE_SCALE) + _GameSettings.GameSettings.TILE_SCALE\n      };\n      return position;\n    }\n  }]);\n\n  return GameEngine;\n}();\n\n// Ensures singleton (I think)\n\n\nvar World = new GameEngine();\n\nexports.default = World;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiNi5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL0dhbWVFbmdpbmUuanM/YWVkYSJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmltcG9ydCB7IEdhbWVTZXR0aW5ncyB9IGZyb20gJy4vR2FtZVNldHRpbmdzJztcbmltcG9ydCB7IFNwcml0ZUNsYXNzTWFwIH0gZnJvbSAnLi9TcHJpdGVDbGFzc01hcCc7XG5pbXBvcnQgeyBndWlkIH0gZnJvbSAnLi9IZWxwZXJzL2d1aWQnO1xuXG4vLyBHYW1lIGVsZW1lbnRzXG4vLyBpbXBvcnQgQ2xpZW50IGZyb20gJy4vc2VydmVyL0NsaWVudCc7XG5pbXBvcnQgTGV2ZWxNYW5hZ2VyIGZyb20gJy4vc2VydmVyL0xldmVsTWFuYWdlcic7XG5pbXBvcnQgQ2hhcmFjdGVyTWFuYWdlciBmcm9tICcuL3NlcnZlci9DaGFyYWN0ZXJNYW5hZ2VyJztcbi8vIFRPRE86IGltcG9ydCBDcmVhdHVyZU1hbmFnZXIgZnJvbSAnLi9zZXJ2ZXIvQ3JlYXR1cmVNYW5hZ2VyJztcblxuZXhwb3J0IHsgc2VuZFBhY2thZ2UsIGJyb2FkY2FzdFBhY2thZ2UsIE1lc3NhZ2VUeXBlcyB9IGZyb20gJy4vSGVscGVycy9tZXNzYWdpbmcnO1xuXG4vLyBEYXRhYmFzZSBlbGVtZW50cz8/P1xuXG5jb25zdCBjbGllbnRzID0ge307XG4vLyBjb25zdCBsZXZlbHMgPSB7fTtcblxuY2xhc3MgR2FtZUVuZ2luZSB7XG5cbiAgLy8gcmVhZCBvbmx5IHNvIHRoYXQgd2UgY2Fubm90IHJlYXNzaWduIGZyb20gb3V0c2lkZS5cbiAgZ2V0IGxldmVscygpIHsgcmV0dXJuIExldmVsTWFuYWdlci5sZXZlbHM7IH1cbiAgZ2V0IGNsaWVudHMoKSB7IHJldHVybiBjbGllbnRzOyB9XG4gIGdldCBDaGFyYWN0ZXJNYW5hZ2VyKCkgeyByZXR1cm4gQ2hhcmFjdGVyTWFuYWdlcjsgfVxuXG4gIGNvbnN0cnVjdG9yKCkge1xuICAgIHRoaXMuZ2V0TGV2ZWwgPSBMZXZlbE1hbmFnZXIuZ2V0TGV2ZWwuYmluZChMZXZlbE1hbmFnZXIpO1xuICAgIHRoaXMuZ2V0TGV2ZWxCeVNwcml0ZSA9IExldmVsTWFuYWdlci5nZXRMZXZlbEJ5U3ByaXRlLmJpbmQoTGV2ZWxNYW5hZ2VyKTtcbiAgfVxuXG4gIC8vIFNvIGF0IHRoaXMgcG9pbnQsIGl0J3MgcHJldHR5IGNsZWFyIHRoYXQgc3ByaXRlcyBhcmUgYm91bmQgdG8gdGhlaXIgbWFwLiBcbiAgc3Bhd25TcHJpdGUobGV2ZWxJZCwgc3ByaXRlVHlwZU5hbWUsIGF0dHJpYnV0ZXMpIHtcbiAgICAvLyBjb25zb2xlLmxvZyhcIlNwYXduaW5nIHNwcml0ZVwiKTtcbiAgICBjb25zdCBjbGFzc1R5cGUgPSBTcHJpdGVDbGFzc01hcC5nZXQoc3ByaXRlVHlwZU5hbWUpO1xuICAgIGNvbnN0IHNwYXduID0gbmV3IGNsYXNzVHlwZShhdHRyaWJ1dGVzKTtcbiAgICBMZXZlbE1hbmFnZXIuYWRkU3ByaXRlKGxldmVsSWQsIHNwYXduKTtcbiAgICByZXR1cm4gc3Bhd247XG4gIH1cblxuICBkZXNwYXduU3ByaXRlKHNwcml0ZSkge1xuICAgIExldmVsTWFuYWdlci5yZW1vdmVTcHJpdGUodGhpcy5nZXRMZXZlbEJ5U3ByaXRlKHNwcml0ZSkuaWQsIHNwcml0ZSk7XG4gIH1cbiAgZGVzcGF3blNwcml0ZUJ5TGV2ZWwobGV2ZWxJZCwgc3ByaXRlKSB7XG4gICAgTGV2ZWxNYW5hZ2VyLnJlbW92ZVNwcml0ZShsZXZlbElkLCBzcHJpdGUpO1xuICB9XG5cbiAgLy8gQ2xpZW50c1xuICBhZGRDbGllbnQoY2xpZW50KSB7XG4gICAgXG4gICAgaWYoIWNsaWVudC5pbnN0YW5jZUlkKSBjbGllbnQuaW5zdGFuY2VJZCA9IGd1aWQoKTtcbiAgICBjbGllbnRzW2NsaWVudC5pbnN0YW5jZUlkXSA9IGNsaWVudDtcbiAgfVxuICBhZGRDbGllbnRXaXRoQXR0cmlidXRlcyhhdHRyaWJ1dGVzKSB7XG4gICAgLy8gVE9ETzogSXMgdGhlcmUgYSB1c2UgZm9yIHRoaXM/XG4gICAgdGhyb3cgbmV3IEVycm9yKFwiTm90IGltcGxlbWVudGVkXCIpO1xuICB9XG4gIHJlbW92ZUNsaWVudChjbGllbnQpIHtcbiAgICBkZWxldGUgY2xpZW50c1tjbGllbnQuaW5zdGFuY2VJZF07XG4gIH1cbiAgZ2V0Q2xpZW50QnlJbnN0YW5jZUlkKGluc3RhbmNlSWQpIHtcbiAgICByZXR1cm4gY2xpZW50c1tpbnN0YW5jZUlkXTtcbiAgfVxuICBnZXRDbGllbnRCeVBsYXllckNoYXJhY3RlcihjaGFyYWN0ZXIpIHtcbiAgICByZXR1cm4gY2xpZW50cy5maW5kKGMgPT4gYy5wbGF5ZXJDaGFyYWN0ZXIgPT09IGNoYXJhY3Rlcik7XG4gIH1cbiAgZ2V0UGxheWVyQnlJbnN0YW5jZUlkKGluc3RhbmNlSWQpIHtcbiAgICAvLyBDYW4gcGFzcyBlaXRoZXIgdGhlIGNsaWVudCdzIGluc3RhbmNlIElkIG9yIHRoZSBjaGFyYWN0ZXIncyBpbnN0YW5jZUlkXG4gICAgcmV0dXJuIGNsaWVudHMuZmluZChjID0+IGMuaW5zdGFuY2VJZCA9PT0gaW5zdGFuY2VJZCB8fCAoYy5wbGF5ZXJDaGFyYWN0ZXIgJiYgYy5wbGF5ZXJDaGFyYWN0ZXIuaW5zdGFuY2VJZCA9PT0gaW5zdGFuY2VJZCkpO1xuICB9XG5cbiAgZ2V0UmFuZG9tU3Bhd25Qb2ludChsZXZlbElkKSB7XG4gICAgY29uc3QgbGV2ZWwgPSBMZXZlbE1hbmFnZXIuZ2V0TGV2ZWwobGV2ZWxJZCk7XG4gICAgLy8gY29uc29sZS5sb2coXCJHZXR0aW5nIHJhbmRvbSBwb2ludCBmb3IgbGV2ZWw6IFwiLCBsZXZlbCk7XG4gICAgLy8gY29uc29sZS5sb2coXCJMZXZlbCB3aWR0aCAmIHNjYWxlIHNldHRpbmdzOiBcIiwgbGV2ZWwud2lkdGgsIEdhbWVTZXR0aW5ncy5USUxFX1NDQUxFKTtcbiAgICBjb25zdCBwb3NpdGlvbiA9IHtcbiAgICAgIHg6IChNYXRoLnJhbmRvbSgpICogKChHYW1lU2V0dGluZ3MuVElMRV9TQ0FMRSAqIGxldmVsLndpZHRoKSAtIEdhbWVTZXR0aW5ncy5USUxFX1NDQUxFKSkgKyBHYW1lU2V0dGluZ3MuVElMRV9TQ0FMRSxcbiAgICAgIHk6IChNYXRoLnJhbmRvbSgpICogKChHYW1lU2V0dGluZ3MuVElMRV9TQ0FMRSAqIGxldmVsLmhlaWdodCkgLSBHYW1lU2V0dGluZ3MuVElMRV9TQ0FMRSkpICsgR2FtZVNldHRpbmdzLlRJTEVfU0NBTEVcbiAgICB9XG4gICAgcmV0dXJuIHBvc2l0aW9uO1xuICB9XG5cbn1cblxuLy8gRW5zdXJlcyBzaW5nbGV0b24gKEkgdGhpbmspXG5jb25zdCBXb3JsZCA9IG5ldyBHYW1lRW5naW5lKCk7XG5cbmV4cG9ydCBkZWZhdWx0IFdvcmxkO1xuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL0dhbWVFbmdpbmUuanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7OztBQUtBO0FBQ0E7QUFDQTtBQUNBOzs7Ozs7QUFHQTs7Ozs7O0FBQUE7Ozs7OztBQUFBOzs7O0FBVkE7QUFDQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBR0E7QUFDQTs7O0FBQUE7QUFDQTs7Ozs7OztBQUlBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7Ozs7QUFFQTtBQUNBO0FBQUE7QUFBQTs7O0FBQ0E7QUFBQTtBQUFBOzs7QUFDQTtBQUFBO0FBQUE7OztBQUVBO0FBQUE7QUFDQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7QUFEQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBOzs7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7QUFDQTtBQUNBO0FBQ0E7OztBQUNBO0FBQ0E7QUFDQTs7O0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFBQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUZBO0FBSUE7QUFDQTs7Ozs7O0FBSUE7QUFDQTtBQUNBO0FBREE7QUFDQTtBQUNBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.angle2d = angle2d;
+exports.distance2d = distance2d;
+exports.addDistance2d = addDistance2d;
+exports.getYFromXAndRadians = getYFromXAndRadians;
+function angle2d(ax, ay, bx, by) {
+  return Math.atan2(by - ay, bx - ax);
+}
+
+function distance2d(startPosition, endPosition) {
+  var aSquared = (startPosition.x - endPosition.x) ** 2;
+  var bSquared = (startPosition.y - endPosition.y) ** 2;
+  return Math.sqrt(aSquared + bSquared);
+}
+
+function addDistance2d(startPosition, angle, distance) {
+  var deltaY = Math.sin(angle) * distance;
+  var deltaX = Math.cos(angle) * distance;
+  return {
+    x: startPosition.x + deltaX,
+    y: startPosition.y + deltaY
+  };
+}
+
+function getYFromXAndRadians(x, angle) {
+  return x / Math.tan(angle);
+}
 
 /***/ }),
 /* 7 */
-/* unknown exports provided */
-/* all exports used */
-/*!********************************!*\
-  !*** ./classes/SpriteTypes.js ***!
-  \********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.SpriteTextureMap = exports.ClientSpriteClassMap = exports.SpriteTypes = undefined;\nexports.GetSpriteTypeName = GetSpriteTypeName;\n\nvar _PlayerCharacter = __webpack_require__(/*! ./shared/PlayerCharacter */ 4);\n\nvar _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nvar SpriteTypes = exports.SpriteTypes = {\n  PLAYER: 'SpriteTypes.PLAYER',\n  CHEST: 'SpriteTypes.CHEST',\n  FIREBALL: 'SpriteTypes.FIREBALL',\n  EXPLOSION: 'SpriteTypes.EXPLOSION',\n  BLOODSTAIN: 'SpriteTypes.BLOODSTAIN'\n};\n\nvar ClientSpriteClassMap = exports.ClientSpriteClassMap = new Map();\nClientSpriteClassMap.set(SpriteTypes.PLAYER, _PlayerCharacter2.default);\n\nvar SpriteTextureMap = exports.SpriteTextureMap = new Map();\nSpriteTextureMap.set(SpriteTypes.CHEST, './images/ChestClosed.png');\nSpriteTextureMap.set(SpriteTypes.FIREBALL, './images/FireballStatic.png');\nSpriteTextureMap.set(SpriteTypes.PLAYER, './images/PlayerOverhead.png');\n\nfunction GetSpriteTypeName(obj) {\n  var iterator = ClientSpriteClassMap.entries();\n  var mapCursor = {};\n\n  do {\n\n    mapCursor = iterator.next();\n    if (mapCursor.done) break;\n\n    if (obj instanceof mapCursor.value[1]) {\n      return mapCursor.value[0];\n    }\n  } while (!mapCursor.done);\n\n  console.warn(\"didn't find it.\");\n  return undefined;\n}//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiNy5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL1Nwcml0ZVR5cGVzLmpzP2RlZjQiXSwic291cmNlc0NvbnRlbnQiOlsiXG5pbXBvcnQgUGxheWVyQ2hhcmFjdGVyIGZyb20gJy4vc2hhcmVkL1BsYXllckNoYXJhY3Rlcic7XG5cbmV4cG9ydCBjb25zdCBTcHJpdGVUeXBlcyA9IHtcbiAgUExBWUVSOiAnU3ByaXRlVHlwZXMuUExBWUVSJyxcbiAgQ0hFU1Q6ICdTcHJpdGVUeXBlcy5DSEVTVCcsXG4gIEZJUkVCQUxMOiAnU3ByaXRlVHlwZXMuRklSRUJBTEwnLFxuICBFWFBMT1NJT046ICdTcHJpdGVUeXBlcy5FWFBMT1NJT04nLFxuICBCTE9PRFNUQUlOOiAnU3ByaXRlVHlwZXMuQkxPT0RTVEFJTicsXG59O1xuXG5leHBvcnQgY29uc3QgQ2xpZW50U3ByaXRlQ2xhc3NNYXAgPSBuZXcgTWFwKCk7XG5DbGllbnRTcHJpdGVDbGFzc01hcC5zZXQoU3ByaXRlVHlwZXMuUExBWUVSLCBQbGF5ZXJDaGFyYWN0ZXIpO1xuXG5leHBvcnQgY29uc3QgU3ByaXRlVGV4dHVyZU1hcCA9IG5ldyBNYXAoKTtcblNwcml0ZVRleHR1cmVNYXAuc2V0KFNwcml0ZVR5cGVzLkNIRVNULCAnLi9pbWFnZXMvQ2hlc3RDbG9zZWQucG5nJyk7XG5TcHJpdGVUZXh0dXJlTWFwLnNldChTcHJpdGVUeXBlcy5GSVJFQkFMTCwgJy4vaW1hZ2VzL0ZpcmViYWxsU3RhdGljLnBuZycpO1xuU3ByaXRlVGV4dHVyZU1hcC5zZXQoU3ByaXRlVHlwZXMuUExBWUVSLCAnLi9pbWFnZXMvUGxheWVyT3ZlcmhlYWQucG5nJyk7XG5cbmV4cG9ydCBmdW5jdGlvbiBHZXRTcHJpdGVUeXBlTmFtZShvYmopIHtcbiAgdmFyIGl0ZXJhdG9yID0gQ2xpZW50U3ByaXRlQ2xhc3NNYXAuZW50cmllcygpO1xuICBsZXQgbWFwQ3Vyc29yID0ge307XG5cbiAgZG8ge1xuICAgIFxuICAgIG1hcEN1cnNvciA9IGl0ZXJhdG9yLm5leHQoKTtcbiAgICBpZihtYXBDdXJzb3IuZG9uZSkgYnJlYWs7XG5cbiAgICBpZihvYmogaW5zdGFuY2VvZiBtYXBDdXJzb3IudmFsdWVbMV0pIHtcbiAgICAgIHJldHVybiBtYXBDdXJzb3IudmFsdWVbMF07XG4gICAgfVxuICB9IHdoaWxlKCFtYXBDdXJzb3IuZG9uZSk7XG5cbiAgY29uc29sZS53YXJuKFwiZGlkbid0IGZpbmQgaXQuXCIpO1xuICByZXR1cm4gdW5kZWZpbmVkO1xufVxuXG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvU3ByaXRlVHlwZXMuanMiXSwibWFwcGluZ3MiOiI7Ozs7OztBQW1CQTtBQUNBO0FBbkJBO0FBQ0E7Ozs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBTEE7QUFDQTtBQU9BO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.guid = guid;
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
 
 /***/ }),
 /* 8 */
-/* unknown exports provided */
-/* all exports used */
-/*!*********************************!*\
-  !*** ./classes/Helpers/gx2D.js ***!
-  \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.angle2d = angle2d;\nexports.distance2d = distance2d;\nfunction angle2d(ax, ay, bx, by) {\n  return Math.atan2(by - ay, bx - ax);\n}\n\n// These are terrible.\n// see: https://en.wikipedia.org/wiki/Linear_interpolation\n// export function lerp1d(start, end, delta) {\n//   return ( start.y * (end.x - delta) + end.y * (delta - start.x) ) / (end.x - start.x);\n// }\n\n// export function lerp2d(startPosition, endPosition, delta) {\n//   return { \n//     x: lerp1d(startPosition.x, endPosition.x, delta),\n//     y: lerp1d(startPosition.y, endPosition.y, delta),\n//   }\n// }\n\nfunction distance2d(startPosition, endPosition) {\n  var aSquared = Math.pow(startPosition.x - endPosition.x, 2);\n  var bSquared = Math.pow(startPosition.y - endPosition.y, 2);\n  return Math.sqrt(aSquared + bSquared);\n}//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiOC5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL0hlbHBlcnMvZ3gyRC5qcz8yZmU5Il0sInNvdXJjZXNDb250ZW50IjpbIlxuZXhwb3J0IGZ1bmN0aW9uICBhbmdsZTJkKGF4LCBheSwgYngsIGJ5KSB7XG4gICAgcmV0dXJuIE1hdGguYXRhbjIoYnkgLSBheSwgYnggLSBheCk7XG59XG5cbi8vIFRoZXNlIGFyZSB0ZXJyaWJsZS5cbi8vIHNlZTogaHR0cHM6Ly9lbi53aWtpcGVkaWEub3JnL3dpa2kvTGluZWFyX2ludGVycG9sYXRpb25cbi8vIGV4cG9ydCBmdW5jdGlvbiBsZXJwMWQoc3RhcnQsIGVuZCwgZGVsdGEpIHtcbi8vICAgcmV0dXJuICggc3RhcnQueSAqIChlbmQueCAtIGRlbHRhKSArIGVuZC55ICogKGRlbHRhIC0gc3RhcnQueCkgKSAvIChlbmQueCAtIHN0YXJ0LngpO1xuLy8gfVxuXG4vLyBleHBvcnQgZnVuY3Rpb24gbGVycDJkKHN0YXJ0UG9zaXRpb24sIGVuZFBvc2l0aW9uLCBkZWx0YSkge1xuLy8gICByZXR1cm4geyBcbi8vICAgICB4OiBsZXJwMWQoc3RhcnRQb3NpdGlvbi54LCBlbmRQb3NpdGlvbi54LCBkZWx0YSksXG4vLyAgICAgeTogbGVycDFkKHN0YXJ0UG9zaXRpb24ueSwgZW5kUG9zaXRpb24ueSwgZGVsdGEpLFxuLy8gICB9XG4vLyB9XG5cbmV4cG9ydCBmdW5jdGlvbiBkaXN0YW5jZTJkKHN0YXJ0UG9zaXRpb24sIGVuZFBvc2l0aW9uKSB7XG4gIGNvbnN0IGFTcXVhcmVkID0gTWF0aC5wb3coc3RhcnRQb3NpdGlvbi54IC0gZW5kUG9zaXRpb24ueCwgMik7XG4gIGNvbnN0IGJTcXVhcmVkID0gTWF0aC5wb3coc3RhcnRQb3NpdGlvbi55IC0gZW5kUG9zaXRpb24ueSwgMik7XG4gIHJldHVybiBNYXRoLnNxcnQoYVNxdWFyZWQgKyBiU3F1YXJlZCk7XG59XG5cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9IZWxwZXJzL2d4MkQuanMiXSwibWFwcGluZ3MiOiI7Ozs7O0FBQ0E7QUFpQkE7QUFqQkE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EiLCJzb3VyY2VSb290IjoiIn0=");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _SpriteImage = __webpack_require__(51);
+
+var _SpriteImage2 = _interopRequireDefault(_SpriteImage);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ImageLoader = new Map();
+
+var MediaManager = function () {
+  function MediaManager() {
+    _classCallCheck(this, MediaManager);
+  }
+
+  _createClass(MediaManager, [{
+    key: 'loadImage',
+    value: function loadImage(imageSource) {
+
+      var imgElement = ImageLoader.get(imageSource);
+      if (!imgElement) {
+
+        imgElement = new Image();
+        imgElement.src = imageSource;
+
+        imgElement.addEventListener('load', function (e) {
+          console.log("Image loaded.");
+        });
+        ImageLoader.set(imageSource, imgElement);
+      }
+
+      return imgElement;
+    }
+  }]);
+
+  return MediaManager;
+}();
+
+exports.default = new MediaManager();
 
 /***/ }),
 /* 9 */
-/* unknown exports provided */
-/* all exports used */
-/*!****************************************!*\
-  !*** ./classes/client/MediaManager.js ***!
-  \****************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar ImageLoader = new Map();\n\nvar MediaManager = function () {\n  function MediaManager() {\n    _classCallCheck(this, MediaManager);\n  }\n\n  _createClass(MediaManager, [{\n    key: \"loadImage\",\n    value: function loadImage(imageSource, loadComplete) {\n      // var p = new Promise(function(res, rej) {\n      var imgElement = ImageLoader.get(imageSource);\n      if (!imgElement) {\n        imgElement = new Image();\n        imgElement.src = imageSource;\n        // TODO: handle errors where images are not found.\n        imgElement.addEventListener('load', function (e) {\n          console.log(\"Image loaded.\");\n        });\n        ImageLoader.set(imageSource, imgElement);\n        // imgElement.addEventListener('load', (e) => { res(imgElement); });\n        // imgElement.addEventListener('error', (e) => { rej(e); });\n      }\n      // res(imgElement);\n      return imgElement;\n\n      // });\n      // if(typeof loadComplete === \"function\") {\n      //   p.then((image) => loadComplete(undefined, image)).catch((err) => loadComplete(err, undefined));\n      // } else {\n      //   return p;\n      // }\n    }\n  }]);\n\n  return MediaManager;\n}();\n\nexports.default = new MediaManager();//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiOS5qcyIsInNvdXJjZXMiOlsid2VicGFjazovLy9jbGFzc2VzL2NsaWVudC9NZWRpYU1hbmFnZXIuanM/MzA2ZSJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmNvbnN0IEltYWdlTG9hZGVyID0gbmV3IE1hcCgpO1xuXG5jbGFzcyBNZWRpYU1hbmFnZXIge1xuICBsb2FkSW1hZ2UoaW1hZ2VTb3VyY2UsIGxvYWRDb21wbGV0ZSkge1xuICAgIC8vIHZhciBwID0gbmV3IFByb21pc2UoZnVuY3Rpb24ocmVzLCByZWopIHtcbiAgICAgIGxldCBpbWdFbGVtZW50ID0gSW1hZ2VMb2FkZXIuZ2V0KGltYWdlU291cmNlKTtcbiAgICAgIGlmICghaW1nRWxlbWVudCkge1xuICAgICAgICBpbWdFbGVtZW50ID0gbmV3IEltYWdlKCk7XG4gICAgICAgIGltZ0VsZW1lbnQuc3JjID0gaW1hZ2VTb3VyY2U7XG4gICAgICAgIC8vIFRPRE86IGhhbmRsZSBlcnJvcnMgd2hlcmUgaW1hZ2VzIGFyZSBub3QgZm91bmQuXG4gICAgICAgIGltZ0VsZW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignbG9hZCcsIChlKSA9PiB7IFxuICAgICAgICAgIGNvbnNvbGUubG9nKFwiSW1hZ2UgbG9hZGVkLlwiKTsgXG4gICAgICAgIH0pO1xuICAgICAgICBJbWFnZUxvYWRlci5zZXQoaW1hZ2VTb3VyY2UsIGltZ0VsZW1lbnQpO1xuICAgICAgICAvLyBpbWdFbGVtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ2xvYWQnLCAoZSkgPT4geyByZXMoaW1nRWxlbWVudCk7IH0pO1xuICAgICAgICAvLyBpbWdFbGVtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ2Vycm9yJywgKGUpID0+IHsgcmVqKGUpOyB9KTtcbiAgICAgIH1cbiAgICAgICAgLy8gcmVzKGltZ0VsZW1lbnQpO1xuICAgICAgICByZXR1cm4gaW1nRWxlbWVudDtcblxuICAgIC8vIH0pO1xuICAgIC8vIGlmKHR5cGVvZiBsb2FkQ29tcGxldGUgPT09IFwiZnVuY3Rpb25cIikge1xuICAgIC8vICAgcC50aGVuKChpbWFnZSkgPT4gbG9hZENvbXBsZXRlKHVuZGVmaW5lZCwgaW1hZ2UpKS5jYXRjaCgoZXJyKSA9PiBsb2FkQ29tcGxldGUoZXJyLCB1bmRlZmluZWQpKTtcbiAgICAvLyB9IGVsc2Uge1xuICAgIC8vICAgcmV0dXJuIHA7XG4gICAgLy8gfVxuICB9XG59XG5cbmV4cG9ydCBkZWZhdWx0IG5ldyBNZWRpYU1hbmFnZXIoKTtcblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9jbGllbnQvTWVkaWFNYW5hZ2VyLmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7O0FBQ0E7QUFDQTtBQUNBOzs7Ozs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7Ozs7QUFHQSIsInNvdXJjZVJvb3QiOiIifQ==");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Sprite2 = __webpack_require__(0);
+
+var _Sprite3 = _interopRequireDefault(_Sprite2);
+
+var _ColliderTypes = __webpack_require__(4);
+
+var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
+
+var _ProgressBar = __webpack_require__(19);
+
+var _ProgressBar2 = _interopRequireDefault(_ProgressBar);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Character = function (_Sprite) {
+  _inherits(Character, _Sprite);
+
+  function Character() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Character);
+
+    if (!params.collider) params.collider = { type: _ColliderTypes2.default.RADIUS };
+    params.abilities = params.abilities || ['FIREBALL'];
+    return _possibleConstructorReturn(this, (Character.__proto__ || Object.getPrototypeOf(Character)).call(this, params));
+  }
+
+  _createClass(Character, [{
+    key: 'canCast',
+    value: function canCast(spellId) {
+      // TODO: Check if the character has the spell in their spellbook and if it's not on cooldown.
+      return true;
+    }
+  }, {
+    key: 'isVisibleTo',
+    value: function isVisibleTo(bounds) {
+      var right = this.position.x + (this.width || 32);
+      var bottom = this.position.y + (this.width || 32);
+
+      var isGood = this.position.x < bounds.right && this.position.y < bounds.bottom && right > bounds.left && bottom > bounds.top;
+      return isGood;
+    }
+  }, {
+    key: 'drawHealthBar',
+    value: function drawHealthBar(context) {
+      if (this.isActive() && !this.isDead) {
+        if (!this.healthBar) {
+          console.log("creating a healthbar");
+          this.healthBar = new _ProgressBar2.default({
+            x: 0,
+            y: 0,
+            width: 32, // TODO: Use game settings
+            height: 5,
+            current: this.stats.hp,
+            max: this.stats.maxHp,
+            // bgColor: 
+            // fgColor:
+            parentGO: this
+          });
+          this.healthBar.setBounds(this.position.x - 16, this.position.y - 16);
+          this.healthBar.draw(context);
+        } else {
+          // console.log("Setting healthbar bounds to: ", this.position, this.instanceId);
+          this.healthBar.setBounds(this.position.x - 16, this.position.y - 16);
+          this.healthBar.draw(context);
+        }
+      }
+    }
+  }, {
+    key: 'tookDamage',
+    value: function tookDamage() {
+      var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var damageSource = arguments[1];
+
+      // TODO: modifiers.
+      this.health -= amount;
+      var overkill = 0;
+      if (this.health < 0) {
+        overkill = -this.health;
+        // console.log("Overkill!!!! -> " + overkill  + " HP");
+        this.health = 0;
+      }
+      console.log("taking damage!");
+    }
+  }]);
+
+  return Character;
+}(_Sprite3.default);
+
+exports.default = Character;
 
 /***/ }),
 /* 10 */
-/* unknown exports provided */
-/* all exports used */
-/*!*************************************!*\
-  !*** ./classes/shared/Character.js ***!
-  \*************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _Sprite2 = __webpack_require__(/*! ./Sprite */ 0);\n\nvar _Sprite3 = _interopRequireDefault(_Sprite2);\n\nvar _ColliderTypes = __webpack_require__(/*! ../ColliderTypes */ 5);\n\nvar _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);\n\nvar _ProgressBar = __webpack_require__(/*! ../client/ProgressBar */ 17);\n\nvar _ProgressBar2 = _interopRequireDefault(_ProgressBar);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar Character = function (_Sprite) {\n  _inherits(Character, _Sprite);\n\n  function Character() {\n    var paramObject = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n    _classCallCheck(this, Character);\n\n    if (!paramObject.collider) paramObject.collider = { type: _ColliderTypes2.default.RADIUS };\n    return _possibleConstructorReturn(this, (Character.__proto__ || Object.getPrototypeOf(Character)).call(this, paramObject));\n  }\n\n  _createClass(Character, [{\n    key: 'canCast',\n    value: function canCast(spellId) {\n      // TODO: Check if the character has the spell in their spellbook and if it's not on cooldown.\n      return true;\n    }\n  }, {\n    key: 'isVisibleTo',\n    value: function isVisibleTo(bounds) {\n      var right = this.position.x + (this.width || 32);\n      var bottom = this.position.y + (this.width || 32);\n\n      var isGood = this.position.x < bounds.right && this.position.y < bounds.bottom && right > bounds.left && bottom > bounds.top;\n      return isGood;\n    }\n  }, {\n    key: 'drawHealthBar',\n    value: function drawHealthBar(context) {\n      if (this.isActive() && !this.isDead) {\n        if (!this.healthBar) {\n          console.log(\"creating a healthbar\");\n          this.healthBar = new _ProgressBar2.default({\n            x: 0,\n            y: 0,\n            width: 32, // TODO: Use game settings\n            height: 5,\n            current: this.stats.hp,\n            max: this.stats.maxHp,\n            // bgColor: \n            // fgColor:\n            parentGO: this\n          });\n          this.healthBar.setBounds(this.position.x - 16, this.position.y - 16);\n          this.healthBar.draw(context);\n        } else {\n          // console.log(\"Setting healthbar bounds to: \", this.position, this.instanceId);\n          this.healthBar.setBounds(this.position.x - 16, this.position.y - 16);\n          this.healthBar.draw(context);\n        }\n      }\n    }\n  }, {\n    key: 'tookDamage',\n    value: function tookDamage() {\n      var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;\n      var damageSource = arguments[1];\n\n      // TODO: modifiers.\n      this.health -= amount;\n      var overkill = 0;\n      if (this.health < 0) {\n        overkill = -this.health;\n        // console.log(\"Overkill!!!! -> \" + overkill  + \" HP\");\n        this.health = 0;\n      }\n      console.log(\"taking damage!\");\n    }\n  }]);\n\n  return Character;\n}(_Sprite3.default);\n\nexports.default = Character;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTAuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvQ2hhcmFjdGVyLmpzPzJiZTkiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFNwcml0ZSBmcm9tICcuL1Nwcml0ZSc7XG5pbXBvcnQgQ29sbGlkZXJUeXBlcyBmcm9tICcuLi9Db2xsaWRlclR5cGVzJztcblxuaW1wb3J0IFByb2dyZXNzQmFyIGZyb20gJy4uL2NsaWVudC9Qcm9ncmVzc0Jhcic7XG5cbmNsYXNzIENoYXJhY3RlciBleHRlbmRzIFNwcml0ZSB7XG4gIGNvbnN0cnVjdG9yKHBhcmFtT2JqZWN0ID0ge30pIHtcbiAgICBpZighcGFyYW1PYmplY3QuY29sbGlkZXIpIHBhcmFtT2JqZWN0LmNvbGxpZGVyID0geyB0eXBlOiBDb2xsaWRlclR5cGVzLlJBRElVUyB9XG4gICAgc3VwZXIocGFyYW1PYmplY3QpO1xuICB9XG5cbiAgY2FuQ2FzdChzcGVsbElkKSB7XG4gICAgLy8gVE9ETzogQ2hlY2sgaWYgdGhlIGNoYXJhY3RlciBoYXMgdGhlIHNwZWxsIGluIHRoZWlyIHNwZWxsYm9vayBhbmQgaWYgaXQncyBub3Qgb24gY29vbGRvd24uXG4gICAgcmV0dXJuIHRydWU7XG4gIH1cblxuICBpc1Zpc2libGVUbyhib3VuZHMpIHtcbiAgICBjb25zdCByaWdodCA9IHRoaXMucG9zaXRpb24ueCArICh0aGlzLndpZHRoIHx8IDMyKTtcbiAgICBjb25zdCBib3R0b20gPSB0aGlzLnBvc2l0aW9uLnkgKyAodGhpcy53aWR0aCB8fCAzMik7XG5cbiAgICBjb25zdCBpc0dvb2QgPSB0aGlzLnBvc2l0aW9uLnggPCBib3VuZHMucmlnaHRcbiAgICAgICAgICAgJiYgdGhpcy5wb3NpdGlvbi55IDwgYm91bmRzLmJvdHRvbVxuICAgICAgICAgICAmJiByaWdodCA+IGJvdW5kcy5sZWZ0XG4gICAgICAgICAgICYmIGJvdHRvbSA+IGJvdW5kcy50b3A7XG4gICAgcmV0dXJuIGlzR29vZDtcbiAgfVxuXG4gIGRyYXdIZWFsdGhCYXIoY29udGV4dCkge1xuICAgIGlmKHRoaXMuaXNBY3RpdmUoKSAmJiAhdGhpcy5pc0RlYWQpIHtcbiAgICAgIGlmKCF0aGlzLmhlYWx0aEJhcikge1xuICAgICAgICBjb25zb2xlLmxvZyhcImNyZWF0aW5nIGEgaGVhbHRoYmFyXCIpO1xuICAgICAgICB0aGlzLmhlYWx0aEJhciA9IG5ldyBQcm9ncmVzc0Jhcih7XG4gICAgICAgICAgeDogMCxcbiAgICAgICAgICB5OiAwLFxuICAgICAgICAgIHdpZHRoOiAzMiwgLy8gVE9ETzogVXNlIGdhbWUgc2V0dGluZ3NcbiAgICAgICAgICBoZWlnaHQ6IDUsIFxuICAgICAgICAgIGN1cnJlbnQ6IHRoaXMuc3RhdHMuaHAsXG4gICAgICAgICAgbWF4OiB0aGlzLnN0YXRzLm1heEhwLFxuICAgICAgICAgIC8vIGJnQ29sb3I6IFxuICAgICAgICAgIC8vIGZnQ29sb3I6XG4gICAgICAgICAgcGFyZW50R086IHRoaXNcbiAgICAgICAgfSk7XG4gICAgICAgIHRoaXMuaGVhbHRoQmFyLnNldEJvdW5kcyh0aGlzLnBvc2l0aW9uLnggLSAxNiwgdGhpcy5wb3NpdGlvbi55IC0gMTYpO1xuICAgICAgICB0aGlzLmhlYWx0aEJhci5kcmF3KGNvbnRleHQpO1xuICAgICAgfSBlbHNlIHtcbiAgICAgICAgLy8gY29uc29sZS5sb2coXCJTZXR0aW5nIGhlYWx0aGJhciBib3VuZHMgdG86IFwiLCB0aGlzLnBvc2l0aW9uLCB0aGlzLmluc3RhbmNlSWQpO1xuICAgICAgICB0aGlzLmhlYWx0aEJhci5zZXRCb3VuZHModGhpcy5wb3NpdGlvbi54IC0gMTYsIHRoaXMucG9zaXRpb24ueSAtIDE2KTtcbiAgICAgICAgdGhpcy5oZWFsdGhCYXIuZHJhdyhjb250ZXh0KTtcbiAgICAgIH1cbiAgICB9XG4gIH1cblxuICB0b29rRGFtYWdlKGFtb3VudCA9IDAsIGRhbWFnZVNvdXJjZSkge1xuICAgIC8vIFRPRE86IG1vZGlmaWVycy5cbiAgICB0aGlzLmhlYWx0aCAtPSBhbW91bnQ7XG4gICAgbGV0IG92ZXJraWxsID0gMDtcbiAgICBpZiAodGhpcy5oZWFsdGggPCAwKSB7XG4gICAgICBvdmVya2lsbCA9IC10aGlzLmhlYWx0aDtcbiAgICAgIC8vIGNvbnNvbGUubG9nKFwiT3ZlcmtpbGwhISEhIC0+IFwiICsgb3ZlcmtpbGwgICsgXCIgSFBcIik7XG4gICAgICB0aGlzLmhlYWx0aCA9IDA7XG4gICAgfVxuICAgIGNvbnNvbGUubG9nKFwidGFraW5nIGRhbWFnZSFcIik7XG5cbiAgfVxuXG59XG5cbmV4cG9ydCBkZWZhdWx0IENoYXJhY3RlcjtcblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9zaGFyZWQvQ2hhcmFjdGVyLmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7OztBQUFBO0FBQ0E7OztBQUFBO0FBQ0E7OztBQUNBO0FBQ0E7Ozs7Ozs7Ozs7O0FBQ0E7OztBQUNBO0FBQUE7QUFDQTtBQURBO0FBQ0E7QUFBQTtBQURBO0FBR0E7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFJQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBVEE7QUFXQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQUE7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUE7Ozs7OztBQUlBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _Character2 = __webpack_require__(9);
+
+var _Character3 = _interopRequireDefault(_Character2);
+
+var _GameSettings = __webpack_require__(1);
+
+var _ColliderTypes = __webpack_require__(4);
+
+var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
+
+var _gx2D = __webpack_require__(6);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// import FireballAbility from './abilities/FireballAbility';
+
+//import World, { MessageTypes, sendPackage, broadcastPackage  } from '../GameEngine';
+
+var PlayerCharacter = function (_Character) {
+  _inherits(PlayerCharacter, _Character);
+
+  function PlayerCharacter() {
+    var characterName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Frank';
+
+    _classCallCheck(this, PlayerCharacter);
+
+    var _this = _possibleConstructorReturn(this, (PlayerCharacter.__proto__ || Object.getPrototypeOf(PlayerCharacter)).call(this, {
+      collider: {
+        type: _ColliderTypes2.default.RADIUS,
+        tags: ['PLAYER'],
+        radius: 5
+      }
+    }));
+
+    _this.id = -1;
+
+    _this.name = characterName;
+    _this.stats = {
+      level: 1,
+      strength: 1,
+      hp: 50,
+      maxHp: 50,
+      maxVelocity: 8 * _GameSettings.GameSettings.TILE_SCALE,
+      acceleration: 16 * _GameSettings.GameSettings.TILE_SCALE
+    };
+    _this.levelId = 1;
+    _this.strength = 1;
+    // this.health = 50; <- this is now tracked using getters and setters.
+    _this.maxHealth = 50;
+    _this.velocity = 0;
+
+    _this.moveTarget = {};
+
+    _this.setTexture('./images/PlayerOverhead.png');
+
+    _this.abilities = ['FIREBALL', 'BLUEBEAM'];
+
+    console.log("Abilities: ", _this.abilities);
+
+    return _this;
+  }
+
+  _createClass(PlayerCharacter, [{
+    key: 'setPosition',
+    value: function setPosition(position) {
+      _get(PlayerCharacter.prototype.__proto__ || Object.getPrototypeOf(PlayerCharacter.prototype), 'setPosition', this).call(this, position);
+      this.tx = Math.round(this.position.x / _GameSettings.GameSettings.TILE_SCALE);
+      this.ty = Math.round(this.position.y / _GameSettings.GameSettings.TILE_SCALE);
+      if (this.tx < 0) this.tx = 0;
+      if (this.ty < 0) this.ty = 0;
+    }
+  }, {
+    key: 'setMoveTarget',
+    value: function setMoveTarget(x, y) {
+      this.moveTarget = { x: x, y: y };
+    }
+  }, {
+    key: 'clearMoveTarget',
+    value: function clearMoveTarget() {
+      this.moveTarget = undefined;
+      this.moveAngle = undefined;
+    }
+  }, {
+    key: 'update',
+    value: function update(delta) {
+      if (this.hasMoveTarget) {
+        this.isWalking = true;
+
+        // TODO: make 8 = some STOPPING_DISTANCE constant ... GameSettings?
+        if ((0, _gx2D.distance2d)(this.position, this.moveTarget) < 8) {
+          this.clearMoveTarget();
+          return;
+        }
+
+        this.moveAngle = (0, _gx2D.angle2d)(this.position.x, this.position.y, this.moveTarget.x, this.moveTarget.y);
+        this.angle = this.moveAngle + Math.PI / 2;
+
+        if (this.velocity < this.stats.maxVelocity) {
+          // console.log('accelerating from: ' + this.velocity, "DELTA: " + delta, "ANGLE: " + this.angle);
+          this.velocity += this.stats.acceleration * delta / 1000;
+          if (this.velocity > this.stats.maxVelocity) this.velocity = this.stats.maxVelocity;
+          // console.log('New velocity: ' + this.velocity + '/' + this.stats.maxVelocity);
+        }
+
+        var deltaY = Math.sin(this.moveAngle) * this.velocity * (delta / 1000);
+        var deltaX = Math.cos(this.moveAngle) * this.velocity * (delta / 1000);
+
+        var newPosition = {
+          x: this.position.x + deltaX,
+          y: this.position.y + deltaY
+        };
+        //console.log(this.position, newPosition);
+        this.setPosition(newPosition);
+      } else {
+        this.isWalking = false;
+        if (this.hasMoveTarget) this.clearMoveTarget();
+        this.velocity = 0;
+      }
+      // console.log("updated player. calling super.");
+      _get(PlayerCharacter.prototype.__proto__ || Object.getPrototypeOf(PlayerCharacter.prototype), 'update', this).call(this, delta);
+    }
+  }, {
+    key: 'toJSON',
+    value: function toJSON() {
+      var _this2 = this;
+
+      var out = Object.assign({}, this);
+      if (out.children) {
+        out.children = out.children.map(function (c) {
+          var newChild = Object.assign({}, c);
+          c.parentGO = undefined;
+          c.parentId = _this2.instanceId;
+          return newChild;
+        });
+      }
+      if (out.collider && out.collider.ownerGO) {
+        out.collider = Object.assign({}, out.collider);
+        out.collider.ownerGO = undefined;
+      }
+      return out;
+    }
+  }, {
+    key: 'health',
+    get: function get() {
+      return this.stats.hp;
+    },
+    set: function set(value) {
+      this.stats.hp = value;
+    }
+  }, {
+    key: 'hasMoveTarget',
+    get: function get() {
+      return this.moveTarget && this.moveTarget.x && this.moveTarget.y;
+    }
+  }]);
+
+  return PlayerCharacter;
+}(_Character3.default);
+
+exports.default = PlayerCharacter;
 
 /***/ }),
 /* 11 */
-/* unknown exports provided */
-/* all exports used */
-/*!************************************!*\
-  !*** ./classes/shared/Collider.js ***!
-  \************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.CollisionStatus = undefined;\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _guid = __webpack_require__(/*! ../Helpers/guid */ 2);\n\nvar _ColliderTypes = __webpack_require__(/*! ../ColliderTypes */ 5);\n\nvar _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar Collider = function () {\n  function Collider() {\n    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n    var ownerGO = arguments[1];\n\n    _classCallCheck(this, Collider);\n\n    //console.log(\"constructing collider for owner: \" + ownerGO.instanceId, ownerGO);\n    //console.log(\"Tags: \", params.tags);\n    this.ownerGO = ownerGO;\n\n    this.type = params.type || _ColliderTypes2.default.NONE;\n    this.radius = params.radius || 16;\n    this.rect = params.rect || { left: 0, top: 0, right: 32, bottom: 32 };\n    // Tags that this object has.\n    this.tags = params.tags || ['ALL'];\n    // Tags that this object reacts to.\n    this.collidesWith = params.collidesWith || ['ALL'];\n\n    this.ignoresIds = params.ignoresIds || [];\n\n    //TODO: temporary, remove\n    this.instanceId = (0, _guid.guid)();\n\n    this.currentCollisions = [];\n  }\n\n  _createClass(Collider, [{\n    key: 'getCollisionStatus',\n    value: function getCollisionStatus(otherCollider) {\n      // If I have the sprite and not the collider, try to get the collider\n      if (!(otherCollider instanceof Collider)) otherCollider = otherCollider.collider;\n      if (!(otherCollider instanceof Collider)) return CollisionStatus.NONE;\n      // If the other collider's game object is not active.\n      if (!otherCollider.ownerGO.isActive()) return CollisionStatus.NONE;\n\n      // If I'm colliding with myself return CollisionStatus.NONE;\n      if (otherCollider === this) return CollisionStatus.NONE;\n      // Excludes should be provided via ignoresIds\n      if (this.ignoresIds.includes(otherCollider.ownerGO.instanceId)) return CollisionStatus.NONE;\n      // If no collision tracking return CollisionStatus.NONE\n      if (this.type === _ColliderTypes2.default.NONE || otherCollider.type === _ColliderTypes2.default.NONE) return CollisionStatus.NONE;\n\n      // Check types\n      var collidedTags = this.collidesWith.filter(function (tag) {\n        if (otherCollider.tags.includes(tag)) {\n          return true;\n        }\n        return false;\n      });\n      // No collisions on expected tag types.\n      if (collidedTags.length === 0) return CollisionStatus.NONE;\n\n      if (this.type === _ColliderTypes2.default.RADIUS && otherCollider.type === _ColliderTypes2.default.RADIUS) {\n        // two radius colliders\n        var thisCenter = this.getColliderPoint(PointEnum.CENTER);\n        var otherCenter = otherCollider.getColliderPoint(PointEnum.CENTER);\n        var distance = this.getDistanceBetween(thisCenter, otherCenter);\n        var isOverlapping = false;\n        if (distance < this.radius + otherCollider.radius) {\n          // console.log(\"Collision at distance: \" + distance, thisCenter, otherCenter);\n          isOverlapping = true;\n        }\n        if (isOverlapping && !this.currentCollisions.includes(otherCollider.instanceId)) {\n          // console.log(\"collision enter\");\n          // console.log(\"Collided with tags: \", collidedTags);\n          this.currentCollisions.push(otherCollider.instanceId);\n          return CollisionStatus.ENTER;\n        } else if (isOverlapping) {\n          return CollisionStatus.COLLIDING;\n        }\n        if (!isOverlapping && this.currentCollisions.includes(otherCollider.instanceId)) {\n          // console.log(\"collision leave\\n\\n\\n\");\n          this.currentCollisions.splice(this.currentCollisions.indexOf(otherCollider.instanceId), 1);\n          return CollisionStatus.EXIT;\n        }\n        return CollisionStatus.NONE;\n      } else if (this.type === _ColliderTypes2.default.RECTANGLE && otherCollider.type === _ColliderTypes2.default.RECTANGLE) {\n        // two square colliders\n\n      } else if (this.type === _ColliderTypes2.default.RADIUS) {\n        // one of each: this is radius, other is rectangle\n      } else if (this.type === _ColliderTypes2.default.RECTANGLE) {\n        // one of each: this is rectangle, other is radius\n      } else {\n        console.error(\"Unknown collider type: \" + this.type + \" - \" + otherCollider.type);\n      }\n      return false;\n    }\n  }, {\n    key: 'getAbsoluteRect',\n    value: function getAbsoluteRect() {\n      return {\n        left: this.rect.left + this.ownerGO.position.x,\n        right: this.rect.right + this.ownerGO.position.x,\n        top: this.rect.top + this.ownerGO.position.y,\n        bottom: this.rect.bottom + this.ownerGO.position.y\n      };\n    }\n  }, {\n    key: 'getColliderPoint',\n    value: function getColliderPoint(pointType) {\n      var absRect = this.getAbsoluteRect();\n      switch (pointType) {\n        case PointEnum.CENTER:\n          return {\n            x: absRect.left + (absRect.right - absRect.left) / 2,\n            y: absRect.top + (absRect.bottom - absRect.top) / 2\n          };\n        case PointEnum.TOPLEFT:\n          return { x: absRect.left, y: absRect.top };\n        case PointEnum.TOPRIGHT:\n          return { x: absRect.right, y: absRect.top };\n        case PointEnum.BOTTOMLEFT:\n          return { x: absRect.left, y: absRect.bottom };\n        case PointEnum.BOTTOMRIGHT:\n          return { x: absRect.right, y: absRect.bottom };\n        default:\n          return undefined;\n      }\n    }\n\n    // TODO: this probably belongs in some central place (\"engine?\") so the app can access it to.\n\n  }, {\n    key: 'getDistanceBetween',\n    value: function getDistanceBetween(pointA, pointB) {\n      var aSquared = Math.pow(pointA.x - pointB.x, 2);\n      var bSquared = Math.pow(pointA.y - pointB.y, 2);\n      return Math.sqrt(aSquared + bSquared);\n    }\n  }]);\n\n  return Collider;\n}();\n\nvar PointEnum = {\n  CENTER: 'CENTER',\n  TOPLEFT: 'TOPLEFT',\n  TOPRIGHT: 'TOPRIGHT',\n  BOTTOMLEFT: 'BOTTOMLEFT',\n  BOTTOMRIGHT: 'BOTTOMRIGHT'\n};\n\nvar CollisionStatus = exports.CollisionStatus = {\n  ENTER: 'ENTER',\n  COLLIDING: 'COLLIDING',\n  EXIT: 'EXIT',\n  NONE: 'NONE'\n};\n\nexports.default = Collider;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTEuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvQ29sbGlkZXIuanM/YjQzYiJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmltcG9ydCB7IGd1aWQgfSBmcm9tICcuLi9IZWxwZXJzL2d1aWQnO1xuaW1wb3J0IENvbGxpZGVyVHlwZXMgZnJvbSAnLi4vQ29sbGlkZXJUeXBlcyc7XG5cbmNsYXNzIENvbGxpZGVyIHtcbiAgY29uc3RydWN0b3IocGFyYW1zID0ge30sIG93bmVyR08pIHtcblxuICAgIC8vY29uc29sZS5sb2coXCJjb25zdHJ1Y3RpbmcgY29sbGlkZXIgZm9yIG93bmVyOiBcIiArIG93bmVyR08uaW5zdGFuY2VJZCwgb3duZXJHTyk7XG4gICAgLy9jb25zb2xlLmxvZyhcIlRhZ3M6IFwiLCBwYXJhbXMudGFncyk7XG4gICAgdGhpcy5vd25lckdPID0gb3duZXJHTztcblxuICAgIHRoaXMudHlwZSA9IHBhcmFtcy50eXBlIHx8IENvbGxpZGVyVHlwZXMuTk9ORTtcbiAgICB0aGlzLnJhZGl1cyA9IHBhcmFtcy5yYWRpdXMgfHwgMTY7XG4gICAgdGhpcy5yZWN0ID0gcGFyYW1zLnJlY3QgfHwgeyBsZWZ0OiAwLCB0b3A6IDAsIHJpZ2h0OiAzMiwgYm90dG9tOiAzMiB9O1xuICAgIC8vIFRhZ3MgdGhhdCB0aGlzIG9iamVjdCBoYXMuXG4gICAgdGhpcy50YWdzID0gcGFyYW1zLnRhZ3MgfHwgWydBTEwnXTtcbiAgICAvLyBUYWdzIHRoYXQgdGhpcyBvYmplY3QgcmVhY3RzIHRvLlxuICAgIHRoaXMuY29sbGlkZXNXaXRoID0gcGFyYW1zLmNvbGxpZGVzV2l0aCB8fCBbJ0FMTCddO1xuXG4gICAgdGhpcy5pZ25vcmVzSWRzID0gcGFyYW1zLmlnbm9yZXNJZHMgfHwgW107XG5cbiAgICAvL1RPRE86IHRlbXBvcmFyeSwgcmVtb3ZlXG4gICAgdGhpcy5pbnN0YW5jZUlkID0gZ3VpZCgpO1xuXG4gICAgdGhpcy5jdXJyZW50Q29sbGlzaW9ucyA9IFtdO1xuXG4gIH1cblxuICBnZXRDb2xsaXNpb25TdGF0dXMob3RoZXJDb2xsaWRlcikge1xuICAgIC8vIElmIEkgaGF2ZSB0aGUgc3ByaXRlIGFuZCBub3QgdGhlIGNvbGxpZGVyLCB0cnkgdG8gZ2V0IHRoZSBjb2xsaWRlclxuICAgIGlmKCEob3RoZXJDb2xsaWRlciBpbnN0YW5jZW9mIENvbGxpZGVyKSkgb3RoZXJDb2xsaWRlciA9IG90aGVyQ29sbGlkZXIuY29sbGlkZXI7XG4gICAgaWYoIShvdGhlckNvbGxpZGVyIGluc3RhbmNlb2YgQ29sbGlkZXIpKSByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG4gICAgLy8gSWYgdGhlIG90aGVyIGNvbGxpZGVyJ3MgZ2FtZSBvYmplY3QgaXMgbm90IGFjdGl2ZS5cbiAgICBpZighb3RoZXJDb2xsaWRlci5vd25lckdPLmlzQWN0aXZlKCkpIHJldHVybiBDb2xsaXNpb25TdGF0dXMuTk9ORTtcblxuICAgIC8vIElmIEknbSBjb2xsaWRpbmcgd2l0aCBteXNlbGYgcmV0dXJuIENvbGxpc2lvblN0YXR1cy5OT05FO1xuICAgIGlmKG90aGVyQ29sbGlkZXIgPT09IHRoaXMpIHJldHVybiBDb2xsaXNpb25TdGF0dXMuTk9ORTtcbiAgICAvLyBFeGNsdWRlcyBzaG91bGQgYmUgcHJvdmlkZWQgdmlhIGlnbm9yZXNJZHNcbiAgICBpZih0aGlzLmlnbm9yZXNJZHMuaW5jbHVkZXMob3RoZXJDb2xsaWRlci5vd25lckdPLmluc3RhbmNlSWQpKSByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG4gICAgLy8gSWYgbm8gY29sbGlzaW9uIHRyYWNraW5nIHJldHVybiBDb2xsaXNpb25TdGF0dXMuTk9ORVxuICAgIGlmKHRoaXMudHlwZSA9PT0gQ29sbGlkZXJUeXBlcy5OT05FIHx8IG90aGVyQ29sbGlkZXIudHlwZSA9PT0gQ29sbGlkZXJUeXBlcy5OT05FKSByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG4gICAgXG4gICAgLy8gQ2hlY2sgdHlwZXNcbiAgICBjb25zdCBjb2xsaWRlZFRhZ3MgPSB0aGlzLmNvbGxpZGVzV2l0aC5maWx0ZXIoZnVuY3Rpb24odGFnKSB7XG4gICAgICBpZihvdGhlckNvbGxpZGVyLnRhZ3MuaW5jbHVkZXModGFnKSkge1xuICAgICAgICByZXR1cm4gdHJ1ZTtcbiAgICAgIH1cbiAgICAgIHJldHVybiBmYWxzZTtcbiAgICB9KTtcbiAgICAvLyBObyBjb2xsaXNpb25zIG9uIGV4cGVjdGVkIHRhZyB0eXBlcy5cbiAgICBpZihjb2xsaWRlZFRhZ3MubGVuZ3RoID09PSAwKSByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG5cbiAgICBpZih0aGlzLnR5cGUgPT09IENvbGxpZGVyVHlwZXMuUkFESVVTICYmIG90aGVyQ29sbGlkZXIudHlwZSA9PT0gQ29sbGlkZXJUeXBlcy5SQURJVVMpIHtcbiAgICAgIC8vIHR3byByYWRpdXMgY29sbGlkZXJzXG4gICAgICBjb25zdCB0aGlzQ2VudGVyID0gdGhpcy5nZXRDb2xsaWRlclBvaW50KFBvaW50RW51bS5DRU5URVIpO1xuICAgICAgY29uc3Qgb3RoZXJDZW50ZXIgPSBvdGhlckNvbGxpZGVyLmdldENvbGxpZGVyUG9pbnQoUG9pbnRFbnVtLkNFTlRFUik7XG4gICAgICBjb25zdCBkaXN0YW5jZSA9IHRoaXMuZ2V0RGlzdGFuY2VCZXR3ZWVuKHRoaXNDZW50ZXIsIG90aGVyQ2VudGVyKTtcbiAgICAgIGxldCBpc092ZXJsYXBwaW5nID0gZmFsc2U7XG4gICAgICBpZihkaXN0YW5jZSA8IHRoaXMucmFkaXVzICsgb3RoZXJDb2xsaWRlci5yYWRpdXMpIHtcbiAgICAgICAgLy8gY29uc29sZS5sb2coXCJDb2xsaXNpb24gYXQgZGlzdGFuY2U6IFwiICsgZGlzdGFuY2UsIHRoaXNDZW50ZXIsIG90aGVyQ2VudGVyKTtcbiAgICAgICAgaXNPdmVybGFwcGluZyA9IHRydWU7XG4gICAgICB9XG4gICAgICBpZihpc092ZXJsYXBwaW5nICYmICF0aGlzLmN1cnJlbnRDb2xsaXNpb25zLmluY2x1ZGVzKG90aGVyQ29sbGlkZXIuaW5zdGFuY2VJZCkpIHtcbiAgICAgICAgLy8gY29uc29sZS5sb2coXCJjb2xsaXNpb24gZW50ZXJcIik7XG4gICAgICAgIC8vIGNvbnNvbGUubG9nKFwiQ29sbGlkZWQgd2l0aCB0YWdzOiBcIiwgY29sbGlkZWRUYWdzKTtcbiAgICAgICAgdGhpcy5jdXJyZW50Q29sbGlzaW9ucy5wdXNoKG90aGVyQ29sbGlkZXIuaW5zdGFuY2VJZCk7XG4gICAgICAgIHJldHVybiBDb2xsaXNpb25TdGF0dXMuRU5URVI7XG4gICAgICB9IGVsc2UgaWYoaXNPdmVybGFwcGluZykge1xuICAgICAgICByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLkNPTExJRElORztcbiAgICAgIH1cbiAgICAgIGlmKCFpc092ZXJsYXBwaW5nICYmIHRoaXMuY3VycmVudENvbGxpc2lvbnMuaW5jbHVkZXMob3RoZXJDb2xsaWRlci5pbnN0YW5jZUlkKSkge1xuICAgICAgICAvLyBjb25zb2xlLmxvZyhcImNvbGxpc2lvbiBsZWF2ZVxcblxcblxcblwiKTtcbiAgICAgICAgdGhpcy5jdXJyZW50Q29sbGlzaW9ucy5zcGxpY2UodGhpcy5jdXJyZW50Q29sbGlzaW9ucy5pbmRleE9mKG90aGVyQ29sbGlkZXIuaW5zdGFuY2VJZCksIDEpO1xuICAgICAgICByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLkVYSVQ7XG4gICAgICB9XG4gICAgICByZXR1cm4gQ29sbGlzaW9uU3RhdHVzLk5PTkU7XG4gICAgfSBlbHNlIGlmKHRoaXMudHlwZSA9PT0gQ29sbGlkZXJUeXBlcy5SRUNUQU5HTEUgJiYgb3RoZXJDb2xsaWRlci50eXBlID09PSBDb2xsaWRlclR5cGVzLlJFQ1RBTkdMRSkge1xuICAgICAgLy8gdHdvIHNxdWFyZSBjb2xsaWRlcnNcbiAgICAgIFxuICAgIH0gZWxzZSBpZih0aGlzLnR5cGUgPT09IENvbGxpZGVyVHlwZXMuUkFESVVTKSB7XG4gICAgICAvLyBvbmUgb2YgZWFjaDogdGhpcyBpcyByYWRpdXMsIG90aGVyIGlzIHJlY3RhbmdsZVxuICAgIH0gZWxzZSBpZih0aGlzLnR5cGUgPT09IENvbGxpZGVyVHlwZXMuUkVDVEFOR0xFKSB7XG4gICAgICAvLyBvbmUgb2YgZWFjaDogdGhpcyBpcyByZWN0YW5nbGUsIG90aGVyIGlzIHJhZGl1c1xuICAgIH0gZWxzZSB7XG4gICAgICBjb25zb2xlLmVycm9yKFwiVW5rbm93biBjb2xsaWRlciB0eXBlOiBcIiArIHRoaXMudHlwZSArIFwiIC0gXCIgKyBvdGhlckNvbGxpZGVyLnR5cGUpO1xuICAgIH1cbiAgICByZXR1cm4gZmFsc2U7XG4gIH1cblxuICBnZXRBYnNvbHV0ZVJlY3QoKSB7XG4gICAgcmV0dXJuIHtcbiAgICAgIGxlZnQ6IHRoaXMucmVjdC5sZWZ0ICsgdGhpcy5vd25lckdPLnBvc2l0aW9uLngsXG4gICAgICByaWdodDogdGhpcy5yZWN0LnJpZ2h0ICsgdGhpcy5vd25lckdPLnBvc2l0aW9uLngsXG4gICAgICB0b3A6IHRoaXMucmVjdC50b3AgKyB0aGlzLm93bmVyR08ucG9zaXRpb24ueSxcbiAgICAgIGJvdHRvbTogdGhpcy5yZWN0LmJvdHRvbSArIHRoaXMub3duZXJHTy5wb3NpdGlvbi55LFxuICAgIH1cbiAgfVxuXG4gIGdldENvbGxpZGVyUG9pbnQocG9pbnRUeXBlKSB7XG4gICAgY29uc3QgYWJzUmVjdCA9IHRoaXMuZ2V0QWJzb2x1dGVSZWN0KCk7XG4gICAgc3dpdGNoKHBvaW50VHlwZSkge1xuICAgICAgY2FzZSBQb2ludEVudW0uQ0VOVEVSOlxuICAgICAgICByZXR1cm4ge1xuICAgICAgICAgIHg6IGFic1JlY3QubGVmdCArICggKGFic1JlY3QucmlnaHQgLSBhYnNSZWN0LmxlZnQpIC8gMiApLFxuICAgICAgICAgIHk6IGFic1JlY3QudG9wICsgKCAoYWJzUmVjdC5ib3R0b20gLSBhYnNSZWN0LnRvcCkgLyAyICksXG4gICAgICAgIH1cbiAgICAgIGNhc2UgUG9pbnRFbnVtLlRPUExFRlQ6XG4gICAgICAgIHJldHVybiB7IHg6IGFic1JlY3QubGVmdCwgeTogYWJzUmVjdC50b3AgfVxuICAgICAgY2FzZSBQb2ludEVudW0uVE9QUklHSFQ6XG4gICAgICAgIHJldHVybiB7IHg6IGFic1JlY3QucmlnaHQsIHk6IGFic1JlY3QudG9wIH1cbiAgICAgIGNhc2UgUG9pbnRFbnVtLkJPVFRPTUxFRlQ6XG4gICAgICAgIHJldHVybiB7IHg6IGFic1JlY3QubGVmdCwgeTogYWJzUmVjdC5ib3R0b20gfVxuICAgICAgY2FzZSBQb2ludEVudW0uQk9UVE9NUklHSFQ6XG4gICAgICAgIHJldHVybiB7IHg6IGFic1JlY3QucmlnaHQsIHk6IGFic1JlY3QuYm90dG9tIH1cbiAgICAgIGRlZmF1bHQ6XG4gICAgICAgIHJldHVybiB1bmRlZmluZWQ7XG4gICAgfVxuICB9XG5cbiAgLy8gVE9ETzogdGhpcyBwcm9iYWJseSBiZWxvbmdzIGluIHNvbWUgY2VudHJhbCBwbGFjZSAoXCJlbmdpbmU/XCIpIHNvIHRoZSBhcHAgY2FuIGFjY2VzcyBpdCB0by5cbiAgZ2V0RGlzdGFuY2VCZXR3ZWVuKHBvaW50QSwgcG9pbnRCKSB7XG4gICAgY29uc3QgYVNxdWFyZWQgPSBNYXRoLnBvdyhwb2ludEEueCAtIHBvaW50Qi54LCAyKTtcbiAgICBjb25zdCBiU3F1YXJlZCA9IE1hdGgucG93KHBvaW50QS55IC0gcG9pbnRCLnksIDIpO1xuICAgIHJldHVybiBNYXRoLnNxcnQoYVNxdWFyZWQgKyBiU3F1YXJlZCk7XG4gIH1cbn1cblxuY29uc3QgUG9pbnRFbnVtID0ge1xuICBDRU5URVI6ICdDRU5URVInLFxuICBUT1BMRUZUOiAnVE9QTEVGVCcsXG4gIFRPUFJJR0hUOiAnVE9QUklHSFQnLFxuICBCT1RUT01MRUZUOiAnQk9UVE9NTEVGVCcsXG4gIEJPVFRPTVJJR0hUOiAnQk9UVE9NUklHSFQnXG59XG5cbmV4cG9ydCBjb25zdCBDb2xsaXNpb25TdGF0dXMgPSB7XG4gIEVOVEVSOiAnRU5URVInLFxuICBDT0xMSURJTkc6ICdDT0xMSURJTkcnLFxuICBFWElUOiAnRVhJVCcsXG4gIE5PTkU6ICdOT05FJyxcbn1cblxuZXhwb3J0IGRlZmF1bHQgQ29sbGlkZXI7XG5cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9zaGFyZWQvQ29sbGlkZXIuanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7OztBQUNBO0FBQ0E7QUFBQTtBQUNBOzs7Ozs7O0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFDQTtBQURBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBOzs7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUpBO0FBTUE7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRkE7QUFJQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQWZBO0FBaUJBO0FBQ0E7QUFDQTtBQUNBOzs7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7Ozs7QUFHQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFMQTtBQUNBO0FBT0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUpBO0FBQ0E7QUFNQSIsInNvdXJjZVJvb3QiOiIifQ==");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.broadcastPackage = exports.sendPackage = exports.MessageTypes = undefined;
+
+var _ws = __webpack_require__(24);
+
+var _ws2 = _interopRequireDefault(_ws);
+
+var _MessageTypes = __webpack_require__(5);
+
+var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
+
+var _GameEngine = __webpack_require__(3);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.MessageTypes = _MessageTypes2.default;
+var sendPackage = exports.sendPackage = function sendPackage(socket) {
+  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  var attributes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  if (socket === null) throw new Error('Socket must be specified.'); // TODO: instanceof what?
+  if (type === null) throw new Error('Package type must be specified.');
+
+  if (socket.readyState !== _ws2.default.OPEN) return;
+
+  socket.send(JSON.stringify(Object.assign({ type: type }, attributes)));
+};
+
+var broadcastPackage = exports.broadcastPackage = function broadcastPackage() {
+  var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+  var attributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var clientIdList = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+  clientIdList = clientIdList || Object.keys(_GameEngine2.default.clients);
+  // TODO: only affect clients that are in range and can see (but for now everybody)
+  clientIdList.forEach(function (clientKey) {
+    // console.log("broadcasting package to: " + clientKey, type, attributes);
+    var c = _GameEngine2.default.clients[clientKey];
+    if (c) sendPackage(c.socket, type, attributes);
+  });
+};
 
 /***/ }),
 /* 12 */
-/* unknown exports provided */
-/* all exports used */
-/*!**********************************!*\
-  !*** ./classes/PlayerActions.js ***!
-  \**********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nvar PlayerActions = {\n  UNMAPPED: 'UNMAPPED',\n  LEFT: 'LEFT',\n  RIGHT: 'RIGHT',\n  UP: 'UP',\n  DOWN: 'DOWN',\n  SHIFT: 'SHIFT',\n  MOUSE_ACTION_1: 'MOUSE_ACTION_1',\n  MOUSE_ACTION_2: 'MOUSE_ACTION_2',\n  SHOOT_PROJECTILE: 'SHOOT_PROJECTILE'\n};\nexports.default = PlayerActions;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTIuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9QbGF5ZXJBY3Rpb25zLmpzPzFkNzUiXSwic291cmNlc0NvbnRlbnQiOlsiY29uc3QgUGxheWVyQWN0aW9ucyA9IHtcbiAgVU5NQVBQRUQ6ICdVTk1BUFBFRCcsXG4gIExFRlQ6ICdMRUZUJyxcbiAgUklHSFQ6ICdSSUdIVCcsXG4gIFVQOiAnVVAnLFxuICBET1dOOiAnRE9XTicsXG4gIFNISUZUOiAnU0hJRlQnLFxuICBNT1VTRV9BQ1RJT05fMTogJ01PVVNFX0FDVElPTl8xJyxcbiAgTU9VU0VfQUNUSU9OXzI6ICdNT1VTRV9BQ1RJT05fMicsXG4gIFNIT09UX1BST0pFQ1RJTEU6ICdTSE9PVF9QUk9KRUNUSUxFJyxcbn07XG5leHBvcnQgZGVmYXVsdCBQbGF5ZXJBY3Rpb25zO1xuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL1BsYXllckFjdGlvbnMuanMiXSwibWFwcGluZ3MiOiI7Ozs7O0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFUQTtBQVdBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CollisionStatus = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _guid = __webpack_require__(7);
+
+var _ColliderTypes = __webpack_require__(4);
+
+var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Collider = function () {
+  function Collider() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var ownerGO = arguments[1];
+
+    _classCallCheck(this, Collider);
+
+    //console.log("constructing collider for owner: " + ownerGO.instanceId, ownerGO);
+    //console.log("Tags: ", params.tags);
+    this.ownerGO = ownerGO;
+
+    this.type = params.type || _ColliderTypes2.default.NONE;
+    this.radius = params.radius || 16;
+    this.rect = params.rect || { left: 0, top: 0, right: 32, bottom: 32 };
+    // Tags that this object has.
+    this.tags = params.tags || ['ALL'];
+    // Tags that this object reacts to.
+    this.collidesWith = params.collidesWith || ['ALL'];
+
+    this.ignoresIds = params.ignoresIds || [];
+
+    //TODO: temporary, remove
+    this.instanceId = (0, _guid.guid)();
+
+    this.currentCollisions = [];
+  }
+
+  _createClass(Collider, [{
+    key: 'getCollisionStatus',
+    value: function getCollisionStatus(otherCollider) {
+      // If I have the sprite and not the collider, try to get the collider
+      if (!(otherCollider instanceof Collider)) otherCollider = otherCollider.collider;
+      if (!(otherCollider instanceof Collider)) return CollisionStatus.NONE;
+      // If the other collider's game object is not active.
+      if (!otherCollider.ownerGO.isActive()) return CollisionStatus.NONE;
+
+      // If I'm colliding with myself return CollisionStatus.NONE;
+      if (otherCollider === this) return CollisionStatus.NONE;
+      // Excludes should be provided via ignoresIds
+      if (this.ignoresIds.includes(otherCollider.ownerGO.instanceId)) return CollisionStatus.NONE;
+      // If no collision tracking return CollisionStatus.NONE
+      if (this.type === _ColliderTypes2.default.NONE || otherCollider.type === _ColliderTypes2.default.NONE) return CollisionStatus.NONE;
+
+      // Check types
+      var collidedTags = this.collidesWith.filter(function (tag) {
+        if (otherCollider.tags.includes(tag)) {
+          return true;
+        }
+        return false;
+      });
+      // No collisions on expected tag types.
+      if (collidedTags.length === 0) return CollisionStatus.NONE;
+
+      if (this.type === _ColliderTypes2.default.RADIUS && otherCollider.type === _ColliderTypes2.default.RADIUS) {
+        // two radius colliders
+        var thisCenter = this.getColliderPoint(PointEnum.CENTER);
+        var otherCenter = otherCollider.getColliderPoint(PointEnum.CENTER);
+        var distance = this.getDistanceBetween(thisCenter, otherCenter);
+        var isOverlapping = false;
+        if (distance < this.radius + otherCollider.radius) {
+          // console.log("Collision at distance: " + distance, thisCenter, otherCenter);
+          isOverlapping = true;
+        }
+        if (isOverlapping && !this.currentCollisions.includes(otherCollider.instanceId)) {
+          // console.log("collision enter");
+          // console.log("Collided with tags: ", collidedTags);
+          this.currentCollisions.push(otherCollider.instanceId);
+          return CollisionStatus.ENTER;
+        } else if (isOverlapping) {
+          return CollisionStatus.COLLIDING;
+        }
+        if (!isOverlapping && this.currentCollisions.includes(otherCollider.instanceId)) {
+          // console.log("collision leave\n\n\n");
+          this.currentCollisions.splice(this.currentCollisions.indexOf(otherCollider.instanceId), 1);
+          return CollisionStatus.EXIT;
+        }
+        return CollisionStatus.NONE;
+      } else if (this.type === _ColliderTypes2.default.RECTANGLE && otherCollider.type === _ColliderTypes2.default.RECTANGLE) {
+        // two square colliders
+
+      } else if (this.type === _ColliderTypes2.default.RADIUS) {
+        // one of each: this is radius, other is rectangle
+      } else if (this.type === _ColliderTypes2.default.RECTANGLE) {
+        // one of each: this is rectangle, other is radius
+      } else {
+        console.error("Unknown collider type: " + this.type + " - " + otherCollider.type);
+      }
+      return false;
+    }
+  }, {
+    key: 'getAbsoluteRect',
+    value: function getAbsoluteRect() {
+      return {
+        left: this.rect.left + this.ownerGO.position.x,
+        right: this.rect.right + this.ownerGO.position.x,
+        top: this.rect.top + this.ownerGO.position.y,
+        bottom: this.rect.bottom + this.ownerGO.position.y
+      };
+    }
+  }, {
+    key: 'getColliderPoint',
+    value: function getColliderPoint(pointType) {
+      var absRect = this.getAbsoluteRect();
+      switch (pointType) {
+        case PointEnum.CENTER:
+          return {
+            x: absRect.left + (absRect.right - absRect.left) / 2,
+            y: absRect.top + (absRect.bottom - absRect.top) / 2
+          };
+        case PointEnum.TOPLEFT:
+          return { x: absRect.left, y: absRect.top };
+        case PointEnum.TOPRIGHT:
+          return { x: absRect.right, y: absRect.top };
+        case PointEnum.BOTTOMLEFT:
+          return { x: absRect.left, y: absRect.bottom };
+        case PointEnum.BOTTOMRIGHT:
+          return { x: absRect.right, y: absRect.bottom };
+        default:
+          return undefined;
+      }
+    }
+
+    // TODO: this probably belongs in some central place ("engine?") so the app can access it to.
+
+  }, {
+    key: 'getDistanceBetween',
+    value: function getDistanceBetween(pointA, pointB) {
+      var aSquared = Math.pow(pointA.x - pointB.x, 2);
+      var bSquared = Math.pow(pointA.y - pointB.y, 2);
+      return Math.sqrt(aSquared + bSquared);
+    }
+  }]);
+
+  return Collider;
+}();
+
+var PointEnum = {
+  CENTER: 'CENTER',
+  TOPLEFT: 'TOPLEFT',
+  TOPRIGHT: 'TOPRIGHT',
+  BOTTOMLEFT: 'BOTTOMLEFT',
+  BOTTOMRIGHT: 'BOTTOMRIGHT'
+};
+
+var CollisionStatus = exports.CollisionStatus = {
+  ENTER: 'ENTER',
+  COLLIDING: 'COLLIDING',
+  EXIT: 'EXIT',
+  NONE: 'NONE'
+};
+
+exports.default = Collider;
 
 /***/ }),
 /* 13 */
-/* unknown exports provided */
-/* all exports used */
-/*!**************************************!*\
-  !*** ./classes/shared/GameObject.js ***!
-  \**************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _guid = __webpack_require__(/*! ../Helpers/guid */ 2);\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar GameObject = function () {\n  function GameObject() {\n    _classCallCheck(this, GameObject);\n\n    // (paramObject = {}) {\n    this.position = { x: 0, y: 0 };\n    this._relativePosition = { x: 0, y: 0 };\n    this.instanceId = (0, _guid.guid)();\n    this.active = true;\n    this.levelId = undefined;\n    this.children = [];\n  }\n\n  // Relative to current level map\n\n\n  _createClass(GameObject, [{\n    key: \"setPosition\",\n    value: function setPosition() {\n      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };\n\n      // TODO: Integrate legal level position checks.\n      this.position.x = position.x;\n      this.position.y = position.y;\n    }\n\n    // Relative to parent object\n\n  }, {\n    key: \"setRelativePosition\",\n    value: function setRelativePosition() {\n      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };\n\n      this._relativePosition = position;\n      if (!this.parentGO) throw new Error(\"This GameObject does not have a parent GameObject.\");else console.log(position, this.parentGO);\n      var parentX = this.parentGO && this.parentGO.position ? this.parentGO.position.x : 0;\n      var parentY = this.parentGO && this.parentGO.position ? this.parentGO.position.y : 0;\n      this.setPosition({\n        x: parentX + position.x,\n        y: parentY + position.y\n      });\n      console.log(\"set progressbar position?\", this.position);\n    }\n  }, {\n    key: \"deactivate\",\n    value: function deactivate() {\n      this.active = false;\n    }\n  }, {\n    key: \"activate\",\n    value: function activate() {\n      this.active = true;\n    }\n  }, {\n    key: \"isActive\",\n    value: function isActive() {\n      return this.active;\n    }\n  }, {\n    key: \"update\",\n    value: function update(delta) {\n      if (this.isActive()) {\n        if (this.children) {\n          this.children.forEach(function (child) {\n            if (child.update) {\n              child.update(delta);\n            }\n          });\n        }\n      }\n    }\n  }]);\n\n  return GameObject;\n}();\n\nexports.default = GameObject;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvR2FtZU9iamVjdC5qcz85ZGEzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IGd1aWQgfSBmcm9tICcuLi9IZWxwZXJzL2d1aWQnXG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIEdhbWVPYmplY3Qge1xuICBjb25zdHJ1Y3RvcigpIHsgLy8gKHBhcmFtT2JqZWN0ID0ge30pIHtcbiAgICB0aGlzLnBvc2l0aW9uID0geyB4OiAwLCB5OiAwIH1cbiAgICB0aGlzLl9yZWxhdGl2ZVBvc2l0aW9uID0geyB4OiAwLCB5OiAwIH1cbiAgICB0aGlzLmluc3RhbmNlSWQgPSBndWlkKCk7XG4gICAgdGhpcy5hY3RpdmUgPSB0cnVlO1xuICAgIHRoaXMubGV2ZWxJZCA9IHVuZGVmaW5lZDtcbiAgICB0aGlzLmNoaWxkcmVuID0gW107XG4gIH1cblxuICAvLyBSZWxhdGl2ZSB0byBjdXJyZW50IGxldmVsIG1hcFxuICBzZXRQb3NpdGlvbihwb3NpdGlvbiA9IHsgeDogMCwgeTogMCB9KSB7XG4gICAgLy8gVE9ETzogSW50ZWdyYXRlIGxlZ2FsIGxldmVsIHBvc2l0aW9uIGNoZWNrcy5cbiAgICB0aGlzLnBvc2l0aW9uLnggPSBwb3NpdGlvbi54O1xuICAgIHRoaXMucG9zaXRpb24ueSA9IHBvc2l0aW9uLnk7XG4gIH1cblxuICAvLyBSZWxhdGl2ZSB0byBwYXJlbnQgb2JqZWN0XG4gIHNldFJlbGF0aXZlUG9zaXRpb24ocG9zaXRpb24gPSB7IHg6IDAsIHk6IDAgfSkge1xuICAgIHRoaXMuX3JlbGF0aXZlUG9zaXRpb24gPSBwb3NpdGlvbjtcbiAgICBpZighdGhpcy5wYXJlbnRHTykgdGhyb3cgbmV3IEVycm9yKFwiVGhpcyBHYW1lT2JqZWN0IGRvZXMgbm90IGhhdmUgYSBwYXJlbnQgR2FtZU9iamVjdC5cIik7XG4gICAgZWxzZSBjb25zb2xlLmxvZyhwb3NpdGlvbiwgdGhpcy5wYXJlbnRHTyk7XG4gICAgY29uc3QgcGFyZW50WCA9IHRoaXMucGFyZW50R08gJiYgdGhpcy5wYXJlbnRHTy5wb3NpdGlvbiA/IHRoaXMucGFyZW50R08ucG9zaXRpb24ueCA6IDA7XG4gICAgY29uc3QgcGFyZW50WSA9IHRoaXMucGFyZW50R08gJiYgdGhpcy5wYXJlbnRHTy5wb3NpdGlvbiA/IHRoaXMucGFyZW50R08ucG9zaXRpb24ueSA6IDA7XG4gICAgdGhpcy5zZXRQb3NpdGlvbih7XG4gICAgICB4OiBwYXJlbnRYICsgcG9zaXRpb24ueCxcbiAgICAgIHk6IHBhcmVudFkgKyBwb3NpdGlvbi55LFxuICAgIH0pO1xuICAgIGNvbnNvbGUubG9nKFwic2V0IHByb2dyZXNzYmFyIHBvc2l0aW9uP1wiLCB0aGlzLnBvc2l0aW9uKTtcbiAgfVxuXG4gIGRlYWN0aXZhdGUoKSB7XG4gICAgdGhpcy5hY3RpdmUgPSBmYWxzZTtcbiAgfVxuXG4gIGFjdGl2YXRlKCkge1xuICAgIHRoaXMuYWN0aXZlID0gdHJ1ZTtcbiAgfVxuXG4gIGlzQWN0aXZlKCkge1xuICAgIHJldHVybiB0aGlzLmFjdGl2ZTtcbiAgfVxuXG4gIHVwZGF0ZShkZWx0YSkge1xuICAgIGlmKHRoaXMuaXNBY3RpdmUoKSkge1xuICAgICAgaWYodGhpcy5jaGlsZHJlbikge1xuICAgICAgICB0aGlzLmNoaWxkcmVuLmZvckVhY2goY2hpbGQgPT4ge1xuICAgICAgICAgIGlmKGNoaWxkLnVwZGF0ZSkge1xuICAgICAgICAgICAgY2hpbGQudXBkYXRlKGRlbHRhKTtcbiAgICAgICAgICB9XG4gICAgICAgIH0pO1xuICAgICAgfSBcbiAgICB9XG4gIH1cbn1cblxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL3NoYXJlZC9HYW1lT2JqZWN0LmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7OztBQUFBO0FBQ0E7OztBQUNBO0FBQ0E7QUFBQTtBQUNBO0FBREE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7QUFEQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBQUE7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFGQTtBQUlBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7Ozs7OztBQXJEQSIsInNvdXJjZVJvb3QiOiIifQ==");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var PlayerActions = {
+  UNMAPPED: 'UNMAPPED',
+  LEFT: 'LEFT',
+  RIGHT: 'RIGHT',
+  UP: 'UP',
+  DOWN: 'DOWN',
+  SHIFT: 'SHIFT',
+  MOUSE_ACTION_1: 'MOUSE_ACTION_1',
+  MOUSE_ACTION_2: 'MOUSE_ACTION_2',
+  SHOOT_PROJECTILE: 'SHOOT_PROJECTILE'
+};
+exports.default = PlayerActions;
 
 /***/ }),
 /* 14 */
-/* unknown exports provided */
-/* all exports used */
-/*!**************************************!*\
-  !*** ./classes/Helpers/messaging.js ***!
-  \**************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.broadcastPackage = exports.sendPackage = exports.MessageTypes = undefined;\n\nvar _ws = __webpack_require__(/*! ws */ 21);\n\nvar _ws2 = _interopRequireDefault(_ws);\n\nvar _MessageTypes = __webpack_require__(/*! ../MessageTypes */ 3);\n\nvar _MessageTypes2 = _interopRequireDefault(_MessageTypes);\n\nvar _GameEngine = __webpack_require__(/*! ../GameEngine */ 6);\n\nvar _GameEngine2 = _interopRequireDefault(_GameEngine);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nexports.MessageTypes = _MessageTypes2.default;\nvar sendPackage = exports.sendPackage = function sendPackage(socket) {\n  var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;\n  var attributes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};\n\n  if (socket === null) throw new Error('Socket must be specified.'); // TODO: instanceof what?\n  if (type === null) throw new Error('Package type must be specified.');\n\n  if (socket.readyState !== _ws2.default.OPEN) return;\n\n  socket.send(JSON.stringify(Object.assign({ type: type }, attributes)));\n};\n\nvar broadcastPackage = exports.broadcastPackage = function broadcastPackage() {\n  var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;\n  var attributes = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};\n  var clientIdList = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;\n\n  clientIdList = clientIdList || Object.keys(_GameEngine2.default.clients);\n  // TODO: only affect clients that are in range and can see (but for now everybody)\n  clientIdList.forEach(function (clientKey) {\n    // console.log(\"broadcasting package to: \" + clientKey, type, attributes);\n    var c = _GameEngine2.default.clients[clientKey];\n    if (c) sendPackage(c.socket, type, attributes);\n  });\n};//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTQuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9IZWxwZXJzL21lc3NhZ2luZy5qcz8zYzEzIl0sInNvdXJjZXNDb250ZW50IjpbIlxuaW1wb3J0IFdlYlNvY2tldCBmcm9tICd3cyc7XG5cbmltcG9ydCBNZXNzYWdlVHlwZXMgZnJvbSAnLi4vTWVzc2FnZVR5cGVzJztcbmV4cG9ydCB7IE1lc3NhZ2VUeXBlcyB9O1xuXG5pbXBvcnQgV29ybGQgZnJvbSAnLi4vR2FtZUVuZ2luZSc7XG5cbmV4cG9ydCBjb25zdCBzZW5kUGFja2FnZSA9IGZ1bmN0aW9uIHNlbmRQYWNrYWdlKHNvY2tldCwgdHlwZSA9IG51bGwsIGF0dHJpYnV0ZXMgPSB7fSkge1xuICBpZiAoc29ja2V0ID09PSBudWxsKSB0aHJvdyBuZXcgRXJyb3IoJ1NvY2tldCBtdXN0IGJlIHNwZWNpZmllZC4nKTsgLy8gVE9ETzogaW5zdGFuY2VvZiB3aGF0P1xuICBpZiAodHlwZSA9PT0gbnVsbCkgdGhyb3cgbmV3IEVycm9yKCdQYWNrYWdlIHR5cGUgbXVzdCBiZSBzcGVjaWZpZWQuJyk7XG5cbiAgaWYgKHNvY2tldC5yZWFkeVN0YXRlICE9PSBXZWJTb2NrZXQuT1BFTikgcmV0dXJuO1xuXG4gIHNvY2tldC5zZW5kKEpTT04uc3RyaW5naWZ5KE9iamVjdC5hc3NpZ24oeyB0eXBlIH0sIGF0dHJpYnV0ZXMpKSk7XG59O1xuXG5leHBvcnQgY29uc3QgYnJvYWRjYXN0UGFja2FnZSA9IGZ1bmN0aW9uIGJyb2FkY2FzdFBhY2thZ2UodHlwZSA9IG51bGwsIGF0dHJpYnV0ZXMgPSB7fSwgY2xpZW50SWRMaXN0ID0gbnVsbCkge1xuICBjbGllbnRJZExpc3QgPSBjbGllbnRJZExpc3QgfHwgT2JqZWN0LmtleXMoV29ybGQuY2xpZW50cyk7XG4gIC8vIFRPRE86IG9ubHkgYWZmZWN0IGNsaWVudHMgdGhhdCBhcmUgaW4gcmFuZ2UgYW5kIGNhbiBzZWUgKGJ1dCBmb3Igbm93IGV2ZXJ5Ym9keSlcbiAgY2xpZW50SWRMaXN0LmZvckVhY2goY2xpZW50S2V5ID0+IHtcbiAgICAvLyBjb25zb2xlLmxvZyhcImJyb2FkY2FzdGluZyBwYWNrYWdlIHRvOiBcIiArIGNsaWVudEtleSwgdHlwZSwgYXR0cmlidXRlcyk7XG4gICAgY29uc3QgYyA9IFdvcmxkLmNsaWVudHNbY2xpZW50S2V5XTtcbiAgICBpZihjKSBzZW5kUGFja2FnZShjLnNvY2tldCwgdHlwZSwgYXR0cmlidXRlcyk7XG4gIH0pO1xufVxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL0hlbHBlcnMvbWVzc2FnaW5nLmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7O0FBQ0E7QUFDQTs7O0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTs7Ozs7QUFIQTtBQUlBO0FBQUE7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFBQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _GameSettings = __webpack_require__(1);
+
+var _Sprite2 = __webpack_require__(0);
+
+var _Sprite3 = _interopRequireDefault(_Sprite2);
+
+var _ColliderTypes = __webpack_require__(4);
+
+var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
+
+var _SpriteTypes = __webpack_require__(2);
+
+var _gx2D = __webpack_require__(6);
+
+var _MediaManager = __webpack_require__(8);
+
+var _MediaManager2 = _interopRequireDefault(_MediaManager);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// import World from '../GameEngine';
+
+var BlueBeam = function (_Sprite) {
+  _inherits(BlueBeam, _Sprite);
+
+  function BlueBeam() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, BlueBeam);
+
+    if (!params.collider) {
+      params.collider = {
+        type: _ColliderTypes2.default.RADIUS,
+        tags: ['PROJECTILE', 'MAGIC'],
+        collidesWith: ['PLAYER']
+      };
+    }
+
+    if (!params.collider.type) params.collider.type = _ColliderTypes2.default.RADIUS;
+    if (!params.collider.tags) params.collider.tags = ['PROJECTILE', 'MAGIC'];
+    if (!params.collider.collidesWith) params.collider.collidesWith = ['PLAYER'];
+
+    var _this = _possibleConstructorReturn(this, (BlueBeam.__proto__ || Object.getPrototypeOf(BlueBeam)).call(this, params));
+
+    var start = params.start || { x: 0, y: 0 };
+    var aim = params.aim || { x: -1, y: -1, placeholder: true };
+    var speed = params.speed || _GameSettings.GameSettings.TILE_SCALE * 25;
+
+    var life = params.life || 1.5; // Seconds to live
+
+    _this.setTexture('./images/BlueBeam.png');
+
+    //console.log("Starting fireball at: ", start);
+    _this.setPosition(start);
+    _this.aim = aim;
+    // https://gist.github.com/conorbuck/2606166
+    _this.angle = Math.atan2(aim.y - start.y, aim.x - start.x); // radians
+    //console.log("Speed is: ", speed);
+    _this.speed = speed;
+
+    _this.playerPosition = params.playerPosition || { x: 0, y: 0 };
+
+    _this.stats = {
+      damage: 10,
+      tickRate: .5
+    };
+
+    // TODO: Don't hit this fireball's owner!!!! this.owner = owner;
+
+    _this.livesUntil = Date.now() + life * 1000; // 3 seconds.
+
+    _this.lastTick = +Date.now();
+    return _this;
+  }
+
+  _createClass(BlueBeam, [{
+    key: 'update',
+    value: function update(delta) {
+
+      if (Date.now() > this.livesUntil) {
+        this.delete();
+        return;
+      }
+
+      if (this.aim.placeholder) return;
+
+      var beamPosition = (0, _gx2D.addDistance2d)(this.playerPosition, this.angle, .5 * _GameSettings.GameSettings.TILE_SCALE);
+      this.setPosition(beamPosition);
+
+      if (+Date.now() - this.lastTick >= this.stats.tickRate) {
+        // TODO: do tick damage to anything that the hit box overlaps.
+        // Time to do other collision types.
+      }
+    }
+
+    /**
+     * @override
+     */
+
+  }, {
+    key: 'draw',
+    value: function draw(context) {
+      var imgElement = _MediaManager2.default.loadImage(this.texture);
+
+      var rotAngle = 0;
+      if (this.angle) {
+        rotAngle = this.angle;
+      }
+      context.translate(this.position.x, this.position.y);
+      context.rotate(rotAngle);
+      context.drawImage(imgElement, 0, -16);
+      context.drawImage(imgElement, 32, -16);
+      context.drawImage(imgElement, 64, -16);
+      context.rotate(-rotAngle);
+      context.translate(-this.position.x, -this.position.y);
+
+      if (this.children) {
+        this.children.forEach(function (child) {
+          if (child.draw) {
+            child.draw(context);
+          }
+        });
+      }
+    }
+  }, {
+    key: 'delete',
+    value: function _delete() {
+      throw new Error("Must override FireBall.delete() method on instances.");
+    }
+  }, {
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(otherCollider) {
+      _get(BlueBeam.prototype.__proto__ || Object.getPrototypeOf(BlueBeam.prototype), 'onCollisionEnter', this) && _get(BlueBeam.prototype.__proto__ || Object.getPrototypeOf(BlueBeam.prototype), 'onCollisionEnter', this).call(this, otherCollider);
+
+      // if(otherCollider.tags.includes('PLAYER')) {
+      //   const otherPlayer = otherCollider.ownerGO;
+      //   World.CharacterManager.applyDamage(otherPlayer, { damage: this.stats.damage, source: this.ownerGO  });
+      //   World.spawnSprite(otherPlayer.levelId, SpriteTypes.EXPLOSION, { start: this.position });
+      // } else {
+      //   World.spawnSprite(World.getLevelBySprite(this).id, SpriteTypes.EXPLOSION, { start: this.position });
+      // }
+
+      // World.despawnSpriteByLevel(World.getLevelBySprite(this).id, this);
+    }
+  }]);
+
+  return BlueBeam;
+}(_Sprite3.default);
+
+exports.default = BlueBeam;
 
 /***/ }),
 /* 15 */
-/* unknown exports provided */
-/* all exports used */
-/*!***************************!*\
-  !*** external "mongoose" ***!
-  \***************************/
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-eval("module.exports = require(\"mongoose\");//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTUuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vZXh0ZXJuYWwgXCJtb25nb29zZVwiP2Q1MDUiXSwic291cmNlc0NvbnRlbnQiOlsibW9kdWxlLmV4cG9ydHMgPSByZXF1aXJlKFwibW9uZ29vc2VcIik7XG5cblxuLy8vLy8vLy8vLy8vLy8vLy8vXG4vLyBXRUJQQUNLIEZPT1RFUlxuLy8gZXh0ZXJuYWwgXCJtb25nb29zZVwiXG4vLyBtb2R1bGUgaWQgPSAxNVxuLy8gbW9kdWxlIGNodW5rcyA9IDAiXSwibWFwcGluZ3MiOiJBQUFBIiwic291cmNlUm9vdCI6IiJ9");
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _guid = __webpack_require__(7);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var GameObject = function () {
+  function GameObject() {
+    _classCallCheck(this, GameObject);
+
+    // (paramObject = {}) {
+    this.position = { x: 0, y: 0 };
+    this._relativePosition = { x: 0, y: 0 };
+    this.instanceId = (0, _guid.guid)();
+    this.active = true;
+    this.levelId = undefined;
+    this.children = [];
+  }
+
+  // Relative to current level map
+
+
+  _createClass(GameObject, [{
+    key: "setPosition",
+    value: function setPosition() {
+      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
+
+      // TODO: Integrate legal level position checks.
+      this.position.x = position.x;
+      this.position.y = position.y;
+    }
+
+    // Relative to parent object
+
+  }, {
+    key: "setRelativePosition",
+    value: function setRelativePosition() {
+      var position = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 };
+
+      this._relativePosition = position;
+      if (!this.parentGO) throw new Error("This GameObject does not have a parent GameObject.");else console.log(position, this.parentGO);
+      var parentX = this.parentGO && this.parentGO.position ? this.parentGO.position.x : 0;
+      var parentY = this.parentGO && this.parentGO.position ? this.parentGO.position.y : 0;
+      this.setPosition({
+        x: parentX + position.x,
+        y: parentY + position.y
+      });
+      console.log("set progressbar position?", this.position);
+    }
+  }, {
+    key: "deactivate",
+    value: function deactivate() {
+      this.active = false;
+    }
+  }, {
+    key: "activate",
+    value: function activate() {
+      this.active = true;
+    }
+  }, {
+    key: "isActive",
+    value: function isActive() {
+      return this.active;
+    }
+  }, {
+    key: "update",
+    value: function update(delta) {
+      if (this.isActive()) {
+        if (this.children) {
+          this.children.forEach(function (child) {
+            if (child.update) {
+              child.update(delta);
+            }
+          });
+        }
+      }
+    }
+  }]);
+
+  return GameObject;
+}();
+
+exports.default = GameObject;
 
 /***/ }),
 /* 16 */
-/* unknown exports provided */
-/* all exports used */
-/*!***********************************!*\
-  !*** ./classes/SpriteClassMap.js ***!
-  \***********************************/
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.SpriteClassMap = undefined;\nexports.GetSpriteTypeName = GetSpriteTypeName;\n\nvar _PlayerCharacter = __webpack_require__(/*! ./shared/PlayerCharacter */ 4);\n\nvar _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);\n\nvar _FireBall = __webpack_require__(/*! ./shared/FireBall */ 18);\n\nvar _FireBall2 = _interopRequireDefault(_FireBall);\n\nvar _Explosion = __webpack_require__(/*! ./shared/Explosion */ 38);\n\nvar _Explosion2 = _interopRequireDefault(_Explosion);\n\nvar _Bloodstain = __webpack_require__(/*! ./shared/Bloodstain */ 36);\n\nvar _Bloodstain2 = _interopRequireDefault(_Bloodstain);\n\nvar _Chest = __webpack_require__(/*! ./shared/Chest */ 37);\n\nvar _Chest2 = _interopRequireDefault(_Chest);\n\nvar _SpriteTypes = __webpack_require__(/*! ./SpriteTypes */ 7);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nvar SpriteClassMap = exports.SpriteClassMap = new Map();\nSpriteClassMap.set(_SpriteTypes.SpriteTypes.PLAYER, _PlayerCharacter2.default);\nSpriteClassMap.set(_SpriteTypes.SpriteTypes.FIREBALL, _FireBall2.default);\nSpriteClassMap.set(_SpriteTypes.SpriteTypes.EXPLOSION, _Explosion2.default);\nSpriteClassMap.set(_SpriteTypes.SpriteTypes.BLOODSTAIN, _Bloodstain2.default);\nSpriteClassMap.set(_SpriteTypes.SpriteTypes.CHEST, _Chest2.default);\n\nfunction GetSpriteTypeName(obj) {\n  var iterator = SpriteClassMap.entries();\n  var mapCursor = {};\n\n  do {\n\n    mapCursor = iterator.next();\n    if (mapCursor.done) break;\n\n    if (obj instanceof mapCursor.value[1]) {\n      return mapCursor.value[0];\n    }\n  } while (!mapCursor.done);\n\n  return undefined;\n}//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTYuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9TcHJpdGVDbGFzc01hcC5qcz82NDZiIl0sInNvdXJjZXNDb250ZW50IjpbIlxuaW1wb3J0IFBsYXllckNoYXJhY3RlciBmcm9tICcuL3NoYXJlZC9QbGF5ZXJDaGFyYWN0ZXInO1xuaW1wb3J0IEZpcmVCYWxsIGZyb20gJy4vc2hhcmVkL0ZpcmVCYWxsJztcbmltcG9ydCBFeHBsb3Npb24gZnJvbSAnLi9zaGFyZWQvRXhwbG9zaW9uJztcbmltcG9ydCBCbG9vZHN0YWluIGZyb20gJy4vc2hhcmVkL0Jsb29kc3RhaW4nO1xuaW1wb3J0IENoZXN0IGZyb20gJy4vc2hhcmVkL0NoZXN0JztcbmltcG9ydCB7IFNwcml0ZVR5cGVzIH0gZnJvbSAnLi9TcHJpdGVUeXBlcyc7XG5cbmV4cG9ydCBjb25zdCBTcHJpdGVDbGFzc01hcCA9IG5ldyBNYXAoKTtcblNwcml0ZUNsYXNzTWFwLnNldChTcHJpdGVUeXBlcy5QTEFZRVIsIFBsYXllckNoYXJhY3Rlcik7XG5TcHJpdGVDbGFzc01hcC5zZXQoU3ByaXRlVHlwZXMuRklSRUJBTEwsIEZpcmVCYWxsKTtcblNwcml0ZUNsYXNzTWFwLnNldChTcHJpdGVUeXBlcy5FWFBMT1NJT04sIEV4cGxvc2lvbik7XG5TcHJpdGVDbGFzc01hcC5zZXQoU3ByaXRlVHlwZXMuQkxPT0RTVEFJTiwgQmxvb2RzdGFpbik7XG5TcHJpdGVDbGFzc01hcC5zZXQoU3ByaXRlVHlwZXMuQ0hFU1QsIENoZXN0KTtcblxuZXhwb3J0IGZ1bmN0aW9uIEdldFNwcml0ZVR5cGVOYW1lKG9iaikge1xuICB2YXIgaXRlcmF0b3IgPSBTcHJpdGVDbGFzc01hcC5lbnRyaWVzKCk7XG4gIGxldCBtYXBDdXJzb3IgPSB7fTtcblxuICBkbyB7XG4gICAgXG4gICAgbWFwQ3Vyc29yID0gaXRlcmF0b3IubmV4dCgpO1xuICAgIGlmKG1hcEN1cnNvci5kb25lKSBicmVhaztcblxuICAgIGlmKG9iaiBpbnN0YW5jZW9mIG1hcEN1cnNvci52YWx1ZVsxXSkge1xuICAgICAgcmV0dXJuIG1hcEN1cnNvci52YWx1ZVswXTtcbiAgICB9XG4gIH0gd2hpbGUoIW1hcEN1cnNvci5kb25lKTtcblxuICByZXR1cm4gdW5kZWZpbmVkO1xufVxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL1Nwcml0ZUNsYXNzTWFwLmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7QUFlQTtBQUNBO0FBZkE7QUFDQTs7O0FBQUE7QUFDQTs7O0FBQUE7QUFDQTs7O0FBQUE7QUFDQTs7O0FBQUE7QUFDQTs7O0FBQUE7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQSIsInNvdXJjZVJvb3QiOiIifQ==");
+module.exports = require("mongoose");
 
 /***/ }),
 /* 17 */
-/* unknown exports provided */
-/* all exports used */
-/*!***************************************!*\
-  !*** ./classes/client/ProgressBar.js ***!
-  \***************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _Sprite2 = __webpack_require__(/*! ../shared/Sprite */ 0);\n\nvar _Sprite3 = _interopRequireDefault(_Sprite2);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar ProgressBar = function (_Sprite) {\n  _inherits(ProgressBar, _Sprite);\n\n  function ProgressBar() {\n    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n    _classCallCheck(this, ProgressBar);\n\n    var _this = _possibleConstructorReturn(this, (ProgressBar.__proto__ || Object.getPrototypeOf(ProgressBar)).call(this)); // x, y, width, height, current, max, fgColor, bgColor, parentSprite) {\n\n\n    _this.stats = { current: params.current, max: params.max };\n    _this.bgColor = params.bgColor || \"#FFFFFF\";\n    _this.fgColor = params.fgColor || \"#FF0000\";\n    _this.parentGO = params.parentGO || { position: { x: 0, y: 0 } };\n    _this.setBounds(params.x || -1, params.y || -1, params.width || -1, params.height || -1);\n    _this.setRelativePosition({ x: params.x || 0, y: params.y || 0 });\n    return _this;\n  }\n\n  _createClass(ProgressBar, [{\n    key: \"setBounds\",\n    value: function setBounds(x, y, width, height) {\n      this.bounds = this.bounds || {};\n      this.bounds.x = x || this.bounds.x;\n      this.bounds.y = y || this.bounds.y;\n      this.bounds.width = width || this.bounds.width, this.bounds.height = height || this.bounds.height, this.bounds.left = this.bounds.x;\n      this.bounds.right = x && width ? x + width : this.bounds.x + this.bounds.width;\n      this.bounds.top = this.bounds.y;\n      this.bounds.bottom = y && height ? y + height : this.bounds.y + this.bounds.height;\n\n      this.setPosition(this.bounds);\n    }\n  }, {\n    key: \"draw\",\n    value: function draw(ctx) {\n      // Draw background\n      var x = this.position.x;\n      var y = this.position.y;\n      var width = this.bounds.width;\n      var height = this.bounds.height;\n      ctx.fillStyle = this.bgColor;\n      ctx.fillRect(x, y, width, height);\n\n      // Draw foreground\n      width = this.bounds.width * (this.stats.current / this.stats.max);\n      ctx.fillStyle = this.fgColor;\n      ctx.fillRect(x, y, width, height);\n    }\n  }, {\n    key: \"update\",\n    value: function update(delta) {\n      console.log(\"updating progressbar for: \", this.parentId);\n    }\n  }]);\n\n  return ProgressBar;\n}(_Sprite3.default);\n\nexports.default = ProgressBar;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTcuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9jbGllbnQvUHJvZ3Jlc3NCYXIuanM/ZDU3YiJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmltcG9ydCBTcHJpdGUgZnJvbSAnLi4vc2hhcmVkL1Nwcml0ZSc7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIFByb2dyZXNzQmFyIGV4dGVuZHMgU3ByaXRlIHtcbiAgY29uc3RydWN0b3IocGFyYW1zID0ge30pIHsgLy8geCwgeSwgd2lkdGgsIGhlaWdodCwgY3VycmVudCwgbWF4LCBmZ0NvbG9yLCBiZ0NvbG9yLCBwYXJlbnRTcHJpdGUpIHtcbiAgICBzdXBlcigpO1xuICAgIHRoaXMuc3RhdHMgPSB7IGN1cnJlbnQ6IHBhcmFtcy5jdXJyZW50LCBtYXg6IHBhcmFtcy5tYXggfVxuICAgIHRoaXMuYmdDb2xvciA9IHBhcmFtcy5iZ0NvbG9yIHx8IFwiI0ZGRkZGRlwiO1xuICAgIHRoaXMuZmdDb2xvciA9IHBhcmFtcy5mZ0NvbG9yIHx8IFwiI0ZGMDAwMFwiO1xuICAgIHRoaXMucGFyZW50R08gPSBwYXJhbXMucGFyZW50R08gfHwgeyBwb3NpdGlvbjogeyB4OiAwLCB5OiAwIH19O1xuICAgIHRoaXMuc2V0Qm91bmRzKHBhcmFtcy54IHx8IC0xLCBwYXJhbXMueSB8fCAtMSwgcGFyYW1zLndpZHRoIHx8IC0xLCBwYXJhbXMuaGVpZ2h0IHx8IC0xKTtcbiAgICB0aGlzLnNldFJlbGF0aXZlUG9zaXRpb24oeyB4OiBwYXJhbXMueCB8fCAwLCB5OiBwYXJhbXMueSB8fCAwIH0pO1xuICB9XG5cbiAgc2V0Qm91bmRzKHgsIHksIHdpZHRoLCBoZWlnaHQpIHtcbiAgICB0aGlzLmJvdW5kcyA9IHRoaXMuYm91bmRzIHx8IHt9O1xuICAgIHRoaXMuYm91bmRzLnggPSB4IHx8IHRoaXMuYm91bmRzLng7XG4gICAgdGhpcy5ib3VuZHMueSA9IHkgfHwgdGhpcy5ib3VuZHMueTtcbiAgICB0aGlzLmJvdW5kcy53aWR0aCA9IHdpZHRoIHx8IHRoaXMuYm91bmRzLndpZHRoLCBcbiAgICB0aGlzLmJvdW5kcy5oZWlnaHQgPSBoZWlnaHQgfHwgdGhpcy5ib3VuZHMuaGVpZ2h0LCBcbiAgICB0aGlzLmJvdW5kcy5sZWZ0ID0gdGhpcy5ib3VuZHMueDtcbiAgICB0aGlzLmJvdW5kcy5yaWdodCA9IHggJiYgd2lkdGggPyB4ICsgd2lkdGggOiB0aGlzLmJvdW5kcy54ICsgdGhpcy5ib3VuZHMud2lkdGg7XG4gICAgdGhpcy5ib3VuZHMudG9wID0gdGhpcy5ib3VuZHMueTtcbiAgICB0aGlzLmJvdW5kcy5ib3R0b20gPSB5ICYmIGhlaWdodCA/IHkgKyBoZWlnaHQgOiB0aGlzLmJvdW5kcy55ICsgdGhpcy5ib3VuZHMuaGVpZ2h0O1xuXG4gICAgdGhpcy5zZXRQb3NpdGlvbih0aGlzLmJvdW5kcyk7XG4gIH1cblxuICBkcmF3KGN0eCkge1xuICAgIC8vIERyYXcgYmFja2dyb3VuZFxuICAgIGxldCB4ID0gdGhpcy5wb3NpdGlvbi54O1xuICAgIGxldCB5ID0gdGhpcy5wb3NpdGlvbi55O1xuICAgIGxldCB3aWR0aCA9IHRoaXMuYm91bmRzLndpZHRoO1xuICAgIGxldCBoZWlnaHQgPSB0aGlzLmJvdW5kcy5oZWlnaHQ7XG4gICAgY3R4LmZpbGxTdHlsZT10aGlzLmJnQ29sb3I7XG4gICAgY3R4LmZpbGxSZWN0KHgsIHksIHdpZHRoLCBoZWlnaHQpO1xuXG4gICAgLy8gRHJhdyBmb3JlZ3JvdW5kXG4gICAgd2lkdGggPSB0aGlzLmJvdW5kcy53aWR0aCAqICh0aGlzLnN0YXRzLmN1cnJlbnQgLyB0aGlzLnN0YXRzLm1heCk7XG4gICAgY3R4LmZpbGxTdHlsZT10aGlzLmZnQ29sb3I7XG4gICAgY3R4LmZpbGxSZWN0KHgsIHksIHdpZHRoLCBoZWlnaHQpO1xuICB9XG4gIHVwZGF0ZShkZWx0YSkge1xuICAgIGNvbnNvbGUubG9nKFwidXBkYXRpbmcgcHJvZ3Jlc3NiYXIgZm9yOiBcIiwgdGhpcy5wYXJlbnRJZCk7XG4gIH1cbn1cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9jbGllbnQvUHJvZ3Jlc3NCYXIuanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7O0FBQ0E7QUFDQTs7Ozs7Ozs7Ozs7QUFDQTs7O0FBQ0E7QUFBQTtBQUNBO0FBREE7QUFDQTtBQURBO0FBQ0E7QUFDQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQVBBO0FBUUE7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUdBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBOzs7Ozs7QUF6Q0EiLCJzb3VyY2VSb290IjoiIn0=");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SpriteClassMap = undefined;
+exports.GetSpriteTypeName = GetSpriteTypeName;
+
+var _PlayerCharacter = __webpack_require__(10);
+
+var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
+
+var _FireBall = __webpack_require__(44);
+
+var _FireBall2 = _interopRequireDefault(_FireBall);
+
+var _Explosion = __webpack_require__(43);
+
+var _Explosion2 = _interopRequireDefault(_Explosion);
+
+var _Bloodstain = __webpack_require__(41);
+
+var _Bloodstain2 = _interopRequireDefault(_Bloodstain);
+
+var _Chest = __webpack_require__(42);
+
+var _Chest2 = _interopRequireDefault(_Chest);
+
+var _SpriteTypes = __webpack_require__(2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var SpriteClassMap = exports.SpriteClassMap = new Map();
+SpriteClassMap.set(_SpriteTypes.SpriteTypes.PLAYER, _PlayerCharacter2.default);
+SpriteClassMap.set(_SpriteTypes.SpriteTypes.FIREBALL, _FireBall2.default);
+SpriteClassMap.set(_SpriteTypes.SpriteTypes.EXPLOSION, _Explosion2.default);
+SpriteClassMap.set(_SpriteTypes.SpriteTypes.BLOODSTAIN, _Bloodstain2.default);
+SpriteClassMap.set(_SpriteTypes.SpriteTypes.CHEST, _Chest2.default);
+
+function GetSpriteTypeName(obj) {
+  var iterator = SpriteClassMap.entries();
+  var mapCursor = {};
+
+  do {
+
+    mapCursor = iterator.next();
+    if (mapCursor.done) break;
+
+    if (obj instanceof mapCursor.value[1]) {
+      return mapCursor.value[0];
+    }
+  } while (!mapCursor.done);
+
+  return undefined;
+}
 
 /***/ }),
-/* 18 */
-/* unknown exports provided */
-/* all exports used */
-/*!************************************!*\
-  !*** ./classes/shared/FireBall.js ***!
-  \************************************/
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if (\"value\" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };\n\nvar _GameSettings = __webpack_require__(/*! ../GameSettings */ 1);\n\nvar _Sprite2 = __webpack_require__(/*! ./Sprite */ 0);\n\nvar _Sprite3 = _interopRequireDefault(_Sprite2);\n\nvar _ColliderTypes = __webpack_require__(/*! ../ColliderTypes */ 5);\n\nvar _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);\n\nvar _SpriteTypes = __webpack_require__(/*! ../SpriteTypes */ 7);\n\nvar _MessageTypes = __webpack_require__(/*! ../MessageTypes */ 3);\n\nvar _MessageTypes2 = _interopRequireDefault(_MessageTypes);\n\nvar _GameEngine = __webpack_require__(/*! ../GameEngine */ 6);\n\nvar _GameEngine2 = _interopRequireDefault(_GameEngine);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar FireBall = function (_Sprite) {\n  _inherits(FireBall, _Sprite);\n\n  function FireBall() {\n    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n    _classCallCheck(this, FireBall);\n\n    if (!params.collider) {\n      params.collider = {\n        type: _ColliderTypes2.default.RADIUS,\n        tags: ['PROJECTILE', 'FIRE'],\n        collidesWith: ['PLAYER', 'WALL']\n      };\n    }\n\n    if (!params.collider.type) params.collider.type = _ColliderTypes2.default.RADIUS;\n    if (!params.collider.tags) params.collider.tags = ['PROJECTILE', 'FIRE'];\n    if (!params.collider.collidesWith) params.collider.collidesWith = ['PLAYER', 'WALL'];\n\n    var _this = _possibleConstructorReturn(this, (FireBall.__proto__ || Object.getPrototypeOf(FireBall)).call(this, params));\n\n    var start = params.start || { x: 0, y: 0 };\n    var aim = params.aim || { x: -1, y: -1, placeholder: true };\n    var speed = params.speed || _GameSettings.GameSettings.TILE_SCALE * 25;\n    var owner = params.owner || null;\n\n    var life = params.life || .5; // Seconds to live\n\n    _this.setTexture('./images/FireballStatic.png');\n\n    //console.log(\"Starting fireball at: \", start);\n    _this.setPosition(start);\n    _this.aim = aim;\n    // https://gist.github.com/conorbuck/2606166\n    _this.angle = Math.atan2(aim.y - start.y, aim.x - start.x); // radians\n    //console.log(\"Speed is: \", speed);\n    _this.speed = speed;\n\n    _this.stats = {\n      damage: 10\n    };\n\n    // TODO: Don't hit this fireball's owner!!!! this.owner = owner;\n\n    _this.livesUntil = Date.now() + life * 1000; // 3 seconds.\n    return _this;\n  }\n\n  _createClass(FireBall, [{\n    key: 'update',\n    value: function update(delta) {\n      if (Date.now() > this.livesUntil) {\n        // console.log(\"Deleting fireball.\");\n        this.delete();\n        return;\n      }\n\n      //this.checkCollisions();\n\n      if (this.aim.placeholder) return;\n      // SOH, CAH, TOA\n      var deltaY = Math.sin(this.angle) * this.speed * delta / 1000;\n      var deltaX = Math.cos(this.angle) * this.speed * delta / 1000;\n      this.setPosition({\n        x: this.position.x + deltaX,\n        y: this.position.y + deltaY\n      });\n    }\n  }, {\n    key: 'delete',\n    value: function _delete() {\n      throw new Error(\"Must override FireBall.delete() method on instances.\");\n    }\n  }, {\n    key: 'onCollisionEnter',\n    value: function onCollisionEnter(otherCollider) {\n      _get(FireBall.prototype.__proto__ || Object.getPrototypeOf(FireBall.prototype), 'onCollisionEnter', this) && _get(FireBall.prototype.__proto__ || Object.getPrototypeOf(FireBall.prototype), 'onCollisionEnter', this).call(this, otherCollider);\n\n      if (otherCollider.tags.includes('PLAYER')) {\n        var otherPlayer = otherCollider.ownerGO;\n        _GameEngine2.default.CharacterManager.applyDamage(otherPlayer, { damage: this.stats.damage, source: this.ownerGO });\n        _GameEngine2.default.spawnSprite(otherPlayer.levelId, _SpriteTypes.SpriteTypes.EXPLOSION, { start: this.position });\n      } else {\n        _GameEngine2.default.spawnSprite(_GameEngine2.default.getLevelBySprite(this).id, _SpriteTypes.SpriteTypes.EXPLOSION, { start: this.position });\n      }\n\n      _GameEngine2.default.despawnSpriteByLevel(_GameEngine2.default.getLevelBySprite(this).id, this);\n    }\n  }]);\n\n  return FireBall;\n}(_Sprite3.default);\n\nexports.default = FireBall;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTguanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvRmlyZUJhbGwuanM/ODVlMCJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmltcG9ydCB7IEdhbWVTZXR0aW5ncyB9IGZyb20gJy4uL0dhbWVTZXR0aW5ncyc7XG5pbXBvcnQgU3ByaXRlIGZyb20gJy4vU3ByaXRlJztcbmltcG9ydCBDb2xsaWRlclR5cGVzIGZyb20gJy4uL0NvbGxpZGVyVHlwZXMnO1xuaW1wb3J0IHsgU3ByaXRlVHlwZXMgfSBmcm9tICcuLi9TcHJpdGVUeXBlcyc7XG5pbXBvcnQgTWVzc2FnZVR5cGVzIGZyb20gJy4uL01lc3NhZ2VUeXBlcyc7XG5cbmltcG9ydCBXb3JsZCwgeyBicm9hZGNhc3RQYWNrYWdlIH0gZnJvbSAnLi4vR2FtZUVuZ2luZSc7XG5cbmNsYXNzIEZpcmVCYWxsIGV4dGVuZHMgU3ByaXRlIHtcbiAgY29uc3RydWN0b3IocGFyYW1zID0ge30pIHtcbiAgICBpZighcGFyYW1zLmNvbGxpZGVyKSB7XG4gICAgICBwYXJhbXMuY29sbGlkZXIgPSB7IFxuICAgICAgICB0eXBlOiBDb2xsaWRlclR5cGVzLlJBRElVUyxcbiAgICAgICAgdGFnczogWydQUk9KRUNUSUxFJywgJ0ZJUkUnXSxcbiAgICAgICAgY29sbGlkZXNXaXRoOiBbJ1BMQVlFUicsICdXQUxMJ10sXG4gICAgICB9O1xuICAgIH0gXG4gICAgXG4gICAgaWYoIXBhcmFtcy5jb2xsaWRlci50eXBlKVxuICAgICAgcGFyYW1zLmNvbGxpZGVyLnR5cGUgPSBDb2xsaWRlclR5cGVzLlJBRElVUztcbiAgICBpZighcGFyYW1zLmNvbGxpZGVyLnRhZ3MpXG4gICAgICBwYXJhbXMuY29sbGlkZXIudGFncyA9IFsnUFJPSkVDVElMRScsICdGSVJFJ107XG4gICAgaWYoIXBhcmFtcy5jb2xsaWRlci5jb2xsaWRlc1dpdGgpXG4gICAgICBwYXJhbXMuY29sbGlkZXIuY29sbGlkZXNXaXRoID0gWydQTEFZRVInLCAnV0FMTCddO1xuXG4gICAgc3VwZXIocGFyYW1zKTtcblxuICAgIGNvbnN0IHN0YXJ0ID0gcGFyYW1zLnN0YXJ0IHx8IHsgeDogMCwgeTogMCB9O1xuICAgIGNvbnN0IGFpbSA9IHBhcmFtcy5haW0gfHwgeyB4OiAtMSwgeTogLTEsIHBsYWNlaG9sZGVyOiB0cnVlIH07XG4gICAgY29uc3Qgc3BlZWQgPSBwYXJhbXMuc3BlZWQgfHwgR2FtZVNldHRpbmdzLlRJTEVfU0NBTEUgKiAyNTtcbiAgICBjb25zdCBvd25lciA9IHBhcmFtcy5vd25lciB8fCBudWxsO1xuXG4gICAgY29uc3QgbGlmZSA9IHBhcmFtcy5saWZlIHx8IC41OyAvLyBTZWNvbmRzIHRvIGxpdmVcblxuICAgIHRoaXMuc2V0VGV4dHVyZSgnLi9pbWFnZXMvRmlyZWJhbGxTdGF0aWMucG5nJyk7XG5cbiAgICAvL2NvbnNvbGUubG9nKFwiU3RhcnRpbmcgZmlyZWJhbGwgYXQ6IFwiLCBzdGFydCk7XG4gICAgdGhpcy5zZXRQb3NpdGlvbihzdGFydCk7XG4gICAgdGhpcy5haW0gPSBhaW07XG4gICAgLy8gaHR0cHM6Ly9naXN0LmdpdGh1Yi5jb20vY29ub3JidWNrLzI2MDYxNjZcbiAgICB0aGlzLmFuZ2xlID0gTWF0aC5hdGFuMihhaW0ueSAtIHN0YXJ0LnksIGFpbS54IC0gc3RhcnQueCk7IC8vIHJhZGlhbnNcbiAgICAvL2NvbnNvbGUubG9nKFwiU3BlZWQgaXM6IFwiLCBzcGVlZCk7XG4gICAgdGhpcy5zcGVlZCA9IHNwZWVkO1xuXG4gICAgdGhpcy5zdGF0cyA9IHtcbiAgICAgIGRhbWFnZTogMTBcbiAgICB9XG4gICAgXG4gICAgLy8gVE9ETzogRG9uJ3QgaGl0IHRoaXMgZmlyZWJhbGwncyBvd25lciEhISEgdGhpcy5vd25lciA9IG93bmVyO1xuXG4gICAgdGhpcy5saXZlc1VudGlsID0gRGF0ZS5ub3coKSArIChsaWZlICogMTAwMCk7IC8vIDMgc2Vjb25kcy5cbiAgfVxuXG4gIHVwZGF0ZShkZWx0YSkge1xuICAgIGlmIChEYXRlLm5vdygpID4gdGhpcy5saXZlc1VudGlsKSB7XG4gICAgICAvLyBjb25zb2xlLmxvZyhcIkRlbGV0aW5nIGZpcmViYWxsLlwiKTtcbiAgICAgIHRoaXMuZGVsZXRlKCk7XG4gICAgICByZXR1cm47XG4gICAgfVxuXG4gICAgLy90aGlzLmNoZWNrQ29sbGlzaW9ucygpO1xuXG4gICAgaWYodGhpcy5haW0ucGxhY2Vob2xkZXIpIHJldHVybjtcbiAgICAvLyBTT0gsIENBSCwgVE9BXG4gICAgY29uc3QgZGVsdGFZID0gTWF0aC5zaW4odGhpcy5hbmdsZSkgKiB0aGlzLnNwZWVkICogZGVsdGEgLyAxMDAwO1xuICAgIGNvbnN0IGRlbHRhWCA9IE1hdGguY29zKHRoaXMuYW5nbGUpICogdGhpcy5zcGVlZCAqIGRlbHRhIC8gMTAwMDtcbiAgICB0aGlzLnNldFBvc2l0aW9uKHtcbiAgICAgIHg6IHRoaXMucG9zaXRpb24ueCArIGRlbHRhWCxcbiAgICAgIHk6IHRoaXMucG9zaXRpb24ueSArIGRlbHRhWVxuICAgIH0pO1xuICB9XG5cbiAgZGVsZXRlKCkge1xuICAgIHRocm93IG5ldyBFcnJvcihcIk11c3Qgb3ZlcnJpZGUgRmlyZUJhbGwuZGVsZXRlKCkgbWV0aG9kIG9uIGluc3RhbmNlcy5cIik7XG4gIH1cblxuICBvbkNvbGxpc2lvbkVudGVyKG90aGVyQ29sbGlkZXIpIHtcbiAgICBzdXBlci5vbkNvbGxpc2lvbkVudGVyICYmIHN1cGVyLm9uQ29sbGlzaW9uRW50ZXIob3RoZXJDb2xsaWRlcik7XG4gICAgXG4gICAgaWYob3RoZXJDb2xsaWRlci50YWdzLmluY2x1ZGVzKCdQTEFZRVInKSkge1xuICAgICAgY29uc3Qgb3RoZXJQbGF5ZXIgPSBvdGhlckNvbGxpZGVyLm93bmVyR087XG4gICAgICBXb3JsZC5DaGFyYWN0ZXJNYW5hZ2VyLmFwcGx5RGFtYWdlKG90aGVyUGxheWVyLCB7IGRhbWFnZTogdGhpcy5zdGF0cy5kYW1hZ2UsIHNvdXJjZTogdGhpcy5vd25lckdPICB9KTtcbiAgICAgIFdvcmxkLnNwYXduU3ByaXRlKG90aGVyUGxheWVyLmxldmVsSWQsIFNwcml0ZVR5cGVzLkVYUExPU0lPTiwgeyBzdGFydDogdGhpcy5wb3NpdGlvbiB9KTtcbiAgICB9IGVsc2Uge1xuICAgICAgV29ybGQuc3Bhd25TcHJpdGUoV29ybGQuZ2V0TGV2ZWxCeVNwcml0ZSh0aGlzKS5pZCwgU3ByaXRlVHlwZXMuRVhQTE9TSU9OLCB7IHN0YXJ0OiB0aGlzLnBvc2l0aW9uIH0pO1xuICAgIH1cblxuICAgIFdvcmxkLmRlc3Bhd25TcHJpdGVCeUxldmVsKFdvcmxkLmdldExldmVsQnlTcHJpdGUodGhpcykuaWQsIHRoaXMpO1xuXG4gIH1cblxufVxuXG5leHBvcnQgZGVmYXVsdCBGaXJlQmFsbDtcblxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL3NoYXJlZC9GaXJlQmFsbC5qcyJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztBQUNBO0FBQ0E7QUFBQTtBQUNBOzs7QUFBQTtBQUNBOzs7QUFBQTtBQUNBO0FBQUE7QUFDQTs7O0FBQ0E7QUFDQTs7Ozs7Ozs7Ozs7QUFDQTs7O0FBQ0E7QUFBQTtBQUNBO0FBREE7QUFDQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFIQTtBQUtBO0FBQ0E7QUFDQTtBQUVBO0FBRUE7QUFDQTtBQWRBO0FBQ0E7QUFpQkE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFEQTtBQUNBO0FBR0E7QUFDQTtBQUNBO0FBekNBO0FBMENBO0FBQ0E7OztBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRkE7QUFJQTs7O0FBRUE7QUFDQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTs7Ozs7O0FBSUEiLCJzb3VyY2VSb290IjoiIn0=");
-
-/***/ }),
+/* 18 */,
 /* 19 */
-/* unknown exports provided */
-/* all exports used */
-/*!*********************************!*\
-  !*** ./classes/shared/Level.js ***!
-  \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _Sprite = __webpack_require__(/*! ../shared/Sprite */ 0);\n\nvar _Sprite2 = _interopRequireDefault(_Sprite);\n\nvar _GameSettings = __webpack_require__(/*! ../GameSettings */ 1);\n\nvar _MessageTypes = __webpack_require__(/*! ../MessageTypes */ 3);\n\nvar _MessageTypes2 = _interopRequireDefault(_MessageTypes);\n\nvar _SpriteClassMap = __webpack_require__(/*! ../SpriteClassMap */ 16);\n\nvar _GameEngine = __webpack_require__(/*! ../GameEngine */ 6);\n\nvar _GameEngine2 = _interopRequireDefault(_GameEngine);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar Level = function () {\n  function Level(levelId) {\n    _classCallCheck(this, Level);\n\n    // Initialize defaults\n    this.start = { tx: -1, ty: -1 };\n    this.tileMap = [];\n    this.sprites = [];\n\n    this.frameQueue = [];\n\n    // Load data (this may overwrite defaults)\n    if (levelId) {\n      this.id = levelId;\n    } else {\n      throw new Error(\"Didn't provide level ID\");\n    }\n  }\n\n  _createClass(Level, [{\n    key: 'populate',\n    value: function populate(levelData) {\n      this.start = levelData.start;\n      this.tileMap = levelData.tileMap;\n      this.sprites = levelData.sprites.map(function (s) {\n        var sprite = Object.assign(new _Sprite2.default(), s);\n        sprite.setPosition({\n          x: s.tx * _GameSettings.GameSettings.TILE_SCALE,\n          y: s.ty * _GameSettings.GameSettings.TILE_SCALE\n        });\n        return sprite;\n      });\n    }\n  }, {\n    key: 'toJSON',\n    value: function toJSON() {\n      var obj = Object.assign({}, this);\n      obj.sprites = obj.sprites.map(function (s) {\n        var obj = { spawnClass: (0, _SpriteClassMap.GetSpriteTypeName)(s), spawn: s };\n        return obj;\n      });\n      // console.log(\"Level JSONified: \", obj);\n      return JSON.stringify(obj);\n    }\n  }, {\n    key: 'addSprite',\n    value: function addSprite(sprite) {\n      // TODO: something more robust.\n      this.sprites.push(sprite);\n      (0, _GameEngine.broadcastPackage)(_MessageTypes2.default.Spawn, { spawnClass: (0, _SpriteClassMap.GetSpriteTypeName)(sprite), spawn: sprite });\n    }\n  }, {\n    key: 'removeSprite',\n    value: function removeSprite(sprite) {\n      this.sprites.splice(this.sprites.indexOf(sprite), 1);\n      (0, _GameEngine.broadcastPackage)(_MessageTypes2.default.Despawn, { spawnId: sprite.instanceId });\n    }\n  }]);\n\n  return Level;\n}();\n\n// Level.prototype.loadFromJSONFile = function loadFromJSONFile(filename) {\n//   const levelData = JSON.parse(fs.readFileSync(filename, 'utf-8'));\n// };\n\n\nexports.default = Level;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMTkuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvTGV2ZWwuanM/Y2Y1MyJdLCJzb3VyY2VzQ29udGVudCI6WyJcbmltcG9ydCBTcHJpdGUgZnJvbSAnLi4vc2hhcmVkL1Nwcml0ZSc7XG5pbXBvcnQgeyBHYW1lU2V0dGluZ3MgfSBmcm9tICcuLi9HYW1lU2V0dGluZ3MnO1xuaW1wb3J0IE1lc3NhZ2VUeXBlcyBmcm9tICcuLi9NZXNzYWdlVHlwZXMnO1xuaW1wb3J0IHsgR2V0U3ByaXRlVHlwZU5hbWUgfSBmcm9tICcuLi9TcHJpdGVDbGFzc01hcCc7XG5cbmltcG9ydCBXb3JsZCwgeyBicm9hZGNhc3RQYWNrYWdlIH0gZnJvbSAnLi4vR2FtZUVuZ2luZSc7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIExldmVsIHtcbiAgXG4gIGNvbnN0cnVjdG9yKGxldmVsSWQpIHtcblxuICAgIC8vIEluaXRpYWxpemUgZGVmYXVsdHNcbiAgICB0aGlzLnN0YXJ0ID0geyB0eDogLTEsIHR5OiAtMSB9O1xuICAgIHRoaXMudGlsZU1hcCA9IFtdO1xuICAgIHRoaXMuc3ByaXRlcyA9IFtdO1xuXG4gICAgdGhpcy5mcmFtZVF1ZXVlID0gW107XG5cbiAgICAvLyBMb2FkIGRhdGEgKHRoaXMgbWF5IG92ZXJ3cml0ZSBkZWZhdWx0cylcbiAgICBpZiAobGV2ZWxJZCkge1xuICAgICAgdGhpcy5pZCA9IGxldmVsSWQ7XG4gICAgfSBlbHNlIHtcbiAgICAgIHRocm93IG5ldyBFcnJvcihcIkRpZG4ndCBwcm92aWRlIGxldmVsIElEXCIpO1xuICAgIH1cbiAgfVxuXG4gIHBvcHVsYXRlKGxldmVsRGF0YSkge1xuICAgIHRoaXMuc3RhcnQgPSBsZXZlbERhdGEuc3RhcnQ7XG4gICAgdGhpcy50aWxlTWFwID0gbGV2ZWxEYXRhLnRpbGVNYXA7XG4gICAgdGhpcy5zcHJpdGVzID0gbGV2ZWxEYXRhLnNwcml0ZXMubWFwKChzKSA9PiB7XG4gICAgICBjb25zdCBzcHJpdGUgPSBPYmplY3QuYXNzaWduKG5ldyBTcHJpdGUoKSwgcyk7XG4gICAgICBzcHJpdGUuc2V0UG9zaXRpb24oe1xuICAgICAgICB4OiBzLnR4ICogR2FtZVNldHRpbmdzLlRJTEVfU0NBTEUsXG4gICAgICAgIHk6IHMudHkgKiBHYW1lU2V0dGluZ3MuVElMRV9TQ0FMRVxuICAgICAgfSk7XG4gICAgICByZXR1cm4gc3ByaXRlO1xuICAgIH0pO1xuICB9XG5cbiAgdG9KU09OKCkge1xuICAgIGNvbnN0IG9iaiA9IE9iamVjdC5hc3NpZ24oe30sIHRoaXMpO1xuICAgIG9iai5zcHJpdGVzID0gb2JqLnNwcml0ZXMubWFwKHMgPT4ge1xuICAgICAgY29uc3Qgb2JqID0geyBzcGF3bkNsYXNzOiBHZXRTcHJpdGVUeXBlTmFtZShzKSwgc3Bhd246IHMgfVxuICAgICAgcmV0dXJuIG9iajtcbiAgICB9KTtcbiAgICAvLyBjb25zb2xlLmxvZyhcIkxldmVsIEpTT05pZmllZDogXCIsIG9iaik7XG4gICAgcmV0dXJuIEpTT04uc3RyaW5naWZ5KG9iaik7XG4gIH1cblxuICBhZGRTcHJpdGUoc3ByaXRlKSB7XG4gICAgLy8gVE9ETzogc29tZXRoaW5nIG1vcmUgcm9idXN0LlxuICAgIHRoaXMuc3ByaXRlcy5wdXNoKHNwcml0ZSk7XG4gICAgYnJvYWRjYXN0UGFja2FnZShNZXNzYWdlVHlwZXMuU3Bhd24sIHsgc3Bhd25DbGFzczogR2V0U3ByaXRlVHlwZU5hbWUoc3ByaXRlKSwgc3Bhd246IHNwcml0ZSB9KTtcbiAgfVxuXG4gIHJlbW92ZVNwcml0ZShzcHJpdGUpIHtcbiAgICB0aGlzLnNwcml0ZXMuc3BsaWNlKHRoaXMuc3ByaXRlcy5pbmRleE9mKHNwcml0ZSksIDEpO1xuICAgIGJyb2FkY2FzdFBhY2thZ2UoTWVzc2FnZVR5cGVzLkRlc3Bhd24sIHsgc3Bhd25JZDogc3ByaXRlLmluc3RhbmNlSWQgfSk7XG4gIH1cblxufVxuXG4vLyBMZXZlbC5wcm90b3R5cGUubG9hZEZyb21KU09ORmlsZSA9IGZ1bmN0aW9uIGxvYWRGcm9tSlNPTkZpbGUoZmlsZW5hbWUpIHtcbi8vICAgY29uc3QgbGV2ZWxEYXRhID0gSlNPTi5wYXJzZShmcy5yZWFkRmlsZVN5bmMoZmlsZW5hbWUsICd1dGYtOCcpKTtcbi8vIH07XG5cblxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL3NoYXJlZC9MZXZlbC5qcyJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7QUFDQTtBQUNBOzs7QUFBQTtBQUNBO0FBQUE7QUFDQTs7O0FBQUE7QUFDQTtBQUNBO0FBQ0E7Ozs7Ozs7QUFDQTtBQUVBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUZBO0FBSUE7QUFDQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUVBO0FBQ0E7QUFDQTtBQUNBOzs7Ozs7QUFJQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBM0RBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Sprite2 = __webpack_require__(0);
+
+var _Sprite3 = _interopRequireDefault(_Sprite2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ProgressBar = function (_Sprite) {
+  _inherits(ProgressBar, _Sprite);
+
+  function ProgressBar() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, ProgressBar);
+
+    var _this = _possibleConstructorReturn(this, (ProgressBar.__proto__ || Object.getPrototypeOf(ProgressBar)).call(this)); // x, y, width, height, current, max, fgColor, bgColor, parentSprite) {
+
+
+    _this.stats = { current: params.current, max: params.max };
+    _this.bgColor = params.bgColor || "#FFFFFF";
+    _this.fgColor = params.fgColor || "#FF0000";
+    _this.parentGO = params.parentGO || { position: { x: 0, y: 0 } };
+    _this.setBounds(params.x || -1, params.y || -1, params.width || -1, params.height || -1);
+    _this.setRelativePosition({ x: params.x || 0, y: params.y || 0 });
+    return _this;
+  }
+
+  _createClass(ProgressBar, [{
+    key: "setBounds",
+    value: function setBounds(x, y, width, height) {
+      this.bounds = this.bounds || {};
+      this.bounds.x = x || this.bounds.x;
+      this.bounds.y = y || this.bounds.y;
+      this.bounds.width = width || this.bounds.width, this.bounds.height = height || this.bounds.height, this.bounds.left = this.bounds.x;
+      this.bounds.right = x && width ? x + width : this.bounds.x + this.bounds.width;
+      this.bounds.top = this.bounds.y;
+      this.bounds.bottom = y && height ? y + height : this.bounds.y + this.bounds.height;
+
+      this.setPosition(this.bounds);
+    }
+  }, {
+    key: "draw",
+    value: function draw(ctx) {
+      // Draw background
+      var x = this.position.x;
+      var y = this.position.y;
+      var width = this.bounds.width;
+      var height = this.bounds.height;
+      ctx.fillStyle = this.bgColor;
+      ctx.fillRect(x, y, width, height);
+
+      // Draw foreground
+      width = this.bounds.width * (this.stats.current / this.stats.max);
+      ctx.fillStyle = this.fgColor;
+      ctx.fillRect(x, y, width, height);
+    }
+  }, {
+    key: "update",
+    value: function update(delta) {
+      console.log("updating progressbar for: ", this.parentId);
+    }
+  }]);
+
+  return ProgressBar;
+}(_Sprite3.default);
+
+exports.default = ProgressBar;
 
 /***/ }),
 /* 20 */
-/* unknown exports provided */
-/* all exports used */
-/*!*********************!*\
-  !*** external "fs" ***!
-  \*********************/
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-eval("module.exports = require(\"fs\");//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMjAuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vZXh0ZXJuYWwgXCJmc1wiPzJlMDkiXSwic291cmNlc0NvbnRlbnQiOlsibW9kdWxlLmV4cG9ydHMgPSByZXF1aXJlKFwiZnNcIik7XG5cblxuLy8vLy8vLy8vLy8vLy8vLy8vXG4vLyBXRUJQQUNLIEZPT1RFUlxuLy8gZXh0ZXJuYWwgXCJmc1wiXG4vLyBtb2R1bGUgaWQgPSAyMFxuLy8gbW9kdWxlIGNodW5rcyA9IDAiXSwibWFwcGluZ3MiOiJBQUFBIiwic291cmNlUm9vdCI6IiJ9");
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _FireballAbility = __webpack_require__(47);
+
+var _FireballAbility2 = _interopRequireDefault(_FireballAbility);
+
+var _BlueBeamAbility = __webpack_require__(46);
+
+var _BlueBeamAbility2 = _interopRequireDefault(_BlueBeamAbility);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// TODO: Move abilities to server side???
+
+var Abilities = {
+  'FIREBALL': _FireballAbility2.default,
+  'BLUEBEAM': _BlueBeamAbility2.default
+}; // TODO: Move abilities to server side???
+exports.default = Abilities;
 
 /***/ }),
 /* 21 */
-/* unknown exports provided */
-/* all exports used */
-/*!*********************!*\
-  !*** external "ws" ***!
-  \*********************/
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-eval("module.exports = require(\"ws\");//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMjEuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vZXh0ZXJuYWwgXCJ3c1wiPzc4MDYiXSwic291cmNlc0NvbnRlbnQiOlsibW9kdWxlLmV4cG9ydHMgPSByZXF1aXJlKFwid3NcIik7XG5cblxuLy8vLy8vLy8vLy8vLy8vLy8vXG4vLyBXRUJQQUNLIEZPT1RFUlxuLy8gZXh0ZXJuYWwgXCJ3c1wiXG4vLyBtb2R1bGUgaWQgPSAyMVxuLy8gbW9kdWxlIGNodW5rcyA9IDAiXSwibWFwcGluZ3MiOiJBQUFBIiwic291cmNlUm9vdCI6IiJ9");
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Character = __webpack_require__(9);
+
+var _Character2 = _interopRequireDefault(_Character);
+
+var _messaging = __webpack_require__(11);
+
+var _MessageTypes = __webpack_require__(5);
+
+var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
+
+var _SpriteTypes = __webpack_require__(2);
+
+var _Abilities = __webpack_require__(20);
+
+var _Abilities2 = _interopRequireDefault(_Abilities);
+
+var _GameEngine = __webpack_require__(3);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var CharacterController = function () {
+  function CharacterController(character) {
+    _classCallCheck(this, CharacterController);
+
+    this.character = character;
+    this.isPlayer = true; // TODO: Figure out whether I should use this at all. Also how should I set it and should it be false by default.
+    this.populateControllerAbilities.bind(this)();
+  }
+
+  _createClass(CharacterController, [{
+    key: 'applyDamage',
+    value: function applyDamage(character, damageInfo) {
+      character.tookDamage(damageInfo.damage, damageInfo.source);
+    }
+  }, {
+    key: 'useAbility',
+    value: function useAbility(abilityName, params) {
+      // console.log("ability being used.", abilityName, this.abilities[abilityName]);
+      if (this.canUseAbility(abilityName)) {
+        // console.log("ability used");
+        this.abilities[abilityName].use(this.character, params);
+      }
+    }
+  }, {
+    key: 'canUseAbility',
+    value: function canUseAbility(abilityName) {
+      // TODO: Check cooldown, etc.
+      return this.abilities[abilityName] && true;
+    }
+  }, {
+    key: 'populateControllerAbilities',
+    value: function populateControllerAbilities() {
+      // this.abilities = this.character.abilities.map(abilityName => new Abilities[abilityName]());
+      this.abilities = this.character.abilities.reduce(function (keyValAbilities, abilityName) {
+        keyValAbilities[abilityName] = new _Abilities2.default[abilityName](); //a, b, c
+        return keyValAbilities;
+      }, {});
+    }
+  }]);
+
+  return CharacterController;
+}();
+
+exports.default = CharacterController;
 
 /***/ }),
 /* 22 */
-/* unknown exports provided */
-/* all exports used */
-/*!****************************************!*\
-  !*** ./classes/Helpers/passhashing.js ***!
-  \****************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\nexports.hashString = hashString;\nexports.sha512 = sha512;\nexports.hashPassword = hashPassword;\n\nvar _crypto = __webpack_require__(/*! crypto */ 40);\n\nvar _crypto2 = _interopRequireDefault(_crypto);\n\nvar _guid = __webpack_require__(/*! ./guid */ 2);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction hashString() {\n  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : \"\";\n\n  var hash = 0,\n      i,\n      chr;\n  if (str.length === 0) return hash;\n  for (i = 0; i < str.length; i++) {\n    chr = str.charCodeAt(i);\n    hash = (hash << 5) - hash + chr;\n    hash |= 0; // Convert to 32bit integer\n  }\n  return hash;\n}\n\nfunction sha512(password, salt) {\n  var hash = _crypto2.default.createHmac('sha512', salt); /** Hashing algorithm sha512 */\n  hash.update(password);\n  var value = hash.digest('hex');\n  return {\n    salt: salt,\n    hash: value\n  };\n}\n\nfunction hashPassword(password) {\n  var salt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (0, _guid.guid)();\n\n  return sha512(password, salt);\n}//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMjIuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9IZWxwZXJzL3Bhc3NoYXNoaW5nLmpzP2MwNDMiXSwic291cmNlc0NvbnRlbnQiOlsiXG5pbXBvcnQgY3J5cHRvIGZyb20gJ2NyeXB0byc7XG5pbXBvcnQgeyBndWlkIH0gZnJvbSAnLi9ndWlkJztcblxuZXhwb3J0IGZ1bmN0aW9uIGhhc2hTdHJpbmcoc3RyID0gXCJcIikge1xuICB2YXIgaGFzaCA9IDAsIGksIGNocjtcbiAgaWYgKHN0ci5sZW5ndGggPT09IDApIHJldHVybiBoYXNoO1xuICBmb3IgKGkgPSAwOyBpIDwgc3RyLmxlbmd0aDsgaSsrKSB7XG4gICAgY2hyICAgPSBzdHIuY2hhckNvZGVBdChpKTtcbiAgICBoYXNoICA9ICgoaGFzaCA8PCA1KSAtIGhhc2gpICsgY2hyO1xuICAgIGhhc2ggfD0gMDsgLy8gQ29udmVydCB0byAzMmJpdCBpbnRlZ2VyXG4gIH1cbiAgcmV0dXJuIGhhc2g7XG59XG5cbmV4cG9ydCBmdW5jdGlvbiBzaGE1MTIocGFzc3dvcmQsIHNhbHQpIHtcbiAgICB2YXIgaGFzaCA9IGNyeXB0by5jcmVhdGVIbWFjKCdzaGE1MTInLCBzYWx0KTsgLyoqIEhhc2hpbmcgYWxnb3JpdGhtIHNoYTUxMiAqL1xuICAgIGhhc2gudXBkYXRlKHBhc3N3b3JkKTtcbiAgICB2YXIgdmFsdWUgPSBoYXNoLmRpZ2VzdCgnaGV4Jyk7XG4gICAgcmV0dXJuIHtcbiAgICAgICAgc2FsdDogc2FsdCxcbiAgICAgICAgaGFzaDogdmFsdWVcbiAgICB9O1xufVxuXG5leHBvcnQgZnVuY3Rpb24gaGFzaFBhc3N3b3JkKHBhc3N3b3JkLCBzYWx0ID0gZ3VpZCgpKSB7XG4gIHJldHVybiBzaGE1MTIocGFzc3dvcmQsIHNhbHQpO1xufVxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBjbGFzc2VzL0hlbHBlcnMvcGFzc2hhc2hpbmcuanMiXSwibWFwcGluZ3MiOiI7Ozs7O0FBSUE7QUFXQTtBQVVBO0FBQ0E7QUF6QkE7QUFDQTs7O0FBQUE7QUFDQTs7O0FBQ0E7QUFBQTtBQUNBO0FBQUE7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFGQTtBQUlBO0FBQ0E7QUFDQTtBQUFBO0FBQ0E7QUFBQTtBQUNBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Sprite = __webpack_require__(0);
+
+var _Sprite2 = _interopRequireDefault(_Sprite);
+
+var _GameSettings = __webpack_require__(1);
+
+var _MessageTypes = __webpack_require__(5);
+
+var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
+
+var _SpriteClassMap = __webpack_require__(17);
+
+var _GameEngine = __webpack_require__(3);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Level = function () {
+  function Level(levelId) {
+    _classCallCheck(this, Level);
+
+    // Initialize defaults
+    this.start = { tx: -1, ty: -1 };
+    this.tileMap = [];
+    this.sprites = [];
+
+    this.frameQueue = [];
+
+    // Load data (this may overwrite defaults)
+    if (levelId) {
+      this.id = levelId;
+    } else {
+      throw new Error("Didn't provide level ID");
+    }
+  }
+
+  _createClass(Level, [{
+    key: 'populate',
+    value: function populate(levelData) {
+      this.start = levelData.start;
+      this.tileMap = levelData.tileMap;
+      this.sprites = levelData.sprites.map(function (s) {
+        var sprite = Object.assign(new _Sprite2.default(), s);
+        sprite.setPosition({
+          x: s.tx * _GameSettings.GameSettings.TILE_SCALE,
+          y: s.ty * _GameSettings.GameSettings.TILE_SCALE
+        });
+        return sprite;
+      });
+    }
+  }, {
+    key: 'toJSON',
+    value: function toJSON() {
+      var obj = Object.assign({}, this);
+      obj.sprites = obj.sprites.map(function (s) {
+        var obj = { spawnClass: (0, _SpriteClassMap.GetSpriteTypeName)(s), spawn: s };
+        return obj;
+      });
+      // console.log("Level JSONified: ", obj);
+      return JSON.stringify(obj);
+    }
+  }, {
+    key: 'addSprite',
+    value: function addSprite(sprite) {
+      // TODO: something more robust.
+      this.sprites.push(sprite);
+      (0, _GameEngine.broadcastPackage)(_MessageTypes2.default.Spawn, { spawnClass: (0, _SpriteClassMap.GetSpriteTypeName)(sprite), spawn: sprite });
+    }
+  }, {
+    key: 'removeSprite',
+    value: function removeSprite(sprite) {
+      this.sprites.splice(this.sprites.indexOf(sprite), 1);
+      (0, _GameEngine.broadcastPackage)(_MessageTypes2.default.Despawn, { spawnId: sprite.instanceId });
+    }
+  }]);
+
+  return Level;
+}();
+
+// Level.prototype.loadFromJSONFile = function loadFromJSONFile(filename) {
+//   const levelData = JSON.parse(fs.readFileSync(filename, 'utf-8'));
+// };
+
+
+exports.default = Level;
 
 /***/ }),
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */
-/* unknown exports provided */
-/* all exports used */
-/*!**********************************!*\
-  !*** ./classes/server/Client.js ***!
-  \**********************************/
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _gx2D = __webpack_require__(/*! ../Helpers/gx2D */ 8);\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar Client = function () {\n  function Client(info) {\n    _classCallCheck(this, Client);\n\n    this.socket = info.socket;\n    this.token = info.token;\n    this.authenticated = info.authenticated || false;\n    this.ipAddress = this.socket.upgradeReq.headers['x-forwarded-for'] || this.socket.upgradeReq.connection.remoteAddress;\n    this.playerCharacter = info.playerCharacter || null;\n  }\n\n  _createClass(Client, [{\n    key: 'setMouseDown',\n    value: function setMouseDown(params) {\n      // console.log(\"setting playercharacter to moving.\");\n      // this.playerCharacter.moving = true;\n      this.playerCharacter.setMoveTarget(params.x, params.y);\n    }\n  }, {\n    key: 'setMouseUp',\n    value: function setMouseUp() {\n      this.playerCharacter.moving = false;\n    }\n  }, {\n    key: 'setMousePosition',\n    value: function setMousePosition(aim) {\n      // console.error(\"setting position\");\n      var pc = this.playerCharacter;\n      if (pc && !pc.hasMoveTarget) {\n        pc.aim = aim;\n        pc.angle = (0, _gx2D.angle2d)(pc.position.x, pc.position.y, aim.x, aim.y) + Math.PI / 2;\n        // console.log('angle: ', pc.angle);\n      }\n    }\n  }]);\n\n  return Client;\n}();\n\nexports.default = Client;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMjcuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zZXJ2ZXIvQ2xpZW50LmpzPzVjOGYiXSwic291cmNlc0NvbnRlbnQiOlsiXG5pbXBvcnQgeyBhbmdsZTJkIH0gZnJvbSAnLi4vSGVscGVycy9neDJEJztcblxuZXhwb3J0IGRlZmF1bHQgY2xhc3MgQ2xpZW50IHtcbiAgY29uc3RydWN0b3IoaW5mbykge1xuICAgIHRoaXMuc29ja2V0ID0gaW5mby5zb2NrZXQ7XG4gICAgdGhpcy50b2tlbiA9IGluZm8udG9rZW47XG4gICAgdGhpcy5hdXRoZW50aWNhdGVkID0gaW5mby5hdXRoZW50aWNhdGVkIHx8IGZhbHNlO1xuICAgIHRoaXMuaXBBZGRyZXNzID0gdGhpcy5zb2NrZXQudXBncmFkZVJlcS5oZWFkZXJzWyd4LWZvcndhcmRlZC1mb3InXVxuICAgICAgICAgICAgICAgICAgICAgIHx8IHRoaXMuc29ja2V0LnVwZ3JhZGVSZXEuY29ubmVjdGlvbi5yZW1vdGVBZGRyZXNzO1xuICAgIHRoaXMucGxheWVyQ2hhcmFjdGVyID0gaW5mby5wbGF5ZXJDaGFyYWN0ZXIgfHwgbnVsbDtcbiAgfVxuXG4gIHNldE1vdXNlRG93bihwYXJhbXMpIHtcbiAgICAvLyBjb25zb2xlLmxvZyhcInNldHRpbmcgcGxheWVyY2hhcmFjdGVyIHRvIG1vdmluZy5cIik7XG4gICAgLy8gdGhpcy5wbGF5ZXJDaGFyYWN0ZXIubW92aW5nID0gdHJ1ZTtcbiAgICB0aGlzLnBsYXllckNoYXJhY3Rlci5zZXRNb3ZlVGFyZ2V0KHBhcmFtcy54LCBwYXJhbXMueSk7XG4gIH1cbiAgc2V0TW91c2VVcCgpIHtcbiAgICB0aGlzLnBsYXllckNoYXJhY3Rlci5tb3ZpbmcgPSBmYWxzZTtcbiAgfVxuICBzZXRNb3VzZVBvc2l0aW9uKGFpbSkge1xuICAgIC8vIGNvbnNvbGUuZXJyb3IoXCJzZXR0aW5nIHBvc2l0aW9uXCIpO1xuICAgIGNvbnN0IHBjID0gdGhpcy5wbGF5ZXJDaGFyYWN0ZXI7XG4gICAgaWYocGMgJiYgIXBjLmhhc01vdmVUYXJnZXQpIHtcbiAgICAgIHBjLmFpbSA9IGFpbTtcbiAgICAgIHBjLmFuZ2xlID0gYW5nbGUyZChwYy5wb3NpdGlvbi54LCBwYy5wb3NpdGlvbi55LCBhaW0ueCwgYWltLnkpICsgTWF0aC5QSSAvIDI7XG4gICAgICAvLyBjb25zb2xlLmxvZygnYW5nbGU6ICcsIHBjLmFuZ2xlKTtcbiAgICB9IFxuICB9XG59XG5cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9zZXJ2ZXIvQ2xpZW50LmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7OztBQUNBO0FBQ0E7OztBQUNBO0FBQ0E7QUFBQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7OztBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7OztBQUNBO0FBQ0E7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7Ozs7QUExQkEiLCJzb3VyY2VSb290IjoiIn0=");
-
-/***/ }),
-/* 28 */
-/* unknown exports provided */
-/* all exports used */
-/*!*******************************************!*\
-  !*** ./classes/server/DatabaseManager.js ***!
-  \*******************************************/
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _PlayerCharacter = __webpack_require__(/*! ../shared/PlayerCharacter */ 4);\n\nvar _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar DatabaseManager = function () {\n  function DatabaseManager() {\n    _classCallCheck(this, DatabaseManager);\n  }\n\n  _createClass(DatabaseManager, [{\n    key: 'getPlayer',\n    value: function getPlayer(playerName) {\n      // Todo: get player information from a database and Object.assign it.\n      var pc = new _PlayerCharacter2.default(playerName);\n      pc.id = Math.floor(Math.random() * 10000000000 + 1);\n      return pc;\n    }\n  }]);\n\n  return DatabaseManager;\n}();\n\nvar DbManager = new DatabaseManager();\n\nexports.default = DbManager;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMjguanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zZXJ2ZXIvRGF0YWJhc2VNYW5hZ2VyLmpzPzllYzgiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFBsYXllckNoYXJhY3RlciBmcm9tICcuLi9zaGFyZWQvUGxheWVyQ2hhcmFjdGVyJztcblxuY2xhc3MgRGF0YWJhc2VNYW5hZ2VyIHtcbiAgZ2V0UGxheWVyKHBsYXllck5hbWUpIHtcbiAgICAvLyBUb2RvOiBnZXQgcGxheWVyIGluZm9ybWF0aW9uIGZyb20gYSBkYXRhYmFzZSBhbmQgT2JqZWN0LmFzc2lnbiBpdC5cbiAgICBjb25zdCBwYyA9IG5ldyBQbGF5ZXJDaGFyYWN0ZXIocGxheWVyTmFtZSk7XG4gICAgcGMuaWQgPSBNYXRoLmZsb29yKE1hdGgucmFuZG9tKCkgKiAxMDAwMDAwMDAwMCArIDEpO1xuICAgIHJldHVybiBwYztcbiAgfVxufVxuXG5jb25zdCBEYk1hbmFnZXIgPSBuZXcgRGF0YWJhc2VNYW5hZ2VyKCk7XG5cbmV4cG9ydCBkZWZhdWx0IERiTWFuYWdlcjtcblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9zZXJ2ZXIvRGF0YWJhc2VNYW5hZ2VyLmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7OztBQUFBO0FBQ0E7Ozs7Ozs7QUFDQTs7Ozs7OztBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7Ozs7O0FBR0E7QUFDQTtBQUNBIiwic291cmNlUm9vdCI6IiJ9");
-
-/***/ }),
-/* 29 */
-/* unknown exports provided */
-/* all exports used */
-/*!*****************************!*\
-  !*** ./models/Character.js ***!
-  \*****************************/
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _mongoose = __webpack_require__(/*! mongoose */ 15);\n\nvar _mongoose2 = _interopRequireDefault(_mongoose);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n_mongoose2.default.Promise = global.Promise;\n\nvar characterSchema = (0, _mongoose.Schema)({\n  name: { type: String, required: true },\n  stats: {\n    HP: Number, maxHP: Number,\n    level: Number,\n    strength: Number\n  }\n});\n\nvar Character = _mongoose2.default.model('Character', characterSchema);\n\nexports.default = Character;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMjkuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vbW9kZWxzL0NoYXJhY3Rlci5qcz9jNzBkIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBtb25nb29zZSwgeyBTY2hlbWEgfSBmcm9tICdtb25nb29zZSc7XG5tb25nb29zZS5Qcm9taXNlID0gZ2xvYmFsLlByb21pc2U7XG5cbmNvbnN0IGNoYXJhY3RlclNjaGVtYSA9IFNjaGVtYSh7XG4gIG5hbWU6IHsgdHlwZTogU3RyaW5nLCByZXF1aXJlZDogdHJ1ZSB9LFxuICBzdGF0czoge1xuICAgIEhQOiBOdW1iZXIsIG1heEhQOiBOdW1iZXIsXG4gICAgbGV2ZWw6IE51bWJlciwgXG4gICAgc3RyZW5ndGg6IE51bWJlcixcbiAgfSxcbiAgLy8gdXNlcjogeyBcbiAgLy8gICB0eXBlOiBTY2hlbWEuVHlwZXMuT2JqZWN0SWQsIFxuICAvLyAgIHJlcXVpcmVkOiB0cnVlLCBcbiAgLy8gICByZWY6ICdJbmdyZWRpZW50J1xuICAvLyB9LFxufSk7XG5cbmNvbnN0IENoYXJhY3RlciA9IG1vbmdvb3NlLm1vZGVsKCdDaGFyYWN0ZXInLCBjaGFyYWN0ZXJTY2hlbWEpO1xuXG5leHBvcnQgZGVmYXVsdCBDaGFyYWN0ZXI7XG5cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gbW9kZWxzL0NoYXJhY3Rlci5qcyJdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQUE7QUFDQTs7Ozs7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBSEE7QUFGQTtBQUNBO0FBYUE7QUFDQTtBQUNBIiwic291cmNlUm9vdCI6IiJ9");
-
-/***/ }),
-/* 30 */
-/* unknown exports provided */
-/* all exports used */
-/*!************************!*\
-  !*** ./models/User.js ***!
-  \************************/
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _mongoose = __webpack_require__(/*! mongoose */ 15);\n\nvar _mongoose2 = _interopRequireDefault(_mongoose);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n_mongoose2.default.Promise = global.Promise;\n\nvar userSchema = (0, _mongoose.Schema)({\n  user: { type: String, required: true },\n  pass: {\n    hash: { type: String, required: true },\n    salt: { type: String, required: true }\n  },\n  character: {\n    type: _mongoose.Schema.Types.ObjectId,\n    required: true,\n    ref: 'Character'\n  }\n});\n\nvar User = _mongoose2.default.model('User', userSchema);\n\nexports.default = User;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMzAuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vbW9kZWxzL1VzZXIuanM/ZDNkYyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgbW9uZ29vc2UsIHsgU2NoZW1hIH0gZnJvbSAnbW9uZ29vc2UnO1xubW9uZ29vc2UuUHJvbWlzZSA9IGdsb2JhbC5Qcm9taXNlO1xuXG5jb25zdCB1c2VyU2NoZW1hID0gU2NoZW1hKHtcbiAgdXNlcjogeyB0eXBlOiBTdHJpbmcsIHJlcXVpcmVkOiB0cnVlIH0sXG4gIHBhc3M6IHtcbiAgICBoYXNoOiB7IHR5cGU6IFN0cmluZywgcmVxdWlyZWQ6IHRydWUgfSxcbiAgICBzYWx0OiB7IHR5cGU6IFN0cmluZywgcmVxdWlyZWQ6IHRydWUgfSxcbiAgfSxcbiAgY2hhcmFjdGVyOiB7IFxuICAgIHR5cGU6IFNjaGVtYS5UeXBlcy5PYmplY3RJZCwgXG4gICAgcmVxdWlyZWQ6IHRydWUsIFxuICAgIHJlZjogJ0NoYXJhY3RlcidcbiAgfSxcbn0pO1xuXG5jb25zdCBVc2VyID0gbW9uZ29vc2UubW9kZWwoJ1VzZXInLCB1c2VyU2NoZW1hKTtcblxuZXhwb3J0IGRlZmF1bHQgVXNlcjtcblxuXG5cbi8vIFdFQlBBQ0sgRk9PVEVSIC8vXG4vLyBtb2RlbHMvVXNlci5qcyJdLCJtYXBwaW5ncyI6Ijs7Ozs7O0FBQUE7QUFDQTs7Ozs7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUZBO0FBSUE7QUFDQTtBQUNBO0FBQ0E7QUFIQTtBQU5BO0FBQ0E7QUFZQTtBQUNBO0FBQ0EiLCJzb3VyY2VSb290IjoiIn0=");
-
-/***/ }),
-/* 31 */
-/* unknown exports provided */
-/* all exports used */
-/*!**************************!*\
-  !*** external "express" ***!
-  \**************************/
+/* 23 */
 /***/ (function(module, exports) {
 
-eval("module.exports = require(\"express\");//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMzEuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vZXh0ZXJuYWwgXCJleHByZXNzXCI/ZDJkMiJdLCJzb3VyY2VzQ29udGVudCI6WyJtb2R1bGUuZXhwb3J0cyA9IHJlcXVpcmUoXCJleHByZXNzXCIpO1xuXG5cbi8vLy8vLy8vLy8vLy8vLy8vL1xuLy8gV0VCUEFDSyBGT09URVJcbi8vIGV4dGVybmFsIFwiZXhwcmVzc1wiXG4vLyBtb2R1bGUgaWQgPSAzMVxuLy8gbW9kdWxlIGNodW5rcyA9IDAiXSwibWFwcGluZ3MiOiJBQUFBIiwic291cmNlUm9vdCI6IiJ9");
+module.exports = require("fs");
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
+
+module.exports = require("ws");
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _CastTypes = __webpack_require__(38);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/**
+ * Base class for abilities
+ * @constructor
+ * @abstract
+ */
+var Ability = function () {
+  /**
+   * Ability class is the base class for all abilities.
+   * @param {Object} params - Parameters for creating this ability class.
+   * @param {string} params.name - Name of ability.
+   * @param {string} params.playerInstanceId - Instance ID of the player who this ability is assigned to.
+   */
+  function Ability() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Ability);
+
+    this.name = 'Generic ability';
+    // No cooldown instant cast by default
+    this.abilityType = _CastTypes.CastTypes.INSTANT;
+    this.cooldown = 0;
+    this.cooldownStart = null;
+    // this.cooldownGroup = ......... should this be programmed here or described in database.
+  }
+
+  /**
+   * @abstract
+   * @param {Object} params - Details for casting whatever spell is being cast. Likely no more than the character that did the casting.
+   */
+
+
+  _createClass(Ability, [{
+    key: 'use',
+    value: function use(params) {
+      throw new Error("Must override.");
+    }
+
+    /**
+     * @virtual
+     */
+
+  }, {
+    key: 'triggerCooldown',
+    value: function triggerCooldown() {
+      this.cooldownStart = +Date.now();
+    }
+
+    /**
+     * @virtual
+     */
+
+  }, {
+    key: 'isOnCooldown',
+    value: function isOnCooldown() {
+      return +Date.now() < this.cooldownStart + this.cooldown;
+    }
+  }]);
+
+  return Ability;
+}();
+
+exports.default = Ability;
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.hashString = hashString;
+exports.sha512 = sha512;
+exports.hashPassword = hashPassword;
+
+var _crypto = __webpack_require__(49);
+
+var _crypto2 = _interopRequireDefault(_crypto);
+
+var _guid = __webpack_require__(7);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function hashString() {
+  var str = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+
+  var hash = 0,
+      i,
+      chr;
+  if (str.length === 0) return hash;
+  for (i = 0; i < str.length; i++) {
+    chr = str.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
+function sha512(password, salt) {
+  var hash = _crypto2.default.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+  hash.update(password);
+  var value = hash.digest('hex');
+  return {
+    salt: salt,
+    hash: value
+  };
+}
+
+function hashPassword(password) {
+  var salt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (0, _guid.guid)();
+
+  return sha512(password, salt);
+}
+
+/***/ }),
+/* 27 */,
+/* 28 */,
+/* 29 */,
+/* 30 */,
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _gx2D = __webpack_require__(6);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Client = function () {
+  function Client(info) {
+    _classCallCheck(this, Client);
+
+    this.socket = info.socket;
+    this.token = info.token;
+    this.authenticated = info.authenticated || false;
+    this.ipAddress = this.socket.upgradeReq.headers['x-forwarded-for'] || this.socket.upgradeReq.connection.remoteAddress;
+    this.playerCharacter = info.playerCharacter || null;
+  }
+
+  _createClass(Client, [{
+    key: 'setMouseDown',
+    value: function setMouseDown(params) {
+      // console.log("setting playercharacter to moving.");
+      // this.playerCharacter.moving = true;
+      this.playerCharacter.setMoveTarget(params.x, params.y);
+    }
+  }, {
+    key: 'setMouseUp',
+    value: function setMouseUp() {
+      this.playerCharacter.moving = false;
+    }
+  }, {
+    key: 'setMousePosition',
+    value: function setMousePosition(aim) {
+      // console.error("setting position");
+      var pc = this.playerCharacter;
+      if (pc && !pc.hasMoveTarget) {
+        pc.aim = aim;
+        pc.angle = (0, _gx2D.angle2d)(pc.position.x, pc.position.y, aim.x, aim.y) + Math.PI / 2;
+        // console.log('angle: ', pc.angle);
+      }
+    }
+  }]);
+
+  return Client;
+}();
+
+exports.default = Client;
 
 /***/ }),
 /* 32 */
-/* unknown exports provided */
-/* all exports used */
-/*!***********************!*\
-  !*** external "http" ***!
-  \***********************/
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-eval("module.exports = require(\"http\");//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMzIuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vZXh0ZXJuYWwgXCJodHRwXCI/OGU0NCJdLCJzb3VyY2VzQ29udGVudCI6WyJtb2R1bGUuZXhwb3J0cyA9IHJlcXVpcmUoXCJodHRwXCIpO1xuXG5cbi8vLy8vLy8vLy8vLy8vLy8vL1xuLy8gV0VCUEFDSyBGT09URVJcbi8vIGV4dGVybmFsIFwiaHR0cFwiXG4vLyBtb2R1bGUgaWQgPSAzMlxuLy8gbW9kdWxlIGNodW5rcyA9IDAiXSwibWFwcGluZ3MiOiJBQUFBIiwic291cmNlUm9vdCI6IiJ9");
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _PlayerCharacter = __webpack_require__(10);
+
+var _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var DatabaseManager = function () {
+  function DatabaseManager() {
+    _classCallCheck(this, DatabaseManager);
+  }
+
+  _createClass(DatabaseManager, [{
+    key: 'getPlayer',
+    value: function getPlayer(playerName) {
+      // Todo: get player information from a database and Object.assign it.
+      var pc = new _PlayerCharacter2.default(playerName);
+      pc.id = Math.floor(Math.random() * 10000000000 + 1);
+      return pc;
+    }
+  }]);
+
+  return DatabaseManager;
+}();
+
+var DbManager = new DatabaseManager();
+
+exports.default = DbManager;
 
 /***/ }),
 /* 33 */
-/* unknown exports provided */
-/* all exports used */
-/*!****************!*\
-  !*** ./app.js ***!
-  \****************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nvar _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i[\"return\"]) _i[\"return\"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError(\"Invalid attempt to destructure non-iterable instance\"); } }; }();\n\nvar _express = __webpack_require__(/*! express */ 31);\n\nvar _express2 = _interopRequireDefault(_express);\n\nvar _http = __webpack_require__(/*! http */ 32);\n\nvar _http2 = _interopRequireDefault(_http);\n\nvar _ws = __webpack_require__(/*! ws */ 21);\n\nvar _ws2 = _interopRequireDefault(_ws);\n\nvar _mongoose = __webpack_require__(/*! mongoose */ 15);\n\nvar _mongoose2 = _interopRequireDefault(_mongoose);\n\nvar _GameEngine = __webpack_require__(/*! ./classes/GameEngine */ 6);\n\nvar _GameEngine2 = _interopRequireDefault(_GameEngine);\n\nvar _guid = __webpack_require__(/*! ./classes/Helpers/guid */ 2);\n\nvar _passhashing = __webpack_require__(/*! ./classes/Helpers/passhashing */ 22);\n\nvar _messaging = __webpack_require__(/*! ./classes/Helpers/messaging */ 14);\n\nvar _Client = __webpack_require__(/*! ./classes/server/Client */ 27);\n\nvar _Client2 = _interopRequireDefault(_Client);\n\nvar _Level = __webpack_require__(/*! ./classes/shared/Level */ 19);\n\nvar _Level2 = _interopRequireDefault(_Level);\n\nvar _DatabaseManager = __webpack_require__(/*! ./classes/server/DatabaseManager */ 28);\n\nvar _DatabaseManager2 = _interopRequireDefault(_DatabaseManager);\n\nvar _GameSettings = __webpack_require__(/*! ./classes/GameSettings */ 1);\n\nvar _fs = __webpack_require__(/*! fs */ 20);\n\nvar _fs2 = _interopRequireDefault(_fs);\n\nvar _FireBall = __webpack_require__(/*! ./classes/shared/FireBall */ 18);\n\nvar _FireBall2 = _interopRequireDefault(_FireBall);\n\nvar _PlayerCharacter = __webpack_require__(/*! ./classes/shared/PlayerCharacter */ 4);\n\nvar _PlayerCharacter2 = _interopRequireDefault(_PlayerCharacter);\n\nvar _MessageTypes = __webpack_require__(/*! ./classes/MessageTypes */ 3);\n\nvar _MessageTypes2 = _interopRequireDefault(_MessageTypes);\n\nvar _PlayerActions = __webpack_require__(/*! ./classes/PlayerActions */ 12);\n\nvar _PlayerActions2 = _interopRequireDefault(_PlayerActions);\n\nvar _SpriteTypes = __webpack_require__(/*! ./classes/SpriteTypes */ 7);\n\nvar _Collider = __webpack_require__(/*! ./classes/shared/Collider */ 11);\n\nvar _User = __webpack_require__(/*! ./models/User */ 30);\n\nvar _User2 = _interopRequireDefault(_User);\n\nvar _Character = __webpack_require__(/*! ./models/Character */ 29);\n\nvar _Character2 = _interopRequireDefault(_Character);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\n// Environment\nvar PORT = process.env.PORT || 5555;\n\n// External Dependencies\n\n// import randomToken from 'random-token';\n\n\n// Helpers\n\n\n// Internal Dependencies\n\n\n// Game Managers\n\n\n// const serverConfig = JSON.parse(fs.readFileSync('./config.json'));\n\n// Game Objects\n\n\n// Constants & Enumerations\n\n\n// Database related\n_mongoose2.default.connect(process.env.MONGODB_CONNECTIONSTRING);\n\n\n// Application Globals\n// const World = {\n//   levels: {},\n//   clients: {}\n// };\n\n// Helpers & Abstractions\nvar log = console.log; // TODO: log things to a file for production.\n\nvar authenticate = async function authenticate(client, authString) {\n  // TODO: add function name and explain why!\n  // TODO: Faking user authentication. Need the real thing.\n  var _authString$split = authString.split(':'),\n      _authString$split2 = _slicedToArray(_authString$split, 2),\n      username = _authString$split2[0],\n      password = _authString$split2[1];\n\n  if (username && password) {\n    try {\n      var user = await _User2.default.findOne({ user: username }).populate('character'); // , 'user pass');\n      // console.log(\"User: \", user);\n      var hashedPass = (0, _passhashing.hashPassword)(password, user.pass.salt);\n      if (hashedPass.hash === user.pass.hash) {\n        // TODO: retrieve character info???\n        client.user = user;\n        return true;\n      }\n      //  else if(username.toLowerCase() === 'james') {\n      //   console.log(\"Password incorrect.\");\n      //   await User.findOneAndUpdate({ user: username }, { $set: { pass: hashedPass }});\n      //   console.log(\"Changed password. Check DB.\");\n      // }\n    } catch (exception) {\n      // This is probably a promise error.\n      console.error(\"Exception occurred: \", exception);\n    }\n  }\n\n  return false;\n};\n\n// Serving front end items (web pages, client scripts, images, etc.)\nvar app = (0, _express2.default)();\napp.use(_express2.default.static('client'));\nvar server = _http2.default.createServer(app).listen(PORT, function () {\n  return log('App started.');\n});\n\n// Socket Event Handlers\nvar initiateClient = function initiateClient(socket) {\n  // Add socket to client list.\n  var instanceId = (0, _guid.guid)();\n  while (_GameEngine2.default.clients[instanceId]) {\n    instanceId = (0, _guid.guid)();\n  }\n  var client = new _Client2.default({\n    instanceId: instanceId,\n    socket: socket,\n    playerCharacter: null,\n    model: null\n  });\n  //World.clients[clientToken] = client;\n  _GameEngine2.default.addClient(client);\n\n  // Define socket behaviors\n  socket.on('message', clientMessage.bind(client));\n  socket.on('close', clientClose.bind(client));\n\n  socket.on('keyPressed', function (info) {\n    log(info);\n  });\n\n  (0, _messaging.sendPackage)(socket, _MessageTypes2.default.Who);\n};\n\n// const broadcastPackage = function broadcastPackage(type = null, attributes = {}) {\n//   // TODO: only affect clients that are in range and can see (but for now everybody)\n//   Object.keys(World.clients).forEach(clientKey => {\n//     // console.log(\"broadcasting port package to: \" + clientKey, World.clients[clientKey]);\n//     const c = World.clients[clientKey];\n//     if(c) sendPackage(c.socket, type, attributes);\n//   })\n// }\n\n// const sendPackage = function sendPackage(socket, type = null, attributes = {}) {\n//   if (socket === null) throw new Error('Socket must be specified.'); // TODO: instanceof what?\n//   if (type === null) throw new Error('Package type must be specified.');\n\n//   if (socket.readyState !== WebSocket.OPEN) return;\n\n//   socket.send(JSON.stringify(Object.assign({ type }, attributes)));\n// };\n\nvar clientMessage = async function clientMessage() {\n  var incoming = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '{}';\n\n  // 'this' === the client that generated this message\n  // const client = this; ????\n  var message = JSON.parse(incoming);\n\n  switch (message.type) {\n    case _MessageTypes2.default.PING:\n      (0, _messaging.sendPackage)(this.socket, _MessageTypes2.default.PONG, {});\n      break;\n    case _MessageTypes2.default.Who:\n      if (await authenticate(this, message.who)) {\n        // log(\"Getting player.\");\n        this.playerCharacter = _DatabaseManager2.default.getPlayer(this.user.character.name);\n        (0, _messaging.sendPackage)(this.socket, _MessageTypes2.default.Authentication, { success: true, instanceId: this.instanceId, playerCharacter: JSON.stringify(this.playerCharacter) });\n      } else {\n        (0, _messaging.sendPackage)(this.socket, _MessageTypes2.default.Authentication, { success: false, errorMessage: 'Authentication failed.' });\n      }\n      break;\n    case _MessageTypes2.default.Port:\n      // incoming -> message: { levelId }\n      var level = null;\n      if (_GameEngine2.default.levels[message.levelId]) {\n        level = _GameEngine2.default.levels[message.levelId];\n      } else {\n        level = _GameEngine2.default.getLevel(message.levelId); // new Level(message.levelId);\n        _GameEngine2.default.levels[message.levelId] = level;\n      }\n      var pc = this.playerCharacter;\n      //pc.tx = level.start.tx;\n      pc.position.x = level.start.tx * _GameSettings.GameSettings.TILE_SCALE;\n      //pc.ty = level.start.ty;\n      pc.position.y = level.start.ty * _GameSettings.GameSettings.TILE_SCALE;\n      pc.levelId = level.id;\n      // TODO: Update this WHOOOOOLE file with pc.getLevel() instead of levelId\n      pc.getLevel = function () {\n        return level;\n      };\n      level.sprites.push(pc);\n\n      // TODO: Will need to check whether player is \"allowed\" to port here.\n      //  For example, are they currently near a portal to this area?\n      // console.log(\"sending port package to: \" + this.instanceId, this);\n      (0, _messaging.sendPackage)(this.socket, _MessageTypes2.default.Port, { success: true, level: level, playerCharacter: pc });\n      // console.log(\"sent port package\");\n      // console.log(\"broadcasting port package\");\n      (0, _messaging.broadcastPackage)(_MessageTypes2.default.Spawn, { spawnClass: _SpriteTypes.SpriteTypes.PLAYER, spawn: pc });\n      // console.log(\"broadcast port package\");\n      break;\n    case _MessageTypes2.default.KeyPressed:\n      handleKeyPressed(this, message);\n      break;\n    case _MessageTypes2.default.KeyReleased:\n      handleKeyReleased(this, message);\n      break;\n    case _MessageTypes2.default.MouseDown:\n    case _MessageTypes2.default.MouseUp:\n    case _MessageTypes2.default.MouseMove:\n      handleMouseEvent(this, message);\n      break;\n    case _MessageTypes2.default.Cast:\n      castSpell(this, message);\n      break;\n    default:\n      log('Unhandled socket communcation. Message type: ' + message.type, message);\n      break;\n  }\n};\nvar clientClose = function clientClose() {\n  // First stop any messages going to the client.\n  this.socket = null;\n  // TODO: Then save any relevant client data to the database\n  //   Note: should save with a separate function so that we can also auto-save periodically.\n  // Then remove the client from the World. \n  // TODO: When above TODO is finished, this should be a callback.\n  {\n    if (this.playerCharacter) {\n      var level = _GameEngine2.default.getLevel(this.playerCharacter.levelId);\n      if (level) {\n        var levelIndex = level.sprites.indexOf(this.playerCharacter);\n        level.sprites.splice(levelIndex, 1);\n        level.sprites[this.playerCharacter.instanceId] = undefined;\n        _GameEngine2.default.clients[this.instanceId] = undefined; // TODO: use GameEngine.removeClient();\n        (0, _messaging.broadcastPackage)(_MessageTypes2.default.Despawn, { spawnId: this.playerCharacter.instanceId });\n      }\n    }\n  }\n};\n\nvar handleMouseEvent = function handleMouseEvent(client, message) {\n  if (message.type === _MessageTypes2.default.MouseDown) {\n    // console.log(\"Mouse down\", message);\n    client.setMouseDown(message);\n  } else if (message.type === _MessageTypes2.default.MouseUp) {\n    // console.log(\"Mouse up\");\n    client.setMouseUp();\n  } else {\n    // console.log(\"Mouse move: \" + Date.now());\n    client.setMousePosition(message.aim);\n  }\n};\n\nvar handleKeyPressed = function handleKeyPressed(client, message) {\n  var action = message.action;\n  switch (action) {\n    case _PlayerActions2.default.LEFT:\n    case _PlayerActions2.default.RIGHT:\n    case _PlayerActions2.default.UP:\n    case _PlayerActions2.default.DOWN:\n      handlePlayerMoveRequest(client, message);\n      break;\n    case _PlayerActions2.default.SHOOT_PROJECTILE:\n      // log(\"Got shoot request: \", message);\n      handlePlayerFireRequest(client, message);\n      break;\n    default:\n      log('Unexpected player action type: ' + action, message);\n      break;\n  }\n};\nvar handleKeyReleased = function handleKeyReleased(client, message) {\n  var action = message.action;\n  // log(\"Released: \" + action);\n};\n\nvar handlePlayerMoveRequest = function handlePlayerMoveRequest(client, message) {\n  var action = message.action;\n  var pc = client.playerCharacter;\n  var newDirection = { x: 0, y: 0 };\n  switch (action) {\n    case 'LEFT':\n      newDirection.x -= 1;\n      break;\n    case 'RIGHT':\n      newDirection.x += 1;\n      break;\n    case 'UP':\n      newDirection.y -= 1;\n      break;\n    case 'DOWN':\n      newDirection.y += 1;\n      break;\n    default:\n\n      break;\n  }\n  // newDirection.x *= pc.walkSpeed / deltaTime;\n  newDirection.x *= 5;\n  // newDirection.y *= pc.walkSpeed / deltatime;\n  newDirection.y *= 5;\n  pc.setPosition({\n    x: pc.position.x + newDirection.x,\n    y: pc.position.y + newDirection.y\n  });\n  (0, _messaging.sendPackage)(client.socket, _MessageTypes2.default.MoveTo, {\n    x: pc.position.x,\n    y: pc.position.y\n  });\n  pc.getLevel().frameQueue.push({\n    type: _MessageTypes2.default.UpdateSprite,\n    sprite: JSON.stringify(pc)\n  });\n};\n\nvar handlePlayerFireRequest = function handlePlayerFireRequest(client, message) {\n  var pc = client.playerCharacter;\n  //console.log(\"Firing from: \", client.playerCharacter.position);\n  var fireball = new _FireBall2.default({\n    start: pc.position,\n    aim: pc.hasMoveTarget ? pc.moveTarget : message.aim,\n    speed: _GameSettings.GameSettings.TILE_SCALE * 12, // TODO: up to 12 when things seem good.\n    // owner: pc,\n    collider: {\n      ignoresIds: [pc.instanceId]\n    }\n  });\n  pc.collider.ignoresIds.push(fireball.instanceId);\n  var sprites = _GameEngine2.default.levels[pc.levelId].sprites;\n  sprites.push(fireball);\n  (0, _messaging.broadcastPackage)(_MessageTypes2.default.Spawn, { spawnClass: _SpriteTypes.SpriteTypes.FIREBALL, spawn: fireball });\n\n  fireball.delete = function () {\n    sprites = sprites.splice(sprites.indexOf(fireball), 1);\n    (0, _messaging.broadcastPackage)(_MessageTypes2.default.Despawn, { spawnId: fireball.instanceId });\n  };\n\n  // log(\"Number of sprites in level: \" + World.levels[pc.levelId].sprites.length);\n  // log(\"Level sprites: \", World.levels[pc.levelId].sprites);\n};\n\nvar castSpell = function castSpell(client, message) {\n  if (client.playerCharacter.canCast(message.spellId)) {\n    // TODO: Eventually something like this -> client.player.cast(DatabaseManager.getSpell(spellId));\n    //const fb = new FireBall();\n  }\n};\n\n// Serving the game service.\nvar gameServer = new _ws2.default.Server({\n  server: server,\n  perMessageDeflate: false\n});\ngameServer.on('connection', initiateClient);\n\n// Managing timed game loop\nvar lastUpdate = Date.now();\nsetInterval(function () {\n  // TODO?: Cater packages to each client based on view range, etc.?\n  // One use case would be to remove stealth units from client side until they are visible again.\n\n  var thisUpdate = Date.now();\n  var delta = thisUpdate - lastUpdate;\n  lastUpdate = thisUpdate;\n\n  var levelsArray = Object.keys(_GameEngine2.default.levels).map(function (key) {\n    return _GameEngine2.default.levels[key];\n  });\n\n  // Update all gameobjects\n  levelsArray.forEach(function (level) {\n    level.sprites.forEach(function (sprite) {\n      if (sprite.update) {\n        var preSprite = JSON.stringify(sprite, function (k, v) {\n          return k === 'owner' ? undefined : v;\n        });\n        sprite.update(delta);\n        var postSprite = JSON.stringify(sprite, function (k, v) {\n          return k === 'owner' ? undefined : v;\n        });\n        // if(sprite instanceof PlayerCharacter && sprite.moving) {\n        //   console.log(\"PRE: \", preSprite, \"POST: \", postSprite);\n        // }\n        // If updates exist and prop changes are made, add updates to a package\n        if (postSprite !== preSprite) {\n          level.frameQueue.push({\n            type: _MessageTypes2.default.UpdateSprite,\n            sprite: postSprite\n          });\n        }\n      }\n\n      level.sprites.forEach(function (otherSprite) {\n        if (otherSprite === sprite) return;\n        switch (sprite.checkCollision(otherSprite)) {\n          case _Collider.CollisionStatus.ENTER:\n            sprite.onCollisionEnter && sprite.onCollisionEnter(otherSprite.collider);\n            break;\n          case _Collider.CollisionStatus.COLLIDING:\n            sprite.onCollision && sprite.onCollision(otherSprite.collider);\n            break;\n          case _Collider.CollisionStatus.EXIT:\n            sprite.onCollisionExit && sprite.onCollisionExit(otherSprite.collider);\n            break;\n        }\n      });\n    });\n  });\n\n  Object.keys(_GameEngine2.default.clients).map(function (id) {\n    return _GameEngine2.default.clients[id];\n  }).forEach(function (client) {\n    if (!client || !client.playerCharacter || !client.socket) return;\n\n    var level = _GameEngine2.default.levels[client.playerCharacter.levelId];\n    if (!level) return;\n\n    // send update package to all connected clients on a per-level basis.\n    if (level.frameQueue.length > 0) {\n      (0, _messaging.sendPackage)(client.socket, _MessageTypes2.default.FrameQueue, { queue: level.frameQueue });\n    }\n  });\n\n  levelsArray.forEach(function (level) {\n    level.frameQueue.length = 0; // TODO: ensure data is actually gone! This feels weird, but is reportedly the \"fastest\" reliable way to clear an array in Javascript.\n    //       (see http://stackoverflow.com/questions/1232040/how-do-i-empty-an-array-in-javascript);\n  });\n}, 1000 / 60);//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMzMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vYXBwLmpzPzAzNjQiXSwic291cmNlc0NvbnRlbnQiOlsiXG4vLyBFbnZpcm9ubWVudFxuY29uc3QgUE9SVCA9IHByb2Nlc3MuZW52LlBPUlQgfHwgNTU1NTtcblxuLy8gRXh0ZXJuYWwgRGVwZW5kZW5jaWVzXG5pbXBvcnQgZXhwcmVzcyBmcm9tICdleHByZXNzJztcbmltcG9ydCBodHRwIGZyb20gJ2h0dHAnO1xuaW1wb3J0IFdlYlNvY2tldCBmcm9tICd3cyc7XG4vLyBpbXBvcnQgcmFuZG9tVG9rZW4gZnJvbSAncmFuZG9tLXRva2VuJztcbmltcG9ydCBtb25nb29zZSBmcm9tICdtb25nb29zZSc7XG5cbmltcG9ydCBXb3JsZCBmcm9tICcuL2NsYXNzZXMvR2FtZUVuZ2luZSc7XG5cbi8vIEhlbHBlcnNcbmltcG9ydCB7IGd1aWQgfSBmcm9tICcuL2NsYXNzZXMvSGVscGVycy9ndWlkJztcbmltcG9ydCB7IGhhc2hQYXNzd29yZCB9IGZyb20gJy4vY2xhc3Nlcy9IZWxwZXJzL3Bhc3NoYXNoaW5nJztcbmltcG9ydCB7IHNlbmRQYWNrYWdlLCBicm9hZGNhc3RQYWNrYWdlIH0gZnJvbSAnLi9jbGFzc2VzL0hlbHBlcnMvbWVzc2FnaW5nJztcblxuLy8gSW50ZXJuYWwgRGVwZW5kZW5jaWVzXG5pbXBvcnQgQ2xpZW50IGZyb20gJy4vY2xhc3Nlcy9zZXJ2ZXIvQ2xpZW50JztcbmltcG9ydCBMZXZlbCBmcm9tICcuL2NsYXNzZXMvc2hhcmVkL0xldmVsJztcblxuLy8gR2FtZSBNYW5hZ2Vyc1xuaW1wb3J0IERhdGFiYXNlTWFuYWdlciBmcm9tICcuL2NsYXNzZXMvc2VydmVyL0RhdGFiYXNlTWFuYWdlcic7XG5pbXBvcnQgeyBHYW1lU2V0dGluZ3MgfSBmcm9tICAnLi9jbGFzc2VzL0dhbWVTZXR0aW5ncyc7XG5cbmltcG9ydCBmcyBmcm9tICdmcyc7XG5cbi8vIGNvbnN0IHNlcnZlckNvbmZpZyA9IEpTT04ucGFyc2UoZnMucmVhZEZpbGVTeW5jKCcuL2NvbmZpZy5qc29uJykpO1xuXG4vLyBHYW1lIE9iamVjdHNcbmltcG9ydCBGaXJlQmFsbCBmcm9tICcuL2NsYXNzZXMvc2hhcmVkL0ZpcmVCYWxsJztcbmltcG9ydCBQbGF5ZXJDaGFyYWN0ZXIgZnJvbSAnLi9jbGFzc2VzL3NoYXJlZC9QbGF5ZXJDaGFyYWN0ZXInO1xuXG4vLyBDb25zdGFudHMgJiBFbnVtZXJhdGlvbnNcbmltcG9ydCBNZXNzYWdlVHlwZXMgZnJvbSAnLi9jbGFzc2VzL01lc3NhZ2VUeXBlcyc7XG5pbXBvcnQgUGxheWVyQWN0aW9ucyBmcm9tICcuL2NsYXNzZXMvUGxheWVyQWN0aW9ucyc7XG5pbXBvcnQgeyBTcHJpdGVUeXBlcyB9IGZyb20gJy4vY2xhc3Nlcy9TcHJpdGVUeXBlcyc7XG5pbXBvcnQgeyBDb2xsaXNpb25TdGF0dXMgfSBmcm9tICcuL2NsYXNzZXMvc2hhcmVkL0NvbGxpZGVyJztcblxuLy8gRGF0YWJhc2UgcmVsYXRlZFxubW9uZ29vc2UuY29ubmVjdChwcm9jZXNzLmVudi5NT05HT0RCX0NPTk5FQ1RJT05TVFJJTkcpO1xuaW1wb3J0IFVzZXIgZnJvbSAnLi9tb2RlbHMvVXNlcic7XG5pbXBvcnQgQ2hhcmFjdGVyIGZyb20gJy4vbW9kZWxzL0NoYXJhY3Rlcic7XG5cbi8vIEFwcGxpY2F0aW9uIEdsb2JhbHNcbi8vIGNvbnN0IFdvcmxkID0ge1xuLy8gICBsZXZlbHM6IHt9LFxuLy8gICBjbGllbnRzOiB7fVxuLy8gfTtcblxuLy8gSGVscGVycyAmIEFic3RyYWN0aW9uc1xuY29uc3QgbG9nID0gY29uc29sZS5sb2c7IC8vIFRPRE86IGxvZyB0aGluZ3MgdG8gYSBmaWxlIGZvciBwcm9kdWN0aW9uLlxuXG5jb25zdCBhdXRoZW50aWNhdGUgPSBhc3luYyBmdW5jdGlvbiBhdXRoZW50aWNhdGUoY2xpZW50LCBhdXRoU3RyaW5nKSB7IC8vIFRPRE86IGFkZCBmdW5jdGlvbiBuYW1lIGFuZCBleHBsYWluIHdoeSFcbiAgLy8gVE9ETzogRmFraW5nIHVzZXIgYXV0aGVudGljYXRpb24uIE5lZWQgdGhlIHJlYWwgdGhpbmcuXG4gIGNvbnN0IFt1c2VybmFtZSwgcGFzc3dvcmRdID0gYXV0aFN0cmluZy5zcGxpdCgnOicpO1xuXG4gIGlmICh1c2VybmFtZSAmJiBwYXNzd29yZCkge1xuICAgIHRyeSB7XG4gICAgICBjb25zdCB1c2VyID0gYXdhaXQgVXNlci5maW5kT25lKHsgdXNlcjogdXNlcm5hbWUgfSkucG9wdWxhdGUoJ2NoYXJhY3RlcicpOyAvLyAsICd1c2VyIHBhc3MnKTtcbiAgICAgIC8vIGNvbnNvbGUubG9nKFwiVXNlcjogXCIsIHVzZXIpO1xuICAgICAgY29uc3QgaGFzaGVkUGFzcyA9IGhhc2hQYXNzd29yZChwYXNzd29yZCwgdXNlci5wYXNzLnNhbHQpO1xuICAgICAgaWYoaGFzaGVkUGFzcy5oYXNoID09PSB1c2VyLnBhc3MuaGFzaCkge1xuICAgICAgICAvLyBUT0RPOiByZXRyaWV2ZSBjaGFyYWN0ZXIgaW5mbz8/P1xuICAgICAgICBjbGllbnQudXNlciA9IHVzZXI7XG4gICAgICAgIHJldHVybiB0cnVlO1xuICAgICAgfVxuICAgICAgLy8gIGVsc2UgaWYodXNlcm5hbWUudG9Mb3dlckNhc2UoKSA9PT0gJ2phbWVzJykge1xuICAgICAgLy8gICBjb25zb2xlLmxvZyhcIlBhc3N3b3JkIGluY29ycmVjdC5cIik7XG4gICAgICAvLyAgIGF3YWl0IFVzZXIuZmluZE9uZUFuZFVwZGF0ZSh7IHVzZXI6IHVzZXJuYW1lIH0sIHsgJHNldDogeyBwYXNzOiBoYXNoZWRQYXNzIH19KTtcbiAgICAgIC8vICAgY29uc29sZS5sb2coXCJDaGFuZ2VkIHBhc3N3b3JkLiBDaGVjayBEQi5cIik7XG4gICAgICAvLyB9XG4gICAgfSBjYXRjaChleGNlcHRpb24pIHtcbiAgICAgIC8vIFRoaXMgaXMgcHJvYmFibHkgYSBwcm9taXNlIGVycm9yLlxuICAgICAgY29uc29sZS5lcnJvcihcIkV4Y2VwdGlvbiBvY2N1cnJlZDogXCIsIGV4Y2VwdGlvbik7XG4gICAgfVxuICB9XG5cbiAgcmV0dXJuIGZhbHNlO1xufTtcblxuLy8gU2VydmluZyBmcm9udCBlbmQgaXRlbXMgKHdlYiBwYWdlcywgY2xpZW50IHNjcmlwdHMsIGltYWdlcywgZXRjLilcbmNvbnN0IGFwcCA9IGV4cHJlc3MoKTtcbmFwcC51c2UoZXhwcmVzcy5zdGF0aWMoJ2NsaWVudCcpKTtcbmNvbnN0IHNlcnZlciA9IGh0dHAuY3JlYXRlU2VydmVyKGFwcCkubGlzdGVuKFBPUlQsICgpID0+IGxvZygnQXBwIHN0YXJ0ZWQuJykpO1xuXG4vLyBTb2NrZXQgRXZlbnQgSGFuZGxlcnNcbmNvbnN0IGluaXRpYXRlQ2xpZW50ID0gKHNvY2tldCkgPT4ge1xuICAvLyBBZGQgc29ja2V0IHRvIGNsaWVudCBsaXN0LlxuICBsZXQgaW5zdGFuY2VJZCA9IGd1aWQoKTtcbiAgd2hpbGUgKFdvcmxkLmNsaWVudHNbaW5zdGFuY2VJZF0pIHtcbiAgICBpbnN0YW5jZUlkID0gZ3VpZCgpO1xuICB9XG4gIGNvbnN0IGNsaWVudCA9IG5ldyBDbGllbnQoe1xuICAgIGluc3RhbmNlSWQsXG4gICAgc29ja2V0LFxuICAgIHBsYXllckNoYXJhY3RlcjogbnVsbCxcbiAgICBtb2RlbDogbnVsbCxcbiAgfSk7XG4gIC8vV29ybGQuY2xpZW50c1tjbGllbnRUb2tlbl0gPSBjbGllbnQ7XG4gIFdvcmxkLmFkZENsaWVudChjbGllbnQpO1xuXG4gIC8vIERlZmluZSBzb2NrZXQgYmVoYXZpb3JzXG4gIHNvY2tldC5vbignbWVzc2FnZScsIGNsaWVudE1lc3NhZ2UuYmluZChjbGllbnQpKTtcbiAgc29ja2V0Lm9uKCdjbG9zZScsIGNsaWVudENsb3NlLmJpbmQoY2xpZW50KSk7XG5cbiAgc29ja2V0Lm9uKCdrZXlQcmVzc2VkJywgKGluZm8pID0+IHsgbG9nKGluZm8pOyB9KTtcblxuICBzZW5kUGFja2FnZShzb2NrZXQsIE1lc3NhZ2VUeXBlcy5XaG8pO1xufTtcblxuLy8gY29uc3QgYnJvYWRjYXN0UGFja2FnZSA9IGZ1bmN0aW9uIGJyb2FkY2FzdFBhY2thZ2UodHlwZSA9IG51bGwsIGF0dHJpYnV0ZXMgPSB7fSkge1xuLy8gICAvLyBUT0RPOiBvbmx5IGFmZmVjdCBjbGllbnRzIHRoYXQgYXJlIGluIHJhbmdlIGFuZCBjYW4gc2VlIChidXQgZm9yIG5vdyBldmVyeWJvZHkpXG4vLyAgIE9iamVjdC5rZXlzKFdvcmxkLmNsaWVudHMpLmZvckVhY2goY2xpZW50S2V5ID0+IHtcbi8vICAgICAvLyBjb25zb2xlLmxvZyhcImJyb2FkY2FzdGluZyBwb3J0IHBhY2thZ2UgdG86IFwiICsgY2xpZW50S2V5LCBXb3JsZC5jbGllbnRzW2NsaWVudEtleV0pO1xuLy8gICAgIGNvbnN0IGMgPSBXb3JsZC5jbGllbnRzW2NsaWVudEtleV07XG4vLyAgICAgaWYoYykgc2VuZFBhY2thZ2UoYy5zb2NrZXQsIHR5cGUsIGF0dHJpYnV0ZXMpO1xuLy8gICB9KVxuLy8gfVxuXG4vLyBjb25zdCBzZW5kUGFja2FnZSA9IGZ1bmN0aW9uIHNlbmRQYWNrYWdlKHNvY2tldCwgdHlwZSA9IG51bGwsIGF0dHJpYnV0ZXMgPSB7fSkge1xuLy8gICBpZiAoc29ja2V0ID09PSBudWxsKSB0aHJvdyBuZXcgRXJyb3IoJ1NvY2tldCBtdXN0IGJlIHNwZWNpZmllZC4nKTsgLy8gVE9ETzogaW5zdGFuY2VvZiB3aGF0P1xuLy8gICBpZiAodHlwZSA9PT0gbnVsbCkgdGhyb3cgbmV3IEVycm9yKCdQYWNrYWdlIHR5cGUgbXVzdCBiZSBzcGVjaWZpZWQuJyk7XG5cbi8vICAgaWYgKHNvY2tldC5yZWFkeVN0YXRlICE9PSBXZWJTb2NrZXQuT1BFTikgcmV0dXJuO1xuXG4vLyAgIHNvY2tldC5zZW5kKEpTT04uc3RyaW5naWZ5KE9iamVjdC5hc3NpZ24oeyB0eXBlIH0sIGF0dHJpYnV0ZXMpKSk7XG4vLyB9O1xuXG5jb25zdCBjbGllbnRNZXNzYWdlID0gYXN5bmMgZnVuY3Rpb24gY2xpZW50TWVzc2FnZShpbmNvbWluZyA9ICd7fScpIHtcbiAgLy8gJ3RoaXMnID09PSB0aGUgY2xpZW50IHRoYXQgZ2VuZXJhdGVkIHRoaXMgbWVzc2FnZVxuICAvLyBjb25zdCBjbGllbnQgPSB0aGlzOyA/Pz8/XG4gIGNvbnN0IG1lc3NhZ2UgPSBKU09OLnBhcnNlKGluY29taW5nKTtcblxuICBzd2l0Y2ggKG1lc3NhZ2UudHlwZSkge1xuICAgIGNhc2UgTWVzc2FnZVR5cGVzLlBJTkc6XG4gICAgICBzZW5kUGFja2FnZSh0aGlzLnNvY2tldCwgTWVzc2FnZVR5cGVzLlBPTkcsIHt9KTtcbiAgICAgIGJyZWFrO1xuICAgIGNhc2UgTWVzc2FnZVR5cGVzLldobzpcbiAgICAgIGlmIChhd2FpdCBhdXRoZW50aWNhdGUodGhpcywgbWVzc2FnZS53aG8pKSB7XG4gICAgICAgIC8vIGxvZyhcIkdldHRpbmcgcGxheWVyLlwiKTtcbiAgICAgICAgdGhpcy5wbGF5ZXJDaGFyYWN0ZXIgPSBEYXRhYmFzZU1hbmFnZXIuZ2V0UGxheWVyKHRoaXMudXNlci5jaGFyYWN0ZXIubmFtZSk7XG4gICAgICAgIHNlbmRQYWNrYWdlKFxuICAgICAgICAgIHRoaXMuc29ja2V0LFxuICAgICAgICAgIE1lc3NhZ2VUeXBlcy5BdXRoZW50aWNhdGlvbixcbiAgICAgICAgICB7IHN1Y2Nlc3M6IHRydWUsIGluc3RhbmNlSWQ6IHRoaXMuaW5zdGFuY2VJZCwgcGxheWVyQ2hhcmFjdGVyOiBKU09OLnN0cmluZ2lmeSh0aGlzLnBsYXllckNoYXJhY3RlcikgfVxuICAgICAgICApO1xuICAgICAgfSBlbHNlIHtcbiAgICAgICAgc2VuZFBhY2thZ2UoXG4gICAgICAgICAgdGhpcy5zb2NrZXQsXG4gICAgICAgICAgTWVzc2FnZVR5cGVzLkF1dGhlbnRpY2F0aW9uLFxuICAgICAgICAgIHsgc3VjY2VzczogZmFsc2UsIGVycm9yTWVzc2FnZTogJ0F1dGhlbnRpY2F0aW9uIGZhaWxlZC4nIH1cbiAgICAgICAgKTtcbiAgICAgIH1cbiAgICAgIGJyZWFrO1xuICAgIGNhc2UgTWVzc2FnZVR5cGVzLlBvcnQ6IFxuICAgICAgLy8gaW5jb21pbmcgLT4gbWVzc2FnZTogeyBsZXZlbElkIH1cbiAgICAgIGxldCBsZXZlbCA9IG51bGw7XG4gICAgICBpZiggV29ybGQubGV2ZWxzW21lc3NhZ2UubGV2ZWxJZF0pIHtcbiAgICAgICAgbGV2ZWwgPSBXb3JsZC5sZXZlbHNbbWVzc2FnZS5sZXZlbElkXTtcbiAgICAgIH0gZWxzZSB7XG4gICAgICAgIGxldmVsID0gV29ybGQuZ2V0TGV2ZWwobWVzc2FnZS5sZXZlbElkKTsgLy8gbmV3IExldmVsKG1lc3NhZ2UubGV2ZWxJZCk7XG4gICAgICAgIFdvcmxkLmxldmVsc1ttZXNzYWdlLmxldmVsSWRdID0gbGV2ZWw7XG4gICAgICB9XG4gICAgICBjb25zdCBwYyA9IHRoaXMucGxheWVyQ2hhcmFjdGVyO1xuICAgICAgLy9wYy50eCA9IGxldmVsLnN0YXJ0LnR4O1xuICAgICAgcGMucG9zaXRpb24ueCA9IGxldmVsLnN0YXJ0LnR4ICogR2FtZVNldHRpbmdzLlRJTEVfU0NBTEU7XG4gICAgICAvL3BjLnR5ID0gbGV2ZWwuc3RhcnQudHk7XG4gICAgICBwYy5wb3NpdGlvbi55ID0gbGV2ZWwuc3RhcnQudHkgKiBHYW1lU2V0dGluZ3MuVElMRV9TQ0FMRTtcbiAgICAgIHBjLmxldmVsSWQgPSBsZXZlbC5pZDtcbiAgICAgIC8vIFRPRE86IFVwZGF0ZSB0aGlzIFdIT09PT09MRSBmaWxlIHdpdGggcGMuZ2V0TGV2ZWwoKSBpbnN0ZWFkIG9mIGxldmVsSWRcbiAgICAgIHBjLmdldExldmVsID0gKCkgPT4geyByZXR1cm4gbGV2ZWw7IH07XG4gICAgICBsZXZlbC5zcHJpdGVzLnB1c2gocGMpO1xuXG4gICAgICAvLyBUT0RPOiBXaWxsIG5lZWQgdG8gY2hlY2sgd2hldGhlciBwbGF5ZXIgaXMgXCJhbGxvd2VkXCIgdG8gcG9ydCBoZXJlLlxuICAgICAgLy8gIEZvciBleGFtcGxlLCBhcmUgdGhleSBjdXJyZW50bHkgbmVhciBhIHBvcnRhbCB0byB0aGlzIGFyZWE/XG4gICAgICAvLyBjb25zb2xlLmxvZyhcInNlbmRpbmcgcG9ydCBwYWNrYWdlIHRvOiBcIiArIHRoaXMuaW5zdGFuY2VJZCwgdGhpcyk7XG4gICAgICBzZW5kUGFja2FnZShcbiAgICAgICAgdGhpcy5zb2NrZXQsXG4gICAgICAgIE1lc3NhZ2VUeXBlcy5Qb3J0LFxuICAgICAgICB7IHN1Y2Nlc3M6IHRydWUsIGxldmVsLCBwbGF5ZXJDaGFyYWN0ZXI6IHBjIH1cbiAgICAgICk7XG4gICAgICAvLyBjb25zb2xlLmxvZyhcInNlbnQgcG9ydCBwYWNrYWdlXCIpO1xuICAgICAgLy8gY29uc29sZS5sb2coXCJicm9hZGNhc3RpbmcgcG9ydCBwYWNrYWdlXCIpO1xuICAgICAgYnJvYWRjYXN0UGFja2FnZShcbiAgICAgICAgTWVzc2FnZVR5cGVzLlNwYXduLFxuICAgICAgICB7IHNwYXduQ2xhc3M6IFNwcml0ZVR5cGVzLlBMQVlFUiwgc3Bhd246IHBjIH1cbiAgICAgICk7XG4gICAgICAvLyBjb25zb2xlLmxvZyhcImJyb2FkY2FzdCBwb3J0IHBhY2thZ2VcIik7XG4gICAgICBicmVhaztcbiAgICBjYXNlIE1lc3NhZ2VUeXBlcy5LZXlQcmVzc2VkOlxuICAgICAgaGFuZGxlS2V5UHJlc3NlZCh0aGlzLCBtZXNzYWdlKTtcbiAgICAgIGJyZWFrO1xuICAgIGNhc2UgTWVzc2FnZVR5cGVzLktleVJlbGVhc2VkOlxuICAgICAgaGFuZGxlS2V5UmVsZWFzZWQodGhpcywgbWVzc2FnZSk7XG4gICAgICBicmVhaztcbiAgICBjYXNlIE1lc3NhZ2VUeXBlcy5Nb3VzZURvd246XG4gICAgY2FzZSBNZXNzYWdlVHlwZXMuTW91c2VVcDpcbiAgICBjYXNlIE1lc3NhZ2VUeXBlcy5Nb3VzZU1vdmU6XG4gICAgICBoYW5kbGVNb3VzZUV2ZW50KHRoaXMsIG1lc3NhZ2UpO1xuICAgICAgYnJlYWs7XG4gICAgY2FzZSBNZXNzYWdlVHlwZXMuQ2FzdDpcbiAgICAgIGNhc3RTcGVsbCh0aGlzLCBtZXNzYWdlKTtcbiAgICAgIGJyZWFrO1xuICAgIGRlZmF1bHQ6XG4gICAgICBsb2coJ1VuaGFuZGxlZCBzb2NrZXQgY29tbXVuY2F0aW9uLiBNZXNzYWdlIHR5cGU6ICcgKyBtZXNzYWdlLnR5cGUsIG1lc3NhZ2UpO1xuICAgICAgYnJlYWs7XG4gIH1cbn07XG5jb25zdCBjbGllbnRDbG9zZSA9IGZ1bmN0aW9uIGNsaWVudENsb3NlKCkge1xuICAvLyBGaXJzdCBzdG9wIGFueSBtZXNzYWdlcyBnb2luZyB0byB0aGUgY2xpZW50LlxuICB0aGlzLnNvY2tldCA9IG51bGw7XG4gIC8vIFRPRE86IFRoZW4gc2F2ZSBhbnkgcmVsZXZhbnQgY2xpZW50IGRhdGEgdG8gdGhlIGRhdGFiYXNlXG4gIC8vICAgTm90ZTogc2hvdWxkIHNhdmUgd2l0aCBhIHNlcGFyYXRlIGZ1bmN0aW9uIHNvIHRoYXQgd2UgY2FuIGFsc28gYXV0by1zYXZlIHBlcmlvZGljYWxseS5cbiAgLy8gVGhlbiByZW1vdmUgdGhlIGNsaWVudCBmcm9tIHRoZSBXb3JsZC4gXG4gIC8vIFRPRE86IFdoZW4gYWJvdmUgVE9ETyBpcyBmaW5pc2hlZCwgdGhpcyBzaG91bGQgYmUgYSBjYWxsYmFjay5cbiAge1xuICAgIGlmKHRoaXMucGxheWVyQ2hhcmFjdGVyKSB7XG4gICAgICBjb25zdCBsZXZlbCA9IFdvcmxkLmdldExldmVsKHRoaXMucGxheWVyQ2hhcmFjdGVyLmxldmVsSWQpO1xuICAgICAgaWYobGV2ZWwpIHtcbiAgICAgICAgY29uc3QgbGV2ZWxJbmRleCA9IGxldmVsLnNwcml0ZXMuaW5kZXhPZih0aGlzLnBsYXllckNoYXJhY3Rlcik7XG4gICAgICAgIGxldmVsLnNwcml0ZXMuc3BsaWNlKGxldmVsSW5kZXgsIDEpO1xuICAgICAgICBsZXZlbC5zcHJpdGVzW3RoaXMucGxheWVyQ2hhcmFjdGVyLmluc3RhbmNlSWRdID0gdW5kZWZpbmVkO1xuICAgICAgICBXb3JsZC5jbGllbnRzW3RoaXMuaW5zdGFuY2VJZF0gPSB1bmRlZmluZWQ7IC8vIFRPRE86IHVzZSBHYW1lRW5naW5lLnJlbW92ZUNsaWVudCgpO1xuICAgICAgICBicm9hZGNhc3RQYWNrYWdlKE1lc3NhZ2VUeXBlcy5EZXNwYXduLCB7IHNwYXduSWQ6IHRoaXMucGxheWVyQ2hhcmFjdGVyLmluc3RhbmNlSWQgfSk7XG4gICAgICB9XG4gICAgfVxuICB9XG59XG5cbmNvbnN0IGhhbmRsZU1vdXNlRXZlbnQgPSBmdW5jdGlvbiBoYW5kbGVNb3VzZUV2ZW50KGNsaWVudCwgbWVzc2FnZSkge1xuICBpZihtZXNzYWdlLnR5cGUgPT09IE1lc3NhZ2VUeXBlcy5Nb3VzZURvd24pIHtcbiAgICAvLyBjb25zb2xlLmxvZyhcIk1vdXNlIGRvd25cIiwgbWVzc2FnZSk7XG4gICAgY2xpZW50LnNldE1vdXNlRG93bihtZXNzYWdlKTtcbiAgfSBlbHNlIGlmIChtZXNzYWdlLnR5cGUgPT09IE1lc3NhZ2VUeXBlcy5Nb3VzZVVwKSB7XG4gICAgLy8gY29uc29sZS5sb2coXCJNb3VzZSB1cFwiKTtcbiAgICBjbGllbnQuc2V0TW91c2VVcCgpO1xuICB9IGVsc2Uge1xuICAgIC8vIGNvbnNvbGUubG9nKFwiTW91c2UgbW92ZTogXCIgKyBEYXRlLm5vdygpKTtcbiAgICBjbGllbnQuc2V0TW91c2VQb3NpdGlvbihtZXNzYWdlLmFpbSk7XG4gIH1cbn1cblxuY29uc3QgaGFuZGxlS2V5UHJlc3NlZCA9IGZ1bmN0aW9uIGhhbmRsZUtleVByZXNzZWQoY2xpZW50LCBtZXNzYWdlKSB7XG4gIGNvbnN0IGFjdGlvbiA9IG1lc3NhZ2UuYWN0aW9uO1xuICBzd2l0Y2ggKGFjdGlvbikge1xuICAgIGNhc2UgUGxheWVyQWN0aW9ucy5MRUZUOlxuICAgIGNhc2UgUGxheWVyQWN0aW9ucy5SSUdIVDpcbiAgICBjYXNlIFBsYXllckFjdGlvbnMuVVA6XG4gICAgY2FzZSBQbGF5ZXJBY3Rpb25zLkRPV046XG4gICAgICBoYW5kbGVQbGF5ZXJNb3ZlUmVxdWVzdChjbGllbnQsIG1lc3NhZ2UpO1xuICAgICAgYnJlYWs7XG4gICAgY2FzZSBQbGF5ZXJBY3Rpb25zLlNIT09UX1BST0pFQ1RJTEU6XG4gICAgICAvLyBsb2coXCJHb3Qgc2hvb3QgcmVxdWVzdDogXCIsIG1lc3NhZ2UpO1xuICAgICAgaGFuZGxlUGxheWVyRmlyZVJlcXVlc3QoY2xpZW50LCBtZXNzYWdlKTtcbiAgICAgIGJyZWFrO1xuICAgIGRlZmF1bHQ6XG4gICAgICBsb2coJ1VuZXhwZWN0ZWQgcGxheWVyIGFjdGlvbiB0eXBlOiAnICsgYWN0aW9uLCBtZXNzYWdlKTtcbiAgICAgIGJyZWFrO1xuICB9XG59O1xuY29uc3QgaGFuZGxlS2V5UmVsZWFzZWQgPSBmdW5jdGlvbiBoYW5kbGVLZXlSZWxlYXNlZChjbGllbnQsIG1lc3NhZ2UpIHtcbiAgY29uc3QgYWN0aW9uID0gbWVzc2FnZS5hY3Rpb247XG4gIC8vIGxvZyhcIlJlbGVhc2VkOiBcIiArIGFjdGlvbik7XG59O1xuXG5jb25zdCBoYW5kbGVQbGF5ZXJNb3ZlUmVxdWVzdCA9IGZ1bmN0aW9uIGhhbmRsZVBsYXllck1vdmVSZXF1ZXN0KGNsaWVudCwgbWVzc2FnZSkge1xuICBjb25zdCBhY3Rpb24gPSBtZXNzYWdlLmFjdGlvbjtcbiAgY29uc3QgcGMgPSBjbGllbnQucGxheWVyQ2hhcmFjdGVyO1xuICBjb25zdCBuZXdEaXJlY3Rpb24gPSB7IHg6IDAsIHk6IDAgfTtcbiAgc3dpdGNoIChhY3Rpb24pIHtcbiAgICBjYXNlICdMRUZUJzpcbiAgICAgIG5ld0RpcmVjdGlvbi54IC09MTtcbiAgICAgIGJyZWFrO1xuICAgIGNhc2UgJ1JJR0hUJzpcbiAgICAgIG5ld0RpcmVjdGlvbi54ICs9MTtcbiAgICAgIGJyZWFrO1xuICAgIGNhc2UgJ1VQJzpcbiAgICAgIG5ld0RpcmVjdGlvbi55IC09MTtcbiAgICAgIGJyZWFrO1xuICAgIGNhc2UgJ0RPV04nOlxuICAgICAgbmV3RGlyZWN0aW9uLnkgKz0xO1xuICAgICAgYnJlYWs7XG4gICAgZGVmYXVsdDpcbiAgICAgIFxuICAgICAgYnJlYWs7XG4gIH1cbiAgLy8gbmV3RGlyZWN0aW9uLnggKj0gcGMud2Fsa1NwZWVkIC8gZGVsdGFUaW1lO1xuICBuZXdEaXJlY3Rpb24ueCAqPSA1O1xuICAvLyBuZXdEaXJlY3Rpb24ueSAqPSBwYy53YWxrU3BlZWQgLyBkZWx0YXRpbWU7XG4gIG5ld0RpcmVjdGlvbi55ICo9IDU7XG4gIHBjLnNldFBvc2l0aW9uKHtcbiAgICB4OiBwYy5wb3NpdGlvbi54ICsgbmV3RGlyZWN0aW9uLngsXG4gICAgeTogcGMucG9zaXRpb24ueSArIG5ld0RpcmVjdGlvbi55XG4gIH0pO1xuICBzZW5kUGFja2FnZShcbiAgICBjbGllbnQuc29ja2V0LFxuICAgIE1lc3NhZ2VUeXBlcy5Nb3ZlVG8sXG4gICAge1xuICAgICAgeDogcGMucG9zaXRpb24ueCxcbiAgICAgIHk6IHBjLnBvc2l0aW9uLnlcbiAgICB9XG4gICk7XG4gIHBjLmdldExldmVsKCkuZnJhbWVRdWV1ZS5wdXNoKHtcbiAgICB0eXBlOiBNZXNzYWdlVHlwZXMuVXBkYXRlU3ByaXRlLFxuICAgIHNwcml0ZTogSlNPTi5zdHJpbmdpZnkocGMpXG4gIH0pO1xufVxuXG5jb25zdCBoYW5kbGVQbGF5ZXJGaXJlUmVxdWVzdCA9IGZ1bmN0aW9uIGhhbmRsZVBsYXllckZpcmVSZXF1ZXN0KGNsaWVudCwgbWVzc2FnZSkge1xuICBjb25zdCBwYyA9IGNsaWVudC5wbGF5ZXJDaGFyYWN0ZXI7XG4gIC8vY29uc29sZS5sb2coXCJGaXJpbmcgZnJvbTogXCIsIGNsaWVudC5wbGF5ZXJDaGFyYWN0ZXIucG9zaXRpb24pO1xuICBjb25zdCBmaXJlYmFsbCA9IG5ldyBGaXJlQmFsbChcbiAgICB7XG4gICAgICBzdGFydDogcGMucG9zaXRpb24sXG4gICAgICBhaW06IHBjLmhhc01vdmVUYXJnZXQgPyBwYy5tb3ZlVGFyZ2V0IDogbWVzc2FnZS5haW0sXG4gICAgICBzcGVlZDogR2FtZVNldHRpbmdzLlRJTEVfU0NBTEUgKiAxMiwgLy8gVE9ETzogdXAgdG8gMTIgd2hlbiB0aGluZ3Mgc2VlbSBnb29kLlxuICAgICAgLy8gb3duZXI6IHBjLFxuICAgICAgY29sbGlkZXI6IHtcbiAgICAgICAgaWdub3Jlc0lkczogWyBwYy5pbnN0YW5jZUlkIF1cbiAgICAgIH1cbiAgICB9XG4gICk7XG4gIHBjLmNvbGxpZGVyLmlnbm9yZXNJZHMucHVzaChmaXJlYmFsbC5pbnN0YW5jZUlkKTtcbiAgbGV0IHNwcml0ZXMgPSBXb3JsZC5sZXZlbHNbcGMubGV2ZWxJZF0uc3ByaXRlcztcbiAgc3ByaXRlcy5wdXNoKGZpcmViYWxsKTtcbiAgYnJvYWRjYXN0UGFja2FnZShNZXNzYWdlVHlwZXMuU3Bhd24sIHsgc3Bhd25DbGFzczogU3ByaXRlVHlwZXMuRklSRUJBTEwsIHNwYXduOiBmaXJlYmFsbCB9KTtcblxuICBmaXJlYmFsbC5kZWxldGUgPSAoKSA9PiB7XG4gICAgc3ByaXRlcyA9IHNwcml0ZXMuc3BsaWNlKHNwcml0ZXMuaW5kZXhPZihmaXJlYmFsbCksIDEpO1xuICAgIGJyb2FkY2FzdFBhY2thZ2UoTWVzc2FnZVR5cGVzLkRlc3Bhd24sIHsgc3Bhd25JZDogZmlyZWJhbGwuaW5zdGFuY2VJZCB9KTtcbiAgfTtcblxuICAvLyBsb2coXCJOdW1iZXIgb2Ygc3ByaXRlcyBpbiBsZXZlbDogXCIgKyBXb3JsZC5sZXZlbHNbcGMubGV2ZWxJZF0uc3ByaXRlcy5sZW5ndGgpO1xuICAvLyBsb2coXCJMZXZlbCBzcHJpdGVzOiBcIiwgV29ybGQubGV2ZWxzW3BjLmxldmVsSWRdLnNwcml0ZXMpO1xufVxuXG5jb25zdCBjYXN0U3BlbGwgPSBmdW5jdGlvbiBjYXN0U3BlbGwoY2xpZW50LCBtZXNzYWdlKSB7XG4gIGlmKGNsaWVudC5wbGF5ZXJDaGFyYWN0ZXIuY2FuQ2FzdChtZXNzYWdlLnNwZWxsSWQpKSB7XG4gICAgLy8gVE9ETzogRXZlbnR1YWxseSBzb21ldGhpbmcgbGlrZSB0aGlzIC0+IGNsaWVudC5wbGF5ZXIuY2FzdChEYXRhYmFzZU1hbmFnZXIuZ2V0U3BlbGwoc3BlbGxJZCkpO1xuICAgIC8vY29uc3QgZmIgPSBuZXcgRmlyZUJhbGwoKTtcbiAgfVxufVxuXG4vLyBTZXJ2aW5nIHRoZSBnYW1lIHNlcnZpY2UuXG5jb25zdCBnYW1lU2VydmVyID0gbmV3IFdlYlNvY2tldC5TZXJ2ZXIoe1xuICBzZXJ2ZXIsXG4gIHBlck1lc3NhZ2VEZWZsYXRlOiBmYWxzZSxcbn0pO1xuZ2FtZVNlcnZlci5vbignY29ubmVjdGlvbicsIGluaXRpYXRlQ2xpZW50KTtcblxuXG4vLyBNYW5hZ2luZyB0aW1lZCBnYW1lIGxvb3BcbmxldCBsYXN0VXBkYXRlID0gRGF0ZS5ub3coKTtcbnNldEludGVydmFsKGZ1bmN0aW9uKCkge1xuICAvLyBUT0RPPzogQ2F0ZXIgcGFja2FnZXMgdG8gZWFjaCBjbGllbnQgYmFzZWQgb24gdmlldyByYW5nZSwgZXRjLj9cbiAgICAvLyBPbmUgdXNlIGNhc2Ugd291bGQgYmUgdG8gcmVtb3ZlIHN0ZWFsdGggdW5pdHMgZnJvbSBjbGllbnQgc2lkZSB1bnRpbCB0aGV5IGFyZSB2aXNpYmxlIGFnYWluLlxuXG4gIGNvbnN0IHRoaXNVcGRhdGUgPSBEYXRlLm5vdygpO1xuICBjb25zdCBkZWx0YSA9IHRoaXNVcGRhdGUgLSBsYXN0VXBkYXRlO1xuICBsYXN0VXBkYXRlID0gdGhpc1VwZGF0ZTtcblxuICBjb25zdCBsZXZlbHNBcnJheSA9IE9iamVjdC5rZXlzKFdvcmxkLmxldmVscykubWFwKGtleSA9PiBXb3JsZC5sZXZlbHNba2V5XSk7XG5cbiAgLy8gVXBkYXRlIGFsbCBnYW1lb2JqZWN0c1xuICBsZXZlbHNBcnJheS5mb3JFYWNoKGxldmVsID0+IHtcbiAgICBsZXZlbC5zcHJpdGVzLmZvckVhY2goc3ByaXRlID0+IHtcbiAgICAgIGlmIChzcHJpdGUudXBkYXRlKSB7XG4gICAgICAgIGNvbnN0IHByZVNwcml0ZSA9IEpTT04uc3RyaW5naWZ5KHNwcml0ZSwgKGssdikgPT4gayA9PT0gJ293bmVyJyA/IHVuZGVmaW5lZCA6IHYpO1xuICAgICAgICBzcHJpdGUudXBkYXRlKGRlbHRhKTtcbiAgICAgICAgY29uc3QgcG9zdFNwcml0ZSA9IEpTT04uc3RyaW5naWZ5KHNwcml0ZSwgKGssdikgPT4gayA9PT0gJ293bmVyJyA/IHVuZGVmaW5lZCA6IHYpO1xuICAgICAgICAvLyBpZihzcHJpdGUgaW5zdGFuY2VvZiBQbGF5ZXJDaGFyYWN0ZXIgJiYgc3ByaXRlLm1vdmluZykge1xuICAgICAgICAvLyAgIGNvbnNvbGUubG9nKFwiUFJFOiBcIiwgcHJlU3ByaXRlLCBcIlBPU1Q6IFwiLCBwb3N0U3ByaXRlKTtcbiAgICAgICAgLy8gfVxuICAgICAgICAvLyBJZiB1cGRhdGVzIGV4aXN0IGFuZCBwcm9wIGNoYW5nZXMgYXJlIG1hZGUsIGFkZCB1cGRhdGVzIHRvIGEgcGFja2FnZVxuICAgICAgICBpZiAocG9zdFNwcml0ZSAhPT0gcHJlU3ByaXRlKSB7XG4gICAgICAgICAgbGV2ZWwuZnJhbWVRdWV1ZS5wdXNoKHtcbiAgICAgICAgICAgIHR5cGU6IE1lc3NhZ2VUeXBlcy5VcGRhdGVTcHJpdGUsXG4gICAgICAgICAgICBzcHJpdGU6IHBvc3RTcHJpdGVcbiAgICAgICAgICB9KTtcbiAgICAgICAgfVxuICAgICAgfVxuXG4gICAgICBsZXZlbC5zcHJpdGVzLmZvckVhY2goZnVuY3Rpb24ob3RoZXJTcHJpdGUpIHtcbiAgICAgICAgaWYob3RoZXJTcHJpdGUgPT09IHNwcml0ZSkgcmV0dXJuO1xuICAgICAgICBzd2l0Y2goc3ByaXRlLmNoZWNrQ29sbGlzaW9uKG90aGVyU3ByaXRlKSkge1xuICAgICAgICAgIGNhc2UgQ29sbGlzaW9uU3RhdHVzLkVOVEVSOlxuICAgICAgICAgICAgc3ByaXRlLm9uQ29sbGlzaW9uRW50ZXIgJiYgc3ByaXRlLm9uQ29sbGlzaW9uRW50ZXIob3RoZXJTcHJpdGUuY29sbGlkZXIpO1xuICAgICAgICAgICAgYnJlYWs7XG4gICAgICAgICAgY2FzZSBDb2xsaXNpb25TdGF0dXMuQ09MTElESU5HOlxuICAgICAgICAgICAgc3ByaXRlLm9uQ29sbGlzaW9uICYmIHNwcml0ZS5vbkNvbGxpc2lvbihvdGhlclNwcml0ZS5jb2xsaWRlcik7XG4gICAgICAgICAgICBicmVhaztcbiAgICAgICAgICBjYXNlIENvbGxpc2lvblN0YXR1cy5FWElUOlxuICAgICAgICAgICAgc3ByaXRlLm9uQ29sbGlzaW9uRXhpdCAmJiBzcHJpdGUub25Db2xsaXNpb25FeGl0KG90aGVyU3ByaXRlLmNvbGxpZGVyKTtcbiAgICAgICAgICAgIGJyZWFrO1xuICAgICAgICB9XG4gICAgICB9KVxuXG4gICAgfSk7XG4gIH0pO1xuXG4gIE9iamVjdC5rZXlzKFdvcmxkLmNsaWVudHMpXG4gICAgLm1hcChpZCA9PiBXb3JsZC5jbGllbnRzW2lkXSlcbiAgICAuZm9yRWFjaCgoY2xpZW50KSA9PiB7XG4gICAgICBpZighY2xpZW50IHx8ICFjbGllbnQucGxheWVyQ2hhcmFjdGVyIHx8ICFjbGllbnQuc29ja2V0KSByZXR1cm47XG4gICAgICBcbiAgICAgIGNvbnN0IGxldmVsID0gV29ybGQubGV2ZWxzW2NsaWVudC5wbGF5ZXJDaGFyYWN0ZXIubGV2ZWxJZF07XG4gICAgICBpZighbGV2ZWwpIHJldHVybjtcbiAgICAgIFxuICAgICAgLy8gc2VuZCB1cGRhdGUgcGFja2FnZSB0byBhbGwgY29ubmVjdGVkIGNsaWVudHMgb24gYSBwZXItbGV2ZWwgYmFzaXMuXG4gICAgICBpZihsZXZlbC5mcmFtZVF1ZXVlLmxlbmd0aCA+IDApIHtcbiAgICAgICAgc2VuZFBhY2thZ2UoY2xpZW50LnNvY2tldCwgTWVzc2FnZVR5cGVzLkZyYW1lUXVldWUsIHsgcXVldWU6IGxldmVsLmZyYW1lUXVldWUgfSk7XG4gICAgICB9XG4gICAgfSk7XG5cbiAgbGV2ZWxzQXJyYXkuZm9yRWFjaChsZXZlbCA9PiB7XG4gICAgbGV2ZWwuZnJhbWVRdWV1ZS5sZW5ndGggPSAwOyAvLyBUT0RPOiBlbnN1cmUgZGF0YSBpcyBhY3R1YWxseSBnb25lISBUaGlzIGZlZWxzIHdlaXJkLCBidXQgaXMgcmVwb3J0ZWRseSB0aGUgXCJmYXN0ZXN0XCIgcmVsaWFibGUgd2F5IHRvIGNsZWFyIGFuIGFycmF5IGluIEphdmFzY3JpcHQuXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAvLyAgICAgICAoc2VlIGh0dHA6Ly9zdGFja292ZXJmbG93LmNvbS9xdWVzdGlvbnMvMTIzMjA0MC9ob3ctZG8taS1lbXB0eS1hbi1hcnJheS1pbi1qYXZhc2NyaXB0KTtcbiAgfSk7XG5cbn0sIDEwMDAgLyA2MCk7XG5cblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gYXBwLmpzIl0sIm1hcHBpbmdzIjoiOzs7O0FBS0E7QUFDQTs7O0FBQUE7QUFDQTs7O0FBQUE7QUFDQTs7O0FBQ0E7QUFDQTs7O0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBRUE7QUFDQTs7O0FBQUE7QUFDQTs7O0FBRUE7QUFDQTs7O0FBQUE7QUFDQTtBQUNBO0FBQ0E7OztBQUlBO0FBQ0E7OztBQUFBO0FBQ0E7OztBQUVBO0FBQ0E7OztBQUFBO0FBQ0E7OztBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBR0E7QUFDQTs7O0FBQUE7QUFDQTs7Ozs7QUEzQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUdBO0FBQ0E7QUFDQTtBQUdBO0FBQ0E7QUFDQTtBQUdBO0FBQ0E7QUFDQTtBQUVBO0FBQ0E7QUFDQTtBQUlBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFJQTtBQUNBO0FBQ0E7QUFDQTtBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFDQTtBQURBO0FBQUE7QUFBQTtBQUFBO0FBQ0E7QUFHQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUpBO0FBTUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFDQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBS0E7QUFDQTtBQUtBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUtBO0FBQ0E7QUFDQTtBQUlBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBeEVBO0FBMEVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQWJBO0FBZUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQWZBO0FBaUJBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRkE7QUFJQTtBQUlBO0FBQ0E7QUFGQTtBQUtBO0FBQ0E7QUFDQTtBQUZBO0FBSUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBREE7QUFMQTtBQVVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRkE7QUFJQTtBQUNBO0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUFBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRkE7QUFJQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFUQTtBQVdBO0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUFBO0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUEiLCJzb3VyY2VSb290IjoiIn0=");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _mongoose = __webpack_require__(16);
+
+var _mongoose2 = _interopRequireDefault(_mongoose);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_mongoose2.default.Promise = global.Promise;
+
+var characterSchema = (0, _mongoose.Schema)({
+  name: { type: String, required: true },
+  stats: {
+    HP: Number, maxHP: Number,
+    level: Number,
+    strength: Number
+  }
+});
+
+var Character = _mongoose2.default.model('Character', characterSchema);
+
+exports.default = Character;
 
 /***/ }),
 /* 34 */
-/* unknown exports provided */
-/* all exports used */
-/*!********************************************!*\
-  !*** ./classes/server/CharacterManager.js ***!
-  \********************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _messaging = __webpack_require__(/*! ../Helpers/messaging */ 14);\n\nvar _MessageTypes = __webpack_require__(/*! ../MessageTypes */ 3);\n\nvar _MessageTypes2 = _interopRequireDefault(_MessageTypes);\n\nvar _SpriteTypes = __webpack_require__(/*! ../SpriteTypes */ 7);\n\nvar _GameEngine = __webpack_require__(/*! ../GameEngine */ 6);\n\nvar _GameEngine2 = _interopRequireDefault(_GameEngine);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar CharacterManager = function () {\n  function CharacterManager() {\n    _classCallCheck(this, CharacterManager);\n  }\n\n  _createClass(CharacterManager, [{\n    key: 'applyDamage',\n    value: function applyDamage(character, damageInfo) {\n      var _this = this;\n\n      // TODO: handle other damage types: bleeding, poison, arcane, fire, frost, etc.???\n      character.tookDamage(damageInfo.damage, damageInfo.source);\n      (0, _messaging.broadcastPackage)(_MessageTypes2.default.TakeDamage, {\n        target: character.instanceId,\n        damage: damageInfo.damage,\n        remainingHp: character.stats.hp,\n        maxHp: character.stats.maxHp,\n        source: damageInfo.source\n      });\n      if (character.health <= 0 && !character.isDead) {\n        character.isDead = true;\n        character.deactivate();\n        (0, _messaging.broadcastPackage)(_MessageTypes2.default.PlayerDeath, {\n          target: character.instanceId,\n          source: damageInfo.source\n        });\n        _GameEngine2.default.spawnSprite(character.levelId, _SpriteTypes.SpriteTypes.BLOODSTAIN, { start: character.position });\n        setTimeout(function () {\n          _this.respawnPlayer(character, { position: _GameEngine2.default.getRandomSpawnPoint(character.levelId) });\n        }, 3000);\n      }\n    }\n  }, {\n    key: 'respawnPlayer',\n    value: function respawnPlayer(character, params) {\n      // console.log(\"Respawning character at: \", params.position);\n      character.isDead = false;\n      character.health = character.stats.maxHp;\n      character.setPosition(params.position);\n      character.activate();\n      (0, _messaging.broadcastPackage)(_MessageTypes2.default.PlayerRespawn, {\n        target: character.instanceId,\n        position: params.position\n      });\n    }\n  }]);\n\n  return CharacterManager;\n}();\n\nexports.default = new CharacterManager();//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMzQuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zZXJ2ZXIvQ2hhcmFjdGVyTWFuYWdlci5qcz9lZGZjIl0sInNvdXJjZXNDb250ZW50IjpbIlxuaW1wb3J0IHsgYnJvYWRjYXN0UGFja2FnZSB9IGZyb20gJy4uL0hlbHBlcnMvbWVzc2FnaW5nJztcbmltcG9ydCBNZXNzYWdlVHlwZXMgZnJvbSAnLi4vTWVzc2FnZVR5cGVzJztcbmltcG9ydCB7IFNwcml0ZVR5cGVzIH0gZnJvbSAnLi4vU3ByaXRlVHlwZXMnO1xuXG5pbXBvcnQgV29ybGQgZnJvbSAnLi4vR2FtZUVuZ2luZSc7XG5cbmNsYXNzIENoYXJhY3Rlck1hbmFnZXIge1xuICBhcHBseURhbWFnZShjaGFyYWN0ZXIsIGRhbWFnZUluZm8pIHtcbiAgICAvLyBUT0RPOiBoYW5kbGUgb3RoZXIgZGFtYWdlIHR5cGVzOiBibGVlZGluZywgcG9pc29uLCBhcmNhbmUsIGZpcmUsIGZyb3N0LCBldGMuPz8/XG4gICAgY2hhcmFjdGVyLnRvb2tEYW1hZ2UoZGFtYWdlSW5mby5kYW1hZ2UsIGRhbWFnZUluZm8uc291cmNlKTtcbiAgICBicm9hZGNhc3RQYWNrYWdlKE1lc3NhZ2VUeXBlcy5UYWtlRGFtYWdlLCB7XG4gICAgICB0YXJnZXQ6IGNoYXJhY3Rlci5pbnN0YW5jZUlkLFxuICAgICAgZGFtYWdlOiBkYW1hZ2VJbmZvLmRhbWFnZSxcbiAgICAgIHJlbWFpbmluZ0hwOiBjaGFyYWN0ZXIuc3RhdHMuaHAsXG4gICAgICBtYXhIcDogY2hhcmFjdGVyLnN0YXRzLm1heEhwLFxuICAgICAgc291cmNlOiBkYW1hZ2VJbmZvLnNvdXJjZVxuICAgIH0pO1xuICAgIGlmKGNoYXJhY3Rlci5oZWFsdGggPD0gMCAmJiAhY2hhcmFjdGVyLmlzRGVhZCkge1xuICAgICAgY2hhcmFjdGVyLmlzRGVhZCA9IHRydWU7XG4gICAgICBjaGFyYWN0ZXIuZGVhY3RpdmF0ZSgpO1xuICAgICAgYnJvYWRjYXN0UGFja2FnZShNZXNzYWdlVHlwZXMuUGxheWVyRGVhdGgsIHtcbiAgICAgICAgdGFyZ2V0OiBjaGFyYWN0ZXIuaW5zdGFuY2VJZCxcbiAgICAgICAgc291cmNlOiBkYW1hZ2VJbmZvLnNvdXJjZVxuICAgICAgfSk7XG4gICAgICBXb3JsZC5zcGF3blNwcml0ZShjaGFyYWN0ZXIubGV2ZWxJZCwgU3ByaXRlVHlwZXMuQkxPT0RTVEFJTiwgeyBzdGFydDogY2hhcmFjdGVyLnBvc2l0aW9uIH0pO1xuICAgICAgc2V0VGltZW91dCgoKSA9PiB7XG4gICAgICAgIHRoaXMucmVzcGF3blBsYXllcihjaGFyYWN0ZXIsIHsgcG9zaXRpb246IFdvcmxkLmdldFJhbmRvbVNwYXduUG9pbnQoY2hhcmFjdGVyLmxldmVsSWQpIH0pO1xuICAgICAgfSwgMzAwMCk7XG4gICAgfVxuICB9XG5cbiAgcmVzcGF3blBsYXllcihjaGFyYWN0ZXIsIHBhcmFtcykge1xuICAgIC8vIGNvbnNvbGUubG9nKFwiUmVzcGF3bmluZyBjaGFyYWN0ZXIgYXQ6IFwiLCBwYXJhbXMucG9zaXRpb24pO1xuICAgIGNoYXJhY3Rlci5pc0RlYWQgPSBmYWxzZTtcbiAgICBjaGFyYWN0ZXIuaGVhbHRoID0gY2hhcmFjdGVyLnN0YXRzLm1heEhwO1xuICAgIGNoYXJhY3Rlci5zZXRQb3NpdGlvbihwYXJhbXMucG9zaXRpb24pO1xuICAgIGNoYXJhY3Rlci5hY3RpdmF0ZSgpO1xuICAgIGJyb2FkY2FzdFBhY2thZ2UoTWVzc2FnZVR5cGVzLlBsYXllclJlc3Bhd24sIHtcbiAgICAgIHRhcmdldDogY2hhcmFjdGVyLmluc3RhbmNlSWQsXG4gICAgICBwb3NpdGlvbjogcGFyYW1zLnBvc2l0aW9uXG4gICAgfSk7XG4gIH1cbn1cblxuZXhwb3J0IGRlZmF1bHQgbmV3IENoYXJhY3Rlck1hbmFnZXIoKTtcblxuXG4vLyBXRUJQQUNLIEZPT1RFUiAvL1xuLy8gY2xhc3Nlcy9zZXJ2ZXIvQ2hhcmFjdGVyTWFuYWdlci5qcyJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7QUFDQTtBQUNBO0FBQUE7QUFDQTs7O0FBQUE7QUFDQTtBQUNBO0FBQ0E7Ozs7Ozs7QUFDQTs7Ozs7OztBQUNBO0FBQUE7QUFDQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFMQTtBQU9BO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUZBO0FBSUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFGQTtBQUlBOzs7Ozs7QUFHQSIsInNvdXJjZVJvb3QiOiIifQ==");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _mongoose = __webpack_require__(16);
+
+var _mongoose2 = _interopRequireDefault(_mongoose);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_mongoose2.default.Promise = global.Promise;
+
+var userSchema = (0, _mongoose.Schema)({
+  user: { type: String, required: true },
+  pass: {
+    hash: { type: String, required: true },
+    salt: { type: String, required: true }
+  },
+  character: {
+    type: _mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Character'
+  }
+});
+
+var User = _mongoose2.default.model('User', userSchema);
+
+exports.default = User;
 
 /***/ }),
 /* 35 */
-/* unknown exports provided */
-/* all exports used */
-/*!****************************************!*\
-  !*** ./classes/server/LevelManager.js ***!
-  \****************************************/
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _fs = __webpack_require__(/*! fs */ 20);\n\nvar _fs2 = _interopRequireDefault(_fs);\n\nvar _Level = __webpack_require__(/*! ../shared/Level */ 19);\n\nvar _Level2 = _interopRequireDefault(_Level);\n\nvar _SpriteClassMap = __webpack_require__(/*! ../SpriteClassMap */ 16);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nvar levels = {};\n\nvar LevelManager = function () {\n  function LevelManager() {\n    _classCallCheck(this, LevelManager);\n  }\n\n  _createClass(LevelManager, [{\n    key: 'getLevel',\n    value: function getLevel(levelId) {\n      if (!this.levels[levelId]) {\n\n        var level = new _Level2.default(levelId);\n        var levelData = this.loadFromJSONFile('./levels/level_' + levelId + '.json');\n        Object.assign(level, levelData);\n        level.populate(levelData);\n\n        if (!level) throw new Error(\"Level did not load. This is probably because of an invalid level ID.\");\n\n        this.levels[levelId] = level;\n      }\n      return this.levels[levelId];\n    }\n    // Note: I expect this is a fairly expensive operation, so I probably don't want to do it every frame.\n\n  }, {\n    key: 'getLevelBySprite',\n    value: function getLevelBySprite(sprite) {\n      var _this = this;\n\n      var levelFound = null;\n      Object.keys(this.levels).forEach(function (levelId) {\n        // console.log(\"doing get level\");\n        var level = _this.getLevel(levelId);\n        // console.log(\"got level\");\n        if (level.sprites.indexOf(sprite) !== -1) {\n          levelFound = level;\n          // console.log(\"Found from comparison: \" + levelFound.id);\n        }\n      });\n      // console.log(\"return level: \", levelFound);\n      return levelFound;\n    }\n  }, {\n    key: 'loadFromJSONFile',\n    value: function loadFromJSONFile(filename) {\n      var level = JSON.parse(_fs2.default.readFileSync(filename, 'utf-8'));\n\n      // console.log(\"Loaded Level: \", level);\n\n      level.sprites = level.sprites.map(function (s) {\n        var spriteClass = _SpriteClassMap.SpriteClassMap.get(s.type);\n        if (spriteClass) {\n          return Object.assign(new spriteClass(), s);\n        }\n        return s;\n      });\n      return level;\n    }\n  }, {\n    key: 'addSprite',\n    value: function addSprite(levelId, sprite) {\n      this.getLevel(levelId).addSprite(sprite);\n    }\n  }, {\n    key: 'removeSprite',\n    value: function removeSprite(levelId, sprite) {\n      this.getLevel(levelId).removeSprite(sprite);\n    }\n  }, {\n    key: 'levels',\n    get: function get() {\n      return levels;\n    }\n  }]);\n\n  return LevelManager;\n}();\n\nvar levelManager = new LevelManager();\n\nexports.default = levelManager;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMzUuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zZXJ2ZXIvTGV2ZWxNYW5hZ2VyLmpzPzNjZjciXSwic291cmNlc0NvbnRlbnQiOlsiXG5pbXBvcnQgZnMgZnJvbSAnZnMnO1xuXG5pbXBvcnQgTGV2ZWwgZnJvbSAnLi4vc2hhcmVkL0xldmVsJztcbmltcG9ydCB7IFNwcml0ZUNsYXNzTWFwIH0gZnJvbSAnLi4vU3ByaXRlQ2xhc3NNYXAnO1xuXG5jb25zdCBsZXZlbHMgPSB7fTtcblxuY2xhc3MgTGV2ZWxNYW5hZ2VyIHtcblxuICBnZXQgbGV2ZWxzKCkge1xuICAgIHJldHVybiBsZXZlbHM7XG4gIH1cblxuICBnZXRMZXZlbChsZXZlbElkKSB7XG4gICAgaWYoIXRoaXMubGV2ZWxzW2xldmVsSWRdKSB7XG4gICAgICBcbiAgICAgIGNvbnN0IGxldmVsID0gbmV3IExldmVsKGxldmVsSWQpO1xuICAgICAgY29uc3QgbGV2ZWxEYXRhID0gdGhpcy5sb2FkRnJvbUpTT05GaWxlKGAuL2xldmVscy9sZXZlbF8ke2xldmVsSWR9Lmpzb25gKTtcbiAgICAgIE9iamVjdC5hc3NpZ24obGV2ZWwsIGxldmVsRGF0YSk7XG4gICAgICBsZXZlbC5wb3B1bGF0ZShsZXZlbERhdGEpO1xuXG4gICAgICBpZighbGV2ZWwpXG4gICAgICAgIHRocm93IG5ldyBFcnJvcihcIkxldmVsIGRpZCBub3QgbG9hZC4gVGhpcyBpcyBwcm9iYWJseSBiZWNhdXNlIG9mIGFuIGludmFsaWQgbGV2ZWwgSUQuXCIpO1xuXG4gICAgICB0aGlzLmxldmVsc1tsZXZlbElkXSA9IGxldmVsO1xuICAgIH1cbiAgICByZXR1cm4gdGhpcy5sZXZlbHNbbGV2ZWxJZF07XG4gIH1cbiAgLy8gTm90ZTogSSBleHBlY3QgdGhpcyBpcyBhIGZhaXJseSBleHBlbnNpdmUgb3BlcmF0aW9uLCBzbyBJIHByb2JhYmx5IGRvbid0IHdhbnQgdG8gZG8gaXQgZXZlcnkgZnJhbWUuXG4gIGdldExldmVsQnlTcHJpdGUoc3ByaXRlKSB7XG4gICAgbGV0IGxldmVsRm91bmQgPSBudWxsO1xuICAgIE9iamVjdC5rZXlzKHRoaXMubGV2ZWxzKS5mb3JFYWNoKGxldmVsSWQgPT4ge1xuICAgICAgLy8gY29uc29sZS5sb2coXCJkb2luZyBnZXQgbGV2ZWxcIik7XG4gICAgICBjb25zdCBsZXZlbCA9IHRoaXMuZ2V0TGV2ZWwobGV2ZWxJZCk7XG4gICAgICAvLyBjb25zb2xlLmxvZyhcImdvdCBsZXZlbFwiKTtcbiAgICAgIGlmKGxldmVsLnNwcml0ZXMuaW5kZXhPZihzcHJpdGUpICE9PSAtMSkge1xuICAgICAgICBsZXZlbEZvdW5kID0gbGV2ZWw7XG4gICAgICAgIC8vIGNvbnNvbGUubG9nKFwiRm91bmQgZnJvbSBjb21wYXJpc29uOiBcIiArIGxldmVsRm91bmQuaWQpO1xuICAgICAgfVxuICAgIH0pO1xuICAgIC8vIGNvbnNvbGUubG9nKFwicmV0dXJuIGxldmVsOiBcIiwgbGV2ZWxGb3VuZCk7XG4gICAgcmV0dXJuIGxldmVsRm91bmQ7XG4gIH1cblxuICBsb2FkRnJvbUpTT05GaWxlKGZpbGVuYW1lKSB7XG4gICAgY29uc3QgbGV2ZWwgPSBKU09OLnBhcnNlKGZzLnJlYWRGaWxlU3luYyhmaWxlbmFtZSwgJ3V0Zi04JykpO1xuICAgIFxuICAgIC8vIGNvbnNvbGUubG9nKFwiTG9hZGVkIExldmVsOiBcIiwgbGV2ZWwpO1xuXG4gICAgbGV2ZWwuc3ByaXRlcyA9IGxldmVsLnNwcml0ZXMubWFwKHMgPT4ge1xuICAgICAgY29uc3Qgc3ByaXRlQ2xhc3MgPSBTcHJpdGVDbGFzc01hcC5nZXQocy50eXBlKTtcbiAgICAgIGlmKHNwcml0ZUNsYXNzKSB7XG4gICAgICAgIHJldHVybiBPYmplY3QuYXNzaWduKG5ldyBzcHJpdGVDbGFzcygpLCBzKTtcbiAgICAgIH1cbiAgICAgIHJldHVybiBzO1xuICAgIH0pO1xuICAgIHJldHVybiBsZXZlbDtcbiAgfVxuXG4gIGFkZFNwcml0ZShsZXZlbElkLCBzcHJpdGUpIHtcbiAgICAodGhpcy5nZXRMZXZlbChsZXZlbElkKSkuYWRkU3ByaXRlKHNwcml0ZSk7XG4gIH1cblxuICByZW1vdmVTcHJpdGUobGV2ZWxJZCwgc3ByaXRlKSB7XG4gICAgKHRoaXMuZ2V0TGV2ZWwobGV2ZWxJZCkpLnJlbW92ZVNwcml0ZShzcHJpdGUpO1xuICB9XG5cbn1cblxuY29uc3QgbGV2ZWxNYW5hZ2VyID0gbmV3IExldmVsTWFuYWdlcigpO1xuXG5leHBvcnQgZGVmYXVsdCBsZXZlbE1hbmFnZXI7XG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvc2VydmVyL0xldmVsTWFuYWdlci5qcyJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7QUFDQTtBQUNBOzs7QUFDQTtBQUNBOzs7QUFBQTtBQUNBOzs7OztBQUNBO0FBQ0E7QUFDQTs7Ozs7OztBQU1BO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOzs7QUFBQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7O0FBRUE7QUFDQTtBQUNBOzs7QUFFQTtBQUNBO0FBQ0E7OztBQXhEQTtBQUNBO0FBQ0E7Ozs7OztBQTBEQTtBQUNBO0FBQ0EiLCJzb3VyY2VSb290IjoiIn0=");
+module.exports = require("express");
 
 /***/ }),
 /* 36 */
-/* unknown exports provided */
-/* all exports used */
-/*!**************************************!*\
-  !*** ./classes/shared/Bloodstain.js ***!
-  \**************************************/
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if (\"value\" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };\n\nvar _Sprite2 = __webpack_require__(/*! ./Sprite */ 0);\n\nvar _Sprite3 = _interopRequireDefault(_Sprite2);\n\nvar _GameEngine = __webpack_require__(/*! ../GameEngine */ 6);\n\nvar _GameEngine2 = _interopRequireDefault(_GameEngine);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar Bloodstain = function (_Sprite) {\n  _inherits(Bloodstain, _Sprite);\n\n  function Bloodstain() {\n    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n    _classCallCheck(this, Bloodstain);\n\n    // console.log(\"Creating an explosion!!!!!\");\n    var _this = _possibleConstructorReturn(this, (Bloodstain.__proto__ || Object.getPrototypeOf(Bloodstain)).call(this, params));\n\n    _this.setPosition(params.start || { x: 0, y: 0 });\n    _this.setTexture('./images/BloodSplatter.png');\n\n    _this.livesUntil = +Date.now() + 1 * 1000; // one second bloodstain!\n\n    return _this;\n  }\n\n  _createClass(Bloodstain, [{\n    key: 'update',\n    value: function update(delta) {\n      if (this.livesUntil && this.livesUntil <= +Date.now()) {\n        _GameEngine2.default.despawnSprite(this);\n        return;\n      }\n      _get(Bloodstain.prototype.__proto__ || Object.getPrototypeOf(Bloodstain.prototype), 'update', this).call(this, delta);\n    }\n  }]);\n\n  return Bloodstain;\n}(_Sprite3.default);\n\nexports.default = Bloodstain;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMzYuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvQmxvb2RzdGFpbi5qcz85M2QxIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBTcHJpdGUgZnJvbSAnLi9TcHJpdGUnO1xuaW1wb3J0IFdvcmxkIGZyb20gJy4uL0dhbWVFbmdpbmUnO1xuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBCbG9vZHN0YWluIGV4dGVuZHMgU3ByaXRlIHtcbiAgY29uc3RydWN0b3IocGFyYW1zID0ge30pIHtcbiAgICBzdXBlcihwYXJhbXMpO1xuICAgIC8vIGNvbnNvbGUubG9nKFwiQ3JlYXRpbmcgYW4gZXhwbG9zaW9uISEhISFcIik7XG4gICAgdGhpcy5zZXRQb3NpdGlvbihwYXJhbXMuc3RhcnQgfHwgeyB4OiAwLCB5OiAwIH0pO1xuICAgIHRoaXMuc2V0VGV4dHVyZSgnLi9pbWFnZXMvQmxvb2RTcGxhdHRlci5wbmcnKTtcblxuICAgIHRoaXMubGl2ZXNVbnRpbCA9ICsgRGF0ZS5ub3coKSArIDEgKiAxMDAwOyAvLyBvbmUgc2Vjb25kIGJsb29kc3RhaW4hXG5cbiAgfVxuXG4gIHVwZGF0ZShkZWx0YSkge1xuICAgIGlmICh0aGlzLmxpdmVzVW50aWwgJiYgdGhpcy5saXZlc1VudGlsIDw9ICtEYXRlLm5vdygpKSB7XG4gICAgICBXb3JsZC5kZXNwYXduU3ByaXRlKHRoaXMpO1xuICAgICAgcmV0dXJuO1xuICAgIH1cbiAgICBzdXBlci51cGRhdGUoZGVsdGEpO1xuICB9XG59XG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvc2hhcmVkL0Jsb29kc3RhaW4uanMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7QUFBQTtBQUNBOzs7QUFBQTtBQUNBOzs7Ozs7Ozs7OztBQUNBOzs7QUFDQTtBQUFBO0FBQ0E7QUFEQTtBQUNBO0FBQ0E7QUFGQTtBQUNBO0FBRUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQVBBO0FBUUE7QUFDQTs7O0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7Ozs7OztBQWpCQSIsInNvdXJjZVJvb3QiOiIifQ==");
+module.exports = require("http");
 
 /***/ }),
 /* 37 */
-/* unknown exports provided */
-/* all exports used */
-/*!*********************************!*\
-  !*** ./classes/shared/Chest.js ***!
-  \*********************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _Sprite2 = __webpack_require__(/*! ./Sprite */ 0);\n\nvar _Sprite3 = _interopRequireDefault(_Sprite2);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar Explosion = function (_Sprite) {\n  _inherits(Explosion, _Sprite);\n\n  function Explosion() {\n    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n    _classCallCheck(this, Explosion);\n\n    var _this = _possibleConstructorReturn(this, (Explosion.__proto__ || Object.getPrototypeOf(Explosion)).call(this, params));\n\n    _this.setPosition(params.start);\n    _this.setTexture('./images/ChestClosed.png');\n    return _this;\n  }\n\n  return Explosion;\n}(_Sprite3.default);\n\nexports.default = Explosion;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMzcuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvQ2hlc3QuanM/YmNjMyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgU3ByaXRlIGZyb20gJy4vU3ByaXRlJztcblxuZXhwb3J0IGRlZmF1bHQgY2xhc3MgRXhwbG9zaW9uIGV4dGVuZHMgU3ByaXRlIHtcbiAgY29uc3RydWN0b3IocGFyYW1zID0ge30pIHtcbiAgICBzdXBlcihwYXJhbXMpO1xuICAgIHRoaXMuc2V0UG9zaXRpb24ocGFyYW1zLnN0YXJ0KTtcbiAgICB0aGlzLnNldFRleHR1cmUoJy4vaW1hZ2VzL0NoZXN0Q2xvc2VkLnBuZycpO1xuICB9XG59XG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvc2hhcmVkL0NoZXN0LmpzIl0sIm1hcHBpbmdzIjoiOzs7Ozs7QUFBQTtBQUNBOzs7Ozs7Ozs7OztBQUNBOzs7QUFDQTtBQUFBO0FBQ0E7QUFEQTtBQUNBO0FBREE7QUFDQTtBQUNBO0FBQ0E7QUFIQTtBQUlBO0FBQ0E7Ozs7QUFOQSIsInNvdXJjZVJvb3QiOiIifQ==");
+
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _express = __webpack_require__(35);
+
+var _express2 = _interopRequireDefault(_express);
+
+var _http = __webpack_require__(36);
+
+var _http2 = _interopRequireDefault(_http);
+
+var _ws = __webpack_require__(24);
+
+var _ws2 = _interopRequireDefault(_ws);
+
+var _mongoose = __webpack_require__(16);
+
+var _mongoose2 = _interopRequireDefault(_mongoose);
+
+var _GameEngine = __webpack_require__(3);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+var _guid = __webpack_require__(7);
+
+var _passhashing = __webpack_require__(26);
+
+var _messaging = __webpack_require__(11);
+
+var _gx2D = __webpack_require__(6);
+
+var _Client = __webpack_require__(31);
+
+var _Client2 = _interopRequireDefault(_Client);
+
+var _Level = __webpack_require__(22);
+
+var _Level2 = _interopRequireDefault(_Level);
+
+var _CharacterController = __webpack_require__(21);
+
+var _CharacterController2 = _interopRequireDefault(_CharacterController);
+
+var _DatabaseManager = __webpack_require__(32);
+
+var _DatabaseManager2 = _interopRequireDefault(_DatabaseManager);
+
+var _GameSettings = __webpack_require__(1);
+
+var _fs = __webpack_require__(23);
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _Abilities = __webpack_require__(20);
+
+var _Abilities2 = _interopRequireDefault(_Abilities);
+
+var _MessageTypes = __webpack_require__(5);
+
+var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
+
+var _PlayerActions = __webpack_require__(13);
+
+var _PlayerActions2 = _interopRequireDefault(_PlayerActions);
+
+var _SpriteTypes = __webpack_require__(2);
+
+var _Collider = __webpack_require__(12);
+
+var _User = __webpack_require__(34);
+
+var _User2 = _interopRequireDefault(_User);
+
+var _Character = __webpack_require__(33);
+
+var _Character2 = _interopRequireDefault(_Character);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Environment
+var PORT = process.env.PORT || 5555;
+
+// External Dependencies
+
+// import randomToken from 'random-token';
+
+
+// Helpers
+
+
+// Internal Dependencies
+
+
+// Game Managers
+
+
+// const serverConfig = JSON.parse(fs.readFileSync('./config.json'));
+
+// Game Objects
+// import FireBall from './classes/shared/FireBall';
+// import PlayerCharacter from './classes/shared/PlayerCharacter';
+// import FireballAbility from './classes/shared/abilities/FireballAbility'
+
+
+// Constants & Enumerations
+
+
+// Database related
+_mongoose2.default.connect(process.env.MONGODB_CONNECTIONSTRING);
+
+
+// Application Globals
+// const World = {
+//   levels: {},
+//   clients: {}
+// };
+
+// Helpers & Abstractions
+var log = console.log; // TODO: log things to a file for production.
+
+var authenticate = async function authenticate(client, authString) {
+  // TODO: add function name and explain why!
+  // TODO: Faking user authentication. Need the real thing.
+  var _authString$split = authString.split(':'),
+      _authString$split2 = _slicedToArray(_authString$split, 2),
+      username = _authString$split2[0],
+      password = _authString$split2[1];
+
+  if (username && password) {
+    try {
+      var user = await _User2.default.findOne({ user: username }).populate('character'); // , 'user pass');
+      // console.log("User: ", user);
+      var hashedPass = (0, _passhashing.hashPassword)(password, user.pass.salt);
+      if (hashedPass.hash === user.pass.hash) {
+        // TODO: retrieve character info???
+        client.user = user;
+        return true;
+      }
+      //  else if(username.toLowerCase() === 'james') {
+      //   console.log("Password incorrect.");
+      //   await User.findOneAndUpdate({ user: username }, { $set: { pass: hashedPass }});
+      //   console.log("Changed password. Check DB.");
+      // }
+    } catch (exception) {
+      // This is probably a promise error.
+      console.error("Exception occurred: ", exception);
+    }
+  }
+
+  return false;
+};
+
+// Serving front end items (web pages, client scripts, images, etc.)
+var app = (0, _express2.default)();
+app.use(_express2.default.static('client'));
+var server = _http2.default.createServer(app).listen(PORT, function () {
+  return log('App started.');
+});
+
+// Socket Event Handlers
+var initiateClient = function initiateClient(socket) {
+  // Add socket to client list.
+  var instanceId = (0, _guid.guid)();
+  while (_GameEngine2.default.clients[instanceId]) {
+    instanceId = (0, _guid.guid)();
+  }
+  var client = new _Client2.default({
+    instanceId: instanceId,
+    socket: socket,
+    playerCharacter: null,
+    model: null
+  });
+  //World.clients[clientToken] = client;
+  _GameEngine2.default.addClient(client);
+
+  // Define socket behaviors
+  socket.on('message', clientMessage.bind(client));
+  socket.on('close', clientClose.bind(client));
+
+  socket.on('keyPressed', function (info) {
+    log(info);
+  });
+
+  (0, _messaging.sendPackage)(socket, _MessageTypes2.default.Who);
+};
+
+// const broadcastPackage = function broadcastPackage(type = null, attributes = {}) {
+//   // TODO: only affect clients that are in range and can see (but for now everybody)
+//   Object.keys(World.clients).forEach(clientKey => {
+//     // console.log("broadcasting port package to: " + clientKey, World.clients[clientKey]);
+//     const c = World.clients[clientKey];
+//     if(c) sendPackage(c.socket, type, attributes);
+//   })
+// }
+
+// const sendPackage = function sendPackage(socket, type = null, attributes = {}) {
+//   if (socket === null) throw new Error('Socket must be specified.'); // TODO: instanceof what?
+//   if (type === null) throw new Error('Package type must be specified.');
+
+//   if (socket.readyState !== WebSocket.OPEN) return;
+
+//   socket.send(JSON.stringify(Object.assign({ type }, attributes)));
+// };
+
+var clientMessage = async function clientMessage() {
+  var incoming = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '{}';
+
+  // 'this' === the client that generated this message
+  // const client = this; ????
+  var message = JSON.parse(incoming);
+
+  switch (message.type) {
+    case _MessageTypes2.default.PING:
+      (0, _messaging.sendPackage)(this.socket, _MessageTypes2.default.PONG, {});
+      break;
+    case _MessageTypes2.default.Who:
+      if (await authenticate(this, message.who)) {
+        // log("Getting player.");
+        this.playerCharacter = _DatabaseManager2.default.getPlayer(this.user.character.name);
+        _GameEngine2.default.CharacterManager.addController(this.playerCharacter);
+        (0, _messaging.sendPackage)(this.socket, _MessageTypes2.default.Authentication, { success: true, instanceId: this.instanceId, playerCharacter: JSON.stringify(this.playerCharacter) });
+      } else {
+        (0, _messaging.sendPackage)(this.socket, _MessageTypes2.default.Authentication, { success: false, errorMessage: 'Authentication failed.' });
+      }
+      break;
+    case _MessageTypes2.default.Port:
+      // incoming -> message: { levelId }
+      var level = null;
+      if (_GameEngine2.default.levels[message.levelId]) {
+        level = _GameEngine2.default.levels[message.levelId];
+      } else {
+        level = _GameEngine2.default.getLevel(message.levelId); // new Level(message.levelId);
+        _GameEngine2.default.levels[message.levelId] = level;
+      }
+      var pc = this.playerCharacter;
+      //pc.tx = level.start.tx;
+      pc.position.x = level.start.tx * _GameSettings.GameSettings.TILE_SCALE;
+      //pc.ty = level.start.ty;
+      pc.position.y = level.start.ty * _GameSettings.GameSettings.TILE_SCALE;
+      pc.levelId = level.id;
+      // TODO: Update this WHOOOOOLE file with pc.getLevel() instead of levelId
+      pc.getLevel = function () {
+        return level;
+      };
+      level.sprites.push(pc);
+
+      // TODO: Will need to check whether player is "allowed" to port here.
+      //  For example, are they currently near a portal to this area?
+      // console.log("sending port package to: " + this.instanceId, this);
+      (0, _messaging.sendPackage)(this.socket, _MessageTypes2.default.Port, { success: true, level: level, playerCharacter: pc });
+      // console.log("sent port package");
+      // console.log("broadcasting port package");
+      (0, _messaging.broadcastPackage)(_MessageTypes2.default.Spawn, { spawnClass: _SpriteTypes.SpriteTypes.PLAYER, spawn: pc });
+      // console.log("broadcast port package");
+      break;
+    case _MessageTypes2.default.KeyPressed:
+      handleKeyPressed(this, message);
+      break;
+    case _MessageTypes2.default.KeyReleased:
+      handleKeyReleased(this, message);
+      break;
+    case _MessageTypes2.default.MouseDown:
+    case _MessageTypes2.default.MouseUp:
+    case _MessageTypes2.default.MouseMove:
+      handleMouseEvent(this, message);
+      break;
+    case _MessageTypes2.default.Cast:
+      castSpell(this, message);
+      break;
+    default:
+      log('Unhandled socket communcation. Message type: ' + message.type, message);
+      break;
+  }
+};
+var clientClose = function clientClose() {
+  // First stop any messages going to the client.
+  this.socket = null;
+  // TODO: Then save any relevant client data to the database
+  //   Note: should save with a separate function so that we can also auto-save periodically.
+  // Then remove the client from the World. 
+  // TODO: When above TODO is finished, this should be a callback.
+  {
+    if (this.playerCharacter) {
+      var level = _GameEngine2.default.getLevel(this.playerCharacter.levelId);
+      if (level) {
+        var levelIndex = level.sprites.indexOf(this.playerCharacter);
+        level.sprites.splice(levelIndex, 1);
+        level.sprites[this.playerCharacter.instanceId] = undefined;
+        _GameEngine2.default.clients[this.instanceId] = undefined; // TODO: use GameEngine.removeClient();
+        (0, _messaging.broadcastPackage)(_MessageTypes2.default.Despawn, { spawnId: this.playerCharacter.instanceId });
+      }
+    }
+  }
+};
+
+var handleMouseEvent = function handleMouseEvent(client, message) {
+  if (message.type === _MessageTypes2.default.MouseDown) {
+    // console.log("Mouse down", message);
+    client.setMouseDown(message);
+  } else if (message.type === _MessageTypes2.default.MouseUp) {
+    // console.log("Mouse up");
+    client.setMouseUp();
+  } else {
+    // console.log("Mouse move: " + Date.now());
+    client.setMousePosition(message.aim);
+  }
+};
+
+var handleKeyPressed = function handleKeyPressed(client, message) {
+  var action = message.action;
+  switch (action) {
+    case _PlayerActions2.default.LEFT:
+    case _PlayerActions2.default.RIGHT:
+    case _PlayerActions2.default.UP:
+    case _PlayerActions2.default.DOWN:
+      handlePlayerMoveRequest(client, message);
+      break;
+    case _PlayerActions2.default.SHOOT_PROJECTILE:
+      // log("Got shoot request: ", message);
+      handlePlayerFireRequest(client, message);
+      break;
+    default:
+      log('Unexpected player action type: ' + action, message);
+      break;
+  }
+};
+var handleKeyReleased = function handleKeyReleased(client, message) {
+  var action = message.action;
+  // log("Released: " + action);
+};
+
+var handlePlayerMoveRequest = function handlePlayerMoveRequest(client, message) {
+  var action = message.action;
+  var pc = client.playerCharacter;
+  var newDirection = { x: 0, y: 0 };
+  switch (action) {
+    case 'LEFT':
+      newDirection.x -= 1;
+      break;
+    case 'RIGHT':
+      newDirection.x += 1;
+      break;
+    case 'UP':
+      newDirection.y -= 1;
+      break;
+    case 'DOWN':
+      newDirection.y += 1;
+      break;
+    default:
+
+      break;
+  }
+  // newDirection.x *= pc.walkSpeed / deltaTime;
+  newDirection.x *= 5;
+  // newDirection.y *= pc.walkSpeed / deltatime;
+  newDirection.y *= 5;
+  pc.setPosition({
+    x: pc.position.x + newDirection.x,
+    y: pc.position.y + newDirection.y
+  });
+  (0, _messaging.sendPackage)(client.socket, _MessageTypes2.default.MoveTo, {
+    x: pc.position.x,
+    y: pc.position.y
+  });
+  pc.getLevel().frameQueue.push({
+    type: _MessageTypes2.default.UpdateSprite,
+    sprite: JSON.stringify(pc)
+  });
+};
+
+var handlePlayerFireRequest = function handlePlayerFireRequest(client, message) {
+  var pc = client.playerCharacter;
+  var pcController = _GameEngine2.default.CharacterManager.getController(pc);
+
+  // console.log(Abilities["FIREBALL"]);
+
+  // const fbAbility = new Abilities["FIREBALL"]();
+
+  pcController.useAbility("BLUEBEAM", message);
+
+  // fbAbility.use(pc);
+
+  // console.log("Player -> Fireball: ", pc.position, "->", addDistance2d(pc.position, pc.angle, 1));
+  // const fireball = new FireBall(
+  //   {
+  //     start: addDistance2d(pc.position, pc.angle - Math.PI / 2, .5 * GameSettings.TILE_SCALE),
+  //     aim: pc.hasMoveTarget ? pc.moveTarget : message.aim, // If the player is moving shoot the fireball at the movement position, otherwise shoot at the mouse position.
+  //     speed: GameSettings.TILE_SCALE * 12,
+  //     collider: {
+  //       ignoresIds: [ pc.instanceId ]
+  //     }
+  //   }
+  // );
+  // // pc.collider.ignoresIds.push(fireball.instanceId);
+  // let sprites = World.levels[pc.levelId].sprites;
+  // sprites.push(fireball);
+  // broadcastPackage(MessageTypes.Spawn, { spawnClass: SpriteTypes.FIREBALL, spawn: fireball });
+
+  // fireball.delete = () => {
+
+  //   sprites = sprites.splice(sprites.indexOf(fireball), 1);
+  //   broadcastPackage(MessageTypes.Despawn, { spawnId: fireball.instanceId });
+  // };
+
+  // log("Number of sprites in level: " + World.levels[pc.levelId].sprites.length);
+  // log("Level sprites: ", World.levels[pc.levelId].sprites);
+};
+
+var castSpell = function castSpell(client, message) {
+  if (client.playerCharacter.canCast(message.spellId)) {
+    // TODO: Eventually something like this -> client.player.cast(DatabaseManager.getSpell(spellId));
+    //const fb = new FireBall();
+  }
+};
+
+// Serving the game service.
+var gameServer = new _ws2.default.Server({
+  server: server,
+  perMessageDeflate: false
+});
+gameServer.on('connection', initiateClient);
+
+// Managing timed game loop
+var lastUpdate = Date.now();
+setInterval(function () {
+  // TODO?: Cater packages to each client based on view range, etc.?
+  // One use case would be to remove stealth units from client side until they are visible again.
+
+  var thisUpdate = Date.now();
+  var delta = thisUpdate - lastUpdate;
+  lastUpdate = thisUpdate;
+
+  var levelsArray = Object.keys(_GameEngine2.default.levels).map(function (key) {
+    return _GameEngine2.default.levels[key];
+  });
+
+  // Update all gameobjects
+  levelsArray.forEach(function (level) {
+    level.sprites.forEach(function (sprite) {
+      if (sprite.update) {
+        var preSprite = JSON.stringify(sprite, function (k, v) {
+          return k === 'owner' ? undefined : v;
+        });
+        sprite.update(delta);
+        var postSprite = JSON.stringify(sprite, function (k, v) {
+          return k === 'owner' ? undefined : v;
+        });
+        // if(sprite instanceof PlayerCharacter && sprite.moving) {
+        //   console.log("PRE: ", preSprite, "POST: ", postSprite);
+        // }
+        // If updates exist and prop changes are made, add updates to a package
+        if (postSprite !== preSprite) {
+          level.frameQueue.push({
+            type: _MessageTypes2.default.UpdateSprite,
+            sprite: postSprite
+          });
+        }
+      }
+
+      level.sprites.forEach(function (otherSprite) {
+        if (otherSprite === sprite) return;
+        switch (sprite.checkCollision(otherSprite)) {
+          case _Collider.CollisionStatus.ENTER:
+            sprite.onCollisionEnter && sprite.onCollisionEnter(otherSprite.collider);
+            break;
+          case _Collider.CollisionStatus.COLLIDING:
+            sprite.onCollision && sprite.onCollision(otherSprite.collider);
+            break;
+          case _Collider.CollisionStatus.EXIT:
+            sprite.onCollisionExit && sprite.onCollisionExit(otherSprite.collider);
+            break;
+        }
+      });
+    });
+  });
+
+  Object.keys(_GameEngine2.default.clients).map(function (id) {
+    return _GameEngine2.default.clients[id];
+  }).forEach(function (client) {
+    if (!client || !client.playerCharacter || !client.socket) return;
+
+    var level = _GameEngine2.default.levels[client.playerCharacter.levelId];
+    if (!level) return;
+
+    // send update package to all connected clients on a per-level basis.
+    if (level.frameQueue.length > 0) {
+      (0, _messaging.sendPackage)(client.socket, _MessageTypes2.default.FrameQueue, { queue: level.frameQueue });
+    }
+  });
+
+  levelsArray.forEach(function (level) {
+    level.frameQueue.length = 0; // TODO: ensure data is actually gone! This feels weird, but is reportedly the "fastest" reliable way to clear an array in Javascript.
+    //       (see http://stackoverflow.com/questions/1232040/how-do-i-empty-an-array-in-javascript);
+  });
+}, 1000 / 60);
 
 /***/ }),
 /* 38 */
-/* unknown exports provided */
-/* all exports used */
-/*!*************************************!*\
-  !*** ./classes/shared/Explosion.js ***!
-  \*************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nObject.defineProperty(exports, \"__esModule\", {\n  value: true\n});\n\nvar _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if (\"value\" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();\n\nvar _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if (\"value\" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };\n\nvar _Sprite2 = __webpack_require__(/*! ./Sprite */ 0);\n\nvar _Sprite3 = _interopRequireDefault(_Sprite2);\n\nvar _GameEngine = __webpack_require__(/*! ../GameEngine */ 6);\n\nvar _GameEngine2 = _interopRequireDefault(_GameEngine);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nfunction _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError(\"Cannot call a class as a function\"); } }\n\nfunction _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError(\"this hasn't been initialised - super() hasn't been called\"); } return call && (typeof call === \"object\" || typeof call === \"function\") ? call : self; }\n\nfunction _inherits(subClass, superClass) { if (typeof superClass !== \"function\" && superClass !== null) { throw new TypeError(\"Super expression must either be null or a function, not \" + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }\n\nvar Explosion = function (_Sprite) {\n  _inherits(Explosion, _Sprite);\n\n  function Explosion() {\n    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};\n\n    _classCallCheck(this, Explosion);\n\n    // console.log(\"Creating an explosion!!!!!\");\n    var _this = _possibleConstructorReturn(this, (Explosion.__proto__ || Object.getPrototypeOf(Explosion)).call(this, params));\n\n    _this.setPosition(params.start || { x: 0, y: 0 });\n    _this.setTexture('./images/ExplosionExploding.png');\n\n    _this.livesUntil = +Date.now() + .1 * 1000; // tenth of a second explosion\n\n    return _this;\n  }\n\n  _createClass(Explosion, [{\n    key: 'update',\n    value: function update(delta) {\n      if (this.livesUntil && this.livesUntil <= +Date.now()) {\n        _GameEngine2.default.despawnSprite(this);\n        return;\n      }\n      _get(Explosion.prototype.__proto__ || Object.getPrototypeOf(Explosion.prototype), 'update', this).call(this, delta);\n    }\n  }]);\n\n  return Explosion;\n}(_Sprite3.default);\n\nexports.default = Explosion;//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiMzguanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vY2xhc3Nlcy9zaGFyZWQvRXhwbG9zaW9uLmpzPzMxYTgiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFNwcml0ZSBmcm9tICcuL1Nwcml0ZSc7XG5pbXBvcnQgV29ybGQgZnJvbSAnLi4vR2FtZUVuZ2luZSc7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIEV4cGxvc2lvbiBleHRlbmRzIFNwcml0ZSB7XG4gIGNvbnN0cnVjdG9yKHBhcmFtcyA9IHt9KSB7XG4gICAgc3VwZXIocGFyYW1zKTtcbiAgICAvLyBjb25zb2xlLmxvZyhcIkNyZWF0aW5nIGFuIGV4cGxvc2lvbiEhISEhXCIpO1xuICAgIHRoaXMuc2V0UG9zaXRpb24ocGFyYW1zLnN0YXJ0IHx8IHsgeDogMCwgeTogMCB9KTtcbiAgICB0aGlzLnNldFRleHR1cmUoJy4vaW1hZ2VzL0V4cGxvc2lvbkV4cGxvZGluZy5wbmcnKTtcblxuICAgIHRoaXMubGl2ZXNVbnRpbCA9ICsgRGF0ZS5ub3coKSArIC4xICogMTAwMDsgLy8gdGVudGggb2YgYSBzZWNvbmQgZXhwbG9zaW9uXG5cbiAgfVxuXG4gIHVwZGF0ZShkZWx0YSkge1xuICAgIGlmICh0aGlzLmxpdmVzVW50aWwgJiYgdGhpcy5saXZlc1VudGlsIDw9ICtEYXRlLm5vdygpKSB7XG4gICAgICBXb3JsZC5kZXNwYXduU3ByaXRlKHRoaXMpO1xuICAgICAgcmV0dXJuO1xuICAgIH1cbiAgICBzdXBlci51cGRhdGUoZGVsdGEpO1xuICB9XG59XG5cblxuLy8gV0VCUEFDSyBGT09URVIgLy9cbi8vIGNsYXNzZXMvc2hhcmVkL0V4cGxvc2lvbi5qcyJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztBQUFBO0FBQ0E7OztBQUFBO0FBQ0E7Ozs7Ozs7Ozs7O0FBQ0E7OztBQUNBO0FBQUE7QUFDQTtBQURBO0FBQ0E7QUFDQTtBQUZBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBUEE7QUFRQTtBQUNBOzs7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7Ozs7O0FBakJBIiwic291cmNlUm9vdCI6IiJ9");
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var CastTypes = exports.CastTypes = {
+  INSTANT: 'INSTANT',
+  CAST: 'CAST'
+};
 
 /***/ }),
-/* 39 */,
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Character = __webpack_require__(9);
+
+var _Character2 = _interopRequireDefault(_Character);
+
+var _CharacterController = __webpack_require__(21);
+
+var _CharacterController2 = _interopRequireDefault(_CharacterController);
+
+var _messaging = __webpack_require__(11);
+
+var _MessageTypes = __webpack_require__(5);
+
+var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
+
+var _SpriteTypes = __webpack_require__(2);
+
+var _GameEngine = __webpack_require__(3);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var controllers = [];
+
+var CharacterManager = function () {
+  function CharacterManager() {
+    _classCallCheck(this, CharacterManager);
+  }
+
+  _createClass(CharacterManager, [{
+    key: 'addController',
+    value: function addController(character) {
+      return controllers.push(new _CharacterController2.default(character));
+    }
+    /**
+     * 
+     * @param {Character} character 
+     * @returns {CharacterController}
+     */
+
+  }, {
+    key: 'getController',
+    value: function getController(character) {
+      var controller = controllers.find(function (c) {
+        return c.character === character;
+      });
+      // console.log("getting controller: ", controller);
+      return controller;
+    }
+  }, {
+    key: 'applyDamage',
+    value: function applyDamage(character, damageInfo) {
+      var _this = this;
+
+      if (character instanceof _Character2.default) {
+        character.tookDamage(damageInfo.damage, damageInfo.source);
+      } else if (character instanceof _CharacterController2.default) {
+        character.applyDamage(damageInfo);
+      }
+      (0, _messaging.broadcastPackage)(_MessageTypes2.default.TakeDamage, {
+        target: character.instanceId,
+        damage: damageInfo.damage,
+        remainingHp: character.stats.hp,
+        maxHp: character.stats.maxHp,
+        source: damageInfo.source
+      });
+      if (character.health <= 0 && !character.isDead) {
+        character.isDead = true;
+        character.deactivate();
+        (0, _messaging.broadcastPackage)(_MessageTypes2.default.PlayerDeath, {
+          target: character.instanceId,
+          source: damageInfo.source
+        });
+        _GameEngine2.default.spawnSprite(character.levelId, _SpriteTypes.SpriteTypes.BLOODSTAIN, { start: character.position });
+        setTimeout(function () {
+          _this.respawnPlayer(character, { position: _GameEngine2.default.getRandomSpawnPoint(character.levelId) });
+        }, 3000);
+      }
+    }
+  }, {
+    key: 'respawnPlayer',
+    value: function respawnPlayer(character, params) {
+      // console.log("Respawning character at: ", params.position);
+      character.isDead = false;
+      character.health = character.stats.maxHp;
+      character.setPosition(params.position);
+      character.activate();
+      (0, _messaging.broadcastPackage)(_MessageTypes2.default.PlayerRespawn, {
+        target: character.instanceId,
+        position: params.position
+      });
+    }
+  }]);
+
+  return CharacterManager;
+}();
+
+exports.default = new CharacterManager();
+
+/***/ }),
 /* 40 */
-/* unknown exports provided */
-/* all exports used */
-/*!*************************!*\
-  !*** external "crypto" ***!
-  \*************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _fs = __webpack_require__(23);
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _Level = __webpack_require__(22);
+
+var _Level2 = _interopRequireDefault(_Level);
+
+var _SpriteClassMap = __webpack_require__(17);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var levels = {};
+
+var LevelManager = function () {
+  function LevelManager() {
+    _classCallCheck(this, LevelManager);
+  }
+
+  _createClass(LevelManager, [{
+    key: 'getLevel',
+    value: function getLevel(levelId) {
+      if (!this.levels[levelId]) {
+
+        var level = new _Level2.default(levelId);
+        var levelData = this.loadFromJSONFile('./levels/level_' + levelId + '.json');
+        Object.assign(level, levelData);
+        level.populate(levelData);
+
+        if (!level) throw new Error("Level did not load. This is probably because of an invalid level ID.");
+
+        this.levels[levelId] = level;
+      }
+      return this.levels[levelId];
+    }
+    // Note: I expect this is a fairly expensive operation, so I probably don't want to do it every frame.
+
+  }, {
+    key: 'getLevelBySprite',
+    value: function getLevelBySprite(sprite) {
+      var _this = this;
+
+      var levelFound = null;
+      Object.keys(this.levels).forEach(function (levelId) {
+        // console.log("doing get level");
+        var level = _this.getLevel(levelId);
+        // console.log("got level");
+        if (level.sprites.indexOf(sprite) !== -1) {
+          levelFound = level;
+          // console.log("Found from comparison: " + levelFound.id);
+        }
+      });
+      // console.log("return level: ", levelFound);
+      return levelFound;
+    }
+  }, {
+    key: 'loadFromJSONFile',
+    value: function loadFromJSONFile(filename) {
+      var level = JSON.parse(_fs2.default.readFileSync(filename, 'utf-8'));
+
+      // console.log("Loaded Level: ", level);
+
+      level.sprites = level.sprites.map(function (s) {
+        var spriteClass = _SpriteClassMap.SpriteClassMap.get(s.type);
+        if (spriteClass) {
+          return Object.assign(new spriteClass(), s);
+        }
+        return s;
+      });
+      return level;
+    }
+  }, {
+    key: 'addSprite',
+    value: function addSprite(levelId, sprite) {
+      this.getLevel(levelId).addSprite(sprite);
+    }
+  }, {
+    key: 'removeSprite',
+    value: function removeSprite(levelId, sprite) {
+      this.getLevel(levelId).removeSprite(sprite);
+    }
+  }, {
+    key: 'levels',
+    get: function get() {
+      return levels;
+    }
+  }]);
+
+  return LevelManager;
+}();
+
+var levelManager = new LevelManager();
+
+exports.default = levelManager;
+
+/***/ }),
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _Sprite2 = __webpack_require__(0);
+
+var _Sprite3 = _interopRequireDefault(_Sprite2);
+
+var _GameEngine = __webpack_require__(3);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Bloodstain = function (_Sprite) {
+  _inherits(Bloodstain, _Sprite);
+
+  function Bloodstain() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Bloodstain);
+
+    // console.log("Creating an explosion!!!!!");
+    var _this = _possibleConstructorReturn(this, (Bloodstain.__proto__ || Object.getPrototypeOf(Bloodstain)).call(this, params));
+
+    _this.setPosition(params.start || { x: 0, y: 0 });
+    _this.setTexture('./images/BloodSplatter.png');
+
+    _this.livesUntil = +Date.now() + 1 * 1000; // one second bloodstain!
+
+    return _this;
+  }
+
+  _createClass(Bloodstain, [{
+    key: 'update',
+    value: function update(delta) {
+      if (this.livesUntil && this.livesUntil <= +Date.now()) {
+        _GameEngine2.default.despawnSprite(this);
+        return;
+      }
+      _get(Bloodstain.prototype.__proto__ || Object.getPrototypeOf(Bloodstain.prototype), 'update', this).call(this, delta);
+    }
+  }]);
+
+  return Bloodstain;
+}(_Sprite3.default);
+
+exports.default = Bloodstain;
+
+/***/ }),
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _Sprite2 = __webpack_require__(0);
+
+var _Sprite3 = _interopRequireDefault(_Sprite2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Explosion = function (_Sprite) {
+  _inherits(Explosion, _Sprite);
+
+  function Explosion() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Explosion);
+
+    var _this = _possibleConstructorReturn(this, (Explosion.__proto__ || Object.getPrototypeOf(Explosion)).call(this, params));
+
+    _this.setPosition(params.start);
+    _this.setTexture('./images/ChestClosed.png');
+    return _this;
+  }
+
+  return Explosion;
+}(_Sprite3.default);
+
+exports.default = Explosion;
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _Sprite2 = __webpack_require__(0);
+
+var _Sprite3 = _interopRequireDefault(_Sprite2);
+
+var _GameEngine = __webpack_require__(3);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Explosion = function (_Sprite) {
+  _inherits(Explosion, _Sprite);
+
+  function Explosion() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Explosion);
+
+    // console.log("Creating an explosion!!!!!");
+    var _this = _possibleConstructorReturn(this, (Explosion.__proto__ || Object.getPrototypeOf(Explosion)).call(this, params));
+
+    _this.setPosition(params.start || { x: 0, y: 0 });
+    _this.setTexture('./images/ExplosionExploding.png');
+
+    _this.livesUntil = +Date.now() + .1 * 1000; // tenth of a second explosion
+
+    return _this;
+  }
+
+  _createClass(Explosion, [{
+    key: 'update',
+    value: function update(delta) {
+      if (this.livesUntil && this.livesUntil <= +Date.now()) {
+        _GameEngine2.default.despawnSprite(this);
+        return;
+      }
+      _get(Explosion.prototype.__proto__ || Object.getPrototypeOf(Explosion.prototype), 'update', this).call(this, delta);
+    }
+  }]);
+
+  return Explosion;
+}(_Sprite3.default);
+
+exports.default = Explosion;
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _GameSettings = __webpack_require__(1);
+
+var _Sprite2 = __webpack_require__(0);
+
+var _Sprite3 = _interopRequireDefault(_Sprite2);
+
+var _ColliderTypes = __webpack_require__(4);
+
+var _ColliderTypes2 = _interopRequireDefault(_ColliderTypes);
+
+var _SpriteTypes = __webpack_require__(2);
+
+var _GameEngine = __webpack_require__(3);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var FireBall = function (_Sprite) {
+  _inherits(FireBall, _Sprite);
+
+  function FireBall() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, FireBall);
+
+    if (!params.collider) {
+      params.collider = {
+        type: _ColliderTypes2.default.RADIUS,
+        tags: ['PROJECTILE', 'FIRE'],
+        collidesWith: ['PLAYER', 'WALL']
+      };
+    }
+
+    if (!params.collider.type) params.collider.type = _ColliderTypes2.default.RADIUS;
+    if (!params.collider.tags) params.collider.tags = ['PROJECTILE', 'FIRE'];
+    if (!params.collider.collidesWith) params.collider.collidesWith = ['PLAYER', 'WALL'];
+
+    var _this = _possibleConstructorReturn(this, (FireBall.__proto__ || Object.getPrototypeOf(FireBall)).call(this, params));
+
+    var start = params.start || { x: 0, y: 0 };
+    var aim = params.aim || { x: -1, y: -1, placeholder: true };
+    var speed = params.speed || _GameSettings.GameSettings.TILE_SCALE * 25;
+    var owner = params.owner || null;
+
+    var life = params.life || .5; // Seconds to live
+
+    _this.setTexture('./images/FireballStatic.png');
+
+    //console.log("Starting fireball at: ", start);
+    _this.setPosition(start);
+    _this.aim = aim;
+    // https://gist.github.com/conorbuck/2606166
+    _this.angle = Math.atan2(aim.y - start.y, aim.x - start.x); // radians
+    //console.log("Speed is: ", speed);
+    _this.speed = speed;
+
+    _this.stats = {
+      damage: 10
+    };
+
+    // TODO: Don't hit this fireball's owner!!!! this.owner = owner;
+
+    _this.livesUntil = Date.now() + life * 1000; // 3 seconds.
+    return _this;
+  }
+
+  _createClass(FireBall, [{
+    key: 'update',
+    value: function update(delta) {
+      if (Date.now() > this.livesUntil) {
+        // console.log("Deleting fireball.");
+        this.delete();
+        return;
+      }
+
+      //this.checkCollisions();
+
+      if (this.aim.placeholder) return;
+      // SOH, CAH, TOA
+      var deltaY = Math.sin(this.angle) * this.speed * delta / 1000;
+      var deltaX = Math.cos(this.angle) * this.speed * delta / 1000;
+      this.setPosition({
+        x: this.position.x + deltaX,
+        y: this.position.y + deltaY
+      });
+    }
+  }, {
+    key: 'delete',
+    value: function _delete() {
+      throw new Error("Must override FireBall.delete() method on instances.");
+    }
+  }, {
+    key: 'onCollisionEnter',
+    value: function onCollisionEnter(otherCollider) {
+      _get(FireBall.prototype.__proto__ || Object.getPrototypeOf(FireBall.prototype), 'onCollisionEnter', this) && _get(FireBall.prototype.__proto__ || Object.getPrototypeOf(FireBall.prototype), 'onCollisionEnter', this).call(this, otherCollider);
+
+      if (otherCollider.tags.includes('PLAYER')) {
+        var otherPlayer = otherCollider.ownerGO;
+        _GameEngine2.default.CharacterManager.applyDamage(otherPlayer, { damage: this.stats.damage, source: this.ownerGO });
+        _GameEngine2.default.spawnSprite(otherPlayer.levelId, _SpriteTypes.SpriteTypes.EXPLOSION, { start: this.position });
+      } else {
+        _GameEngine2.default.spawnSprite(_GameEngine2.default.getLevelBySprite(this).id, _SpriteTypes.SpriteTypes.EXPLOSION, { start: this.position });
+      }
+
+      _GameEngine2.default.despawnSpriteByLevel(_GameEngine2.default.getLevelBySprite(this).id, this);
+    }
+  }]);
+
+  return FireBall;
+}(_Sprite3.default);
+
+exports.default = FireBall;
+
+/***/ }),
+/* 45 */,
+/* 46 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _SpriteTypes = __webpack_require__(2);
+
+var _MessageTypes = __webpack_require__(5);
+
+var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
+
+var _GameSettings = __webpack_require__(1);
+
+var _GameEngine = __webpack_require__(3);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+var _Ability2 = __webpack_require__(25);
+
+var _Ability3 = _interopRequireDefault(_Ability2);
+
+var _BlueBeam = __webpack_require__(14);
+
+var _BlueBeam2 = _interopRequireDefault(_BlueBeam);
+
+var _gx2D = __webpack_require__(6);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var BlueBeamAbility = function (_Ability) {
+  _inherits(BlueBeamAbility, _Ability);
+
+  /**
+   * BlueBeam ability
+   * @param {Object} params - Parameters for creating this ability class.
+   * @param {string} params.playerInstanceId - Instance ID of the player who this ability is assigned to.
+   */
+  function BlueBeamAbility(params) {
+    _classCallCheck(this, BlueBeamAbility);
+
+    var _this = _possibleConstructorReturn(this, (BlueBeamAbility.__proto__ || Object.getPrototypeOf(BlueBeamAbility)).call(this, params));
+
+    _this.name = 'Blue Beam';
+    _this.cooldown = 1500;
+    _this.cooldownStart = null;
+    return _this;
+  }
+
+  _createClass(BlueBeamAbility, [{
+    key: 'use',
+    value: function use(pc, params) {
+      if (this.isOnCooldown()) {
+        // TODO: some sort of feedback to the client that the ability cannot currently be used.
+        /// ie. sendPackage(...)
+      } else {
+        this.triggerCooldown();
+        var beam = new _BlueBeam2.default({
+          start: (0, _gx2D.addDistance2d)(pc.position, pc.angle - Math.PI / 2, .5 * _GameSettings.GameSettings.TILE_SCALE),
+          playerPosition: pc.position,
+          aim: pc.hasMoveTarget ? pc.moveTarget : params.aim, // If the player is moving shoot the fireball at the movement position, otherwise shoot at the mouse position.
+          speed: _GameSettings.GameSettings.TILE_SCALE * 12,
+          collider: {
+            ignoresIds: [pc.instanceId]
+          }
+        });
+
+        var sprites = _GameEngine2.default.levels[pc.levelId].sprites;
+        sprites.push(beam);
+        (0, _GameEngine.broadcastPackage)(_MessageTypes2.default.Spawn, { spawnClass: _SpriteTypes.SpriteTypes.BLUEBEAM, spawn: beam });
+
+        beam.delete = function () {
+          sprites.splice(sprites.indexOf(beam), 1);
+          (0, _GameEngine.broadcastPackage)(_MessageTypes2.default.Despawn, { spawnId: beam.instanceId });
+        };
+      }
+    }
+  }]);
+
+  return BlueBeamAbility;
+}(_Ability3.default);
+
+exports.default = BlueBeamAbility;
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _SpriteTypes = __webpack_require__(2);
+
+var _MessageTypes = __webpack_require__(5);
+
+var _MessageTypes2 = _interopRequireDefault(_MessageTypes);
+
+var _GameSettings = __webpack_require__(1);
+
+var _GameEngine = __webpack_require__(3);
+
+var _GameEngine2 = _interopRequireDefault(_GameEngine);
+
+var _Ability2 = __webpack_require__(25);
+
+var _Ability3 = _interopRequireDefault(_Ability2);
+
+var _FireBall = __webpack_require__(44);
+
+var _FireBall2 = _interopRequireDefault(_FireBall);
+
+var _gx2D = __webpack_require__(6);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var FireballAbility = function (_Ability) {
+  _inherits(FireballAbility, _Ability);
+
+  /**
+   * Fireball ability
+   * @param {Object} params - Parameters for creating this ability class.
+   * @param {string} params.playerInstanceId - Instance ID of the player who this ability is assigned to.
+   */
+  function FireballAbility(params) {
+    _classCallCheck(this, FireballAbility);
+
+    var _this = _possibleConstructorReturn(this, (FireballAbility.__proto__ || Object.getPrototypeOf(FireballAbility)).call(this, params));
+
+    _this.name = 'Fireball';
+    _this.cooldown = 500;
+    _this.cooldownStart = null;
+    return _this;
+  }
+
+  _createClass(FireballAbility, [{
+    key: 'use',
+    value: function use(pc, params) {
+      if (this.isOnCooldown()) {
+        // TODO: some sort of notification to the client that the ability cannot currently be used.
+        /// ie. sendPackage(...)
+      } else {
+        this.triggerCooldown();
+        var fireball = new _FireBall2.default({
+          start: (0, _gx2D.addDistance2d)(pc.position, pc.angle - Math.PI / 2, .5 * _GameSettings.GameSettings.TILE_SCALE),
+          aim: pc.hasMoveTarget ? pc.moveTarget : params.aim, // If the player is moving shoot the fireball at the movement position, otherwise shoot at the mouse position.
+          speed: _GameSettings.GameSettings.TILE_SCALE * 12,
+          collider: {
+            ignoresIds: [pc.instanceId]
+          }
+        });
+
+        var sprites = _GameEngine2.default.levels[pc.levelId].sprites;
+        sprites.push(fireball);
+        (0, _GameEngine.broadcastPackage)(_MessageTypes2.default.Spawn, { spawnClass: _SpriteTypes.SpriteTypes.FIREBALL, spawn: fireball });
+
+        fireball.delete = function () {
+          sprites.splice(sprites.indexOf(fireball), 1);
+          (0, _GameEngine.broadcastPackage)(_MessageTypes2.default.Despawn, { spawnId: fireball.instanceId });
+        };
+      }
+    }
+  }]);
+
+  return FireballAbility;
+}(_Ability3.default);
+
+exports.default = FireballAbility;
+
+/***/ }),
+/* 48 */,
+/* 49 */
 /***/ (function(module, exports) {
 
-eval("module.exports = require(\"crypto\");//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiNDAuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vZXh0ZXJuYWwgXCJjcnlwdG9cIj9lZjQ5Il0sInNvdXJjZXNDb250ZW50IjpbIm1vZHVsZS5leHBvcnRzID0gcmVxdWlyZShcImNyeXB0b1wiKTtcblxuXG4vLy8vLy8vLy8vLy8vLy8vLy9cbi8vIFdFQlBBQ0sgRk9PVEVSXG4vLyBleHRlcm5hbCBcImNyeXB0b1wiXG4vLyBtb2R1bGUgaWQgPSA0MFxuLy8gbW9kdWxlIGNodW5rcyA9IDAiXSwibWFwcGluZ3MiOiJBQUFBIiwic291cmNlUm9vdCI6IiJ9");
+module.exports = require("crypto");
+
+/***/ }),
+/* 50 */,
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var SpriteImage = function () {
+  /**
+   * Base Image class for multiplayer game
+   * @param {Object} params 
+   * @param {String} params.source
+   * @param {Boolean} params.animated
+   * @param {Number} params.frameWidth
+   * @param {Number} params.frameHeight
+   * @param {Number} params.frameRate - Frames per second.
+   */
+  function SpriteImage(_ref) {
+    var _this = this;
+
+    var source = _ref.source,
+        animated = _ref.animated,
+        frameWidth = _ref.frameWidth,
+        frameHeight = _ref.frameHeight,
+        frameRate = _ref.frameRate,
+        frames = _ref.frames;
+
+    _classCallCheck(this, SpriteImage);
+
+    this.imageElement = new Image(source);
+    this.animated = animated || false;
+    this.frameWidth = frameWidth || 32;
+    this.frameHeight = frameHeight || 32;
+    this.frameRate = frameRate || 30;
+    this.frames = 0;
+
+    this.imageElement.style.objectFit = 'none';
+    this.imageElement.style.width = this.frameWidth + "px";
+    this.imageElement.style.height = this.frameHeight + "px";
+
+    if (this.animated) {
+      this.createdAt = +Date.now();
+
+      this.imageElement.addEventListener('load', function () {
+        _this.frames = _this.imageElement.width / _this.frameWidth;
+      });
+    }
+  }
+
+  _createClass(SpriteImage, [{
+    key: "getFrame",
+    value: function getFrame() {
+      if (this.animated) {
+        var currentFrame = parseInt((+Date.now() - this.createdAt) / 1000 * this.frameRate) % this.frames;
+        this.imageElement.style.objectPosition = "-" + this.frameWidth * currentFrame + "px 0";
+      }
+      return this.imageElement;
+    }
+  }]);
+
+  return SpriteImage;
+}();
+
+exports.default = SpriteImage;
 
 /***/ })
 /******/ ]);
+//# sourceMappingURL=app.bundle.js.map

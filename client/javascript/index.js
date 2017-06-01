@@ -157,6 +157,8 @@ function startSocketClient() {
         if(message.spawnClass === SpriteTypes.PLAYER) {
           console.log("Player spawned: ", message.spawn.instanceId);
           console.log('Spawn info: ', message);
+        } else if(message.spawnClass === SpriteTypes.BLUEBEAM) {
+          console.log("SPECIAL BEAM CANNON!")
         }
         // const spawnClass = SpriteClassMap.get(message.spawnClass);
         if(message.spawn.instanceId === playerCharacter.instanceId) return;
@@ -261,6 +263,7 @@ const sendLogin = (username, password) => {
 }
 
 const classifySprite = function classifySprite(sprite, spriteClassTag) {
+  sprite.spriteClassTag = spriteClassTag;
   if(!spriteClassTag) return sprite;
   const spriteClass = ClientSpriteClassMap.get(spriteClassTag);
   if(!spriteClass || sprite instanceof spriteClass) return sprite;
@@ -368,6 +371,10 @@ const drawSprites = function drawSprites() {
       return;
     }
 
+    if(sprite.spriteClassTag === SpriteTypes.BLUEBEAM) {
+      console.log("draw not called for beam.");
+    }
+
     const imageSource = sprite.texture || SpriteTextureMap.get(sprite.type);
     if(imageSource === undefined) console.log("undefined darnit.", sprite);
     drawSprite(sprite.position.x, sprite.position.y, imageSource, sprite.angle || 0);
@@ -386,8 +393,8 @@ const drawHUD = function drawHUD() {
 
   const characters = sprites.filter(s => s instanceof Character);
   characters.forEach(character => {
-    if(character.instanceId !== playerCharacter.instanceId)
-      console.log("checking visibility.");
+    // if(character.instanceId !== playerCharacter.instanceId)
+      // console.log("checking visibility.");
 
     const bounds = {
       left: 0,

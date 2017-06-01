@@ -3,9 +3,8 @@ import { GameSettings } from '../GameSettings';
 import Sprite from './Sprite';
 import ColliderTypes from '../ColliderTypes';
 import { SpriteTypes } from '../SpriteTypes';
-import MessageTypes from '../MessageTypes';
 
-import World, { broadcastPackage } from '../GameEngine';
+import World from '../GameEngine';
 
 class FireBall extends Sprite {
   constructor(params = {}) {

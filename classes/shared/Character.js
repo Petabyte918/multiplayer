@@ -4,9 +4,10 @@ import ColliderTypes from '../ColliderTypes';
 import ProgressBar from '../client/ProgressBar';
 
 class Character extends Sprite {
-  constructor(paramObject = {}) {
-    if(!paramObject.collider) paramObject.collider = { type: ColliderTypes.RADIUS }
-    super(paramObject);
+  constructor(params = {}) {
+    if(!params.collider) params.collider = { type: ColliderTypes.RADIUS }
+    params.abilities = params.abilities || ['FIREBALL'];
+    super(params);
   }
 
   canCast(spellId) {
